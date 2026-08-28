@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biblioteca Central</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f1ecdc;
+    --paper-raised: #f8f4e8;
+    --ink: #2a2420;
+    --ink-soft: #5c5346;
+    --pine: #1f4b3f;
+    --pine-soft: #e4ece7;
+    --oak: #8b5a34;
+    --stamp: #ab3a2e;
+    --stamp-soft: #f3e2dc;
+    --line: #d9cfb8;
+    --font-stamp: 'Special Elite', 'Courier New', monospace;
+    --font-body: 'Archivo', system-ui, sans-serif;
+    --font-mono: 'Space Mono', 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  body {
+    font-family: var(--font-body);
+    max-width: 920px;
+    margin: 32px auto 80px;
+    padding: 0 20px;
+    color: var(--ink);
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px);
+    background-size: 100% 2.1em;
+    background-position: 0 148px;
+  }
+
+  ::selection { background: var(--pine); color: var(--paper); }
+
+  a, button, input, select, [tabindex] {
+    outline-offset: 2px;
+  }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--pine);
+  }
+
+  .masthead {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 22px 0 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 6px;
+  }
+  .masthead-mark {
+    flex: none;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 3px double var(--pine);
+    background: var(--pine-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-stamp);
+    font-size: 1.4rem;
+    color: var(--pine);
+    transform: rotate(-6deg);
+  }
+  h1 {
+    font-family: var(--font-stamp);
+    font-size: 1.65rem;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+  .tagline {
+    margin: 5px 0 0;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  h2 {
+    font-family: var(--font-stamp);
+    font-weight: 400;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    margin: 0 0 10px;
+    padding-left: 14px;
+    border-left: 3px solid var(--oak);
+  }
+  .section-title { margin-top: 28px; }
+
+  .tabs { display: flex; gap: 4px; margin: 8px 0 0; border-bottom: 2px solid var(--ink); flex-wrap: wrap; }
+  .tab-btn {
+    font-family: var(--font-stamp);
+    padding: 9px 18px 8px;
+    margin-top: 0;
+    width: auto;
+    border: 2px solid var(--ink);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: var(--line);
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transform: translateY(2px);
+  }
+  .tab-btn:hover { color: var(--ink); background: var(--paper-raised); }
+  .tab-btn.active {
+    color: var(--pine);
+    background: var(--paper-raised);
+    transform: translateY(0);
+    box-shadow: 0 -2px 0 var(--paper-raised) inset;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: settle 0.28s ease-out; }
+
+  @keyframes settle {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  label { display: block; margin-top: 14px; font-weight: 600; font-size: 0.82rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+  select, input {
+    margin-top: 5px;
+    padding: 9px 10px;
+    font-size: 0.95rem;
+    font-family: var(--font-body);
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-bottom: 2px solid var(--oak);
+    border-radius: 3px;
+    color: var(--ink);
+  }
+  input[type="checkbox"] { width: auto; }
+
+  button {
+    margin-top: 18px;
+    cursor: pointer;
+    background: var(--pine);
+    color: var(--paper-raised);
+    border: 1.5px solid var(--pine);
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-family: var(--font-stamp);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.85rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  button:hover { transform: translateY(-1px); box-shadow: 0 3px 0 rgba(31,75,63,0.25); }
+  button:active { transform: translateY(0); box-shadow: none; }
+
+  button.danger { background: var(--stamp); border-color: var(--stamp); margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
+  button.danger:hover { box-shadow: 0 3px 0 rgba(171,58,46,0.3); }
+  button.secondary { background: transparent; color: var(--oak); border: 1.5px solid var(--oak); margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
+  button.secondary:hover { background: var(--oak); color: var(--paper-raised); box-shadow: none; }
+  button.ghost { background: transparent; color: var(--ink-soft); border: 1.5px solid transparent; margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
+  button.ghost:hover { border-color: var(--line); background: var(--paper); color: var(--ink); transform: none; box-shadow: none; }
+  button.success { background: var(--pine); border-color: var(--pine); margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
+  button.cancel { background: var(--ink-soft); border-color: var(--ink-soft); }
+
+  .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .result {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 3px;
+    white-space: pre-wrap;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    border-left: 3px solid;
+  }
+  .ok { background: var(--pine-soft); color: var(--pine); border-color: var(--pine); }
+  .error { background: var(--stamp-soft); color: var(--stamp); border-color: var(--stamp); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    font-family: var(--font-stamp);
+    font-weight: 400;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--paper-raised);
+    background: var(--pine);
+    white-space: nowrap;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tbody tr:nth-child(even) td { background: var(--paper); }
+  tbody tr:hover td { background: var(--pine-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .table-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-top: 8px;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--line);
+  }
+
+  .card {
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    border-radius: 4px;
+    padding: 18px 18px 20px;
+    margin-top: 18px;
+    box-shadow: 3px 3px 0 var(--line);
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--font-stamp);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.66rem;
+    padding: 3px 11px;
+    border: 3px double currentColor;
+    border-radius: 999px;
+    background: transparent;
+    transform: rotate(-2deg);
+    animation: stamp 0.18s ease-out;
+  }
+  @keyframes stamp {
+    from { opacity: 0; transform: rotate(-2deg) scale(1.3); }
+    to { opacity: 1; transform: rotate(-2deg) scale(1); }
+  }
+  .badge-active { color: var(--pine); }
+  .badge-inactive { color: var(--ink-soft); }
+  .badge-overdue { color: var(--stamp); }
+  .badge-returned { color: var(--oak); }
+  .badge-unpaid { color: var(--stamp); }
+  .badge-paid { color: var(--oak); }
+
+  .inline-stock { display: flex; gap: 4px; align-items: center; }
+  .inline-stock input { width: 60px; margin-top: 0; padding: 6px; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(42,36,32,0.5);
+    align-items: center;
+    justify-content: center;
+    animation: veil 0.15s ease;
+  }
+  .modal-overlay.open { display: flex; }
+  @keyframes veil { from { background: rgba(42,36,32,0); } to { background: rgba(42,36,32,0.5); } }
+
+  .modal {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 24px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 6px 6px 0 var(--ink);
+    animation: settle 0.2s ease-out;
+  }
+
+  .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid var(--ink); }
+  .modal-head .eyebrow { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--oak); margin: 0 0 4px; }
+  .modal h2 { border-left: none; padding-left: 0; margin: 0; font-size: 1.2rem; }
+  .modal-close { flex: none; margin: 0; }
+
+  .modal h3 {
+    font-family: var(--font-stamp);
+    font-weight: 400;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin: 24px 0 8px;
+  }
+  .modal h3:first-of-type { margin-top: 20px; }
+
+  .empty-note {
+    display: block;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    padding: 18px 10px !important;
+  }
+</style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-mark" aria-hidden="true">B°</div>
+    <div>
+      <h1>Biblioteca Central</h1>
+      <p class="tagline">registro de préstamos · catálogo · fichero de socios</p>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="loans">Préstamos</button>
+    <button class="tab-btn" data-tab="books">Libros</button>
+    <button class="tab-btn" data-tab="users">Usuarios</button>
+    <button class="tab-btn" data-tab="debts">Deudas</button>
+  </div>
+
+  <!-- ==================== PRÉSTAMOS ==================== -->
+  <section id="tab-loans" class="tab-panel active">
+    <div class="card">
+      <h2>Solicitar préstamo</h2>
+      <label for="loanUserId">Usuario</label>
+      <select id="loanUserId"></select>
+
+      <label for="loanBookId">Libro</label>
+      <select id="loanBookId"></select>
+
+      <button id="loanSubmit">Solicitar préstamo (14 días)</button>
+      <div id="loanResult" class="result" style="display:none"></div>
+    </div>
+
+    <h2 class="section-title">
+      Historial de préstamos
+      <label style="display:inline-block; font-weight:normal; margin-left:12px;">
+        <input type="checkbox" id="onlyOverdue"> mostrar solo vencidos
+      </label>
+    </h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Usuario</th><th>Libro</th><th>Vencimiento</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="loansTableBody"></tbody>
+    </table></div>
+  </section>
+
+  <!-- ==================== LIBROS ==================== -->
+  <section id="tab-books" class="tab-panel">
+    <div class="card">
+      <h2 id="bookFormTitle">Agregar libro</h2>
+      <label for="bookTitle">Título</label>
+      <input id="bookTitle" type="text">
+
+      <label for="bookAuthor">Autor</label>
+      <input id="bookAuthor" type="text">
+
+      <label for="bookCopies" id="bookCopiesLabel">Copias iniciales</label>
+      <input id="bookCopies" type="number" min="0" value="1">
+
+      <button id="bookSubmit">Agregar libro</button>
+      <button id="bookCancelEdit" class="cancel" style="display:none">Cancelar edición</button>
+      <div id="bookResult" class="result" style="display:none"></div>
+    </div>
+
+    <h2 class="section-title">Catálogo</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Título</th><th>Autor</th><th>Copias</th><th>Agregar stock</th><th></th></tr></thead>
+      <tbody id="booksTableBody"></tbody>
+    </table></div>
+  </section>
+
+  <!-- ==================== USUARIOS ==================== -->
+  <section id="tab-users" class="tab-panel">
+    <div class="card">
+      <h2 id="userFormTitle">Agregar usuario</h2>
+      <label for="userName">Nombre</label>
+      <input id="userName" type="text">
+
+      <label for="userEmail">Email</label>
+      <input id="userEmail" type="email">
+
+      <button id="userSubmit">Agregar usuario</button>
+      <button id="userCancelEdit" class="cancel" style="display:none">Cancelar edición</button>
+      <div id="userResult" class="result" style="display:none"></div>
+    </div>
+
+    <h2 class="section-title">Usuarios registrados</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Nombre</th><th>Email</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="usersTableBody"></tbody>
+    </table></div>
+  </section>
+
+  <!-- ==================== DEUDAS ==================== -->
+  <section id="tab-debts" class="tab-panel">
+    <h2 class="section-title">Todas las deudas</h2>
+    <div id="debtResult" class="result" style="display:none"></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Usuario</th><th>Monto</th><th>Generada</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="debtsTableBody"></tbody>
+    </table></div>
+  </section>
+
+  <!-- ==================== MODAL DETALLE USUARIO ==================== -->
+  <div class="modal-overlay" id="userDetailOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">Ficha de socio</p>
+          <h2><span id="userDetailName"></span></h2>
+        </div>
+        <button class="secondary modal-close" id="userDetailClose">Cerrar</button>
+      </div>
+      <h3>Préstamos</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Libro</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+        <tbody id="userDetailLoans"></tbody>
+      </table></div>
+      <h3>Deudas</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Monto</th><th>Generada</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="userDetailDebts"></tbody>
+      </table></div>
+      <div id="modalResult" class="result" style="display:none"></div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Navegación entre pestañas ----------
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    function showResult(el, ok, message) {
+      el.style.display = 'block';
+      el.className = 'result ' + (ok ? 'ok' : 'error');
+      el.textContent = message;
+    }
+
+    function errorMessage(data) {
+      return data?.error ?? 'Ocurrió un error inesperado.';
+    }
+
+    function fmtDate(iso) {
+      return new Date(iso).toLocaleDateString();
+    }
+
+    function loanBadge(l) {
+      if (l.status === 'RETURNED') return '<span class="badge badge-returned">Devuelto</span>';
+      const isOverdue = new Date(l.dueDate).getTime() < Date.now();
+      return isOverdue
+        ? '<span class="badge badge-overdue">Vencido</span>'
+        : '<span class="badge badge-active">Activo</span>';
+    }
+
+    async function fetchJson(url, options) {
+      const res = await fetch(url, options);
+      const data = res.status === 204 ? null : await res.json();
+      return { ok: res.ok, data };
+    }
+
+    let allUsers = [];
+    let allBooks = [];
+    let allLoans = [];
+
+    async function loadAll() {
+      [allUsers, allBooks] = await Promise.all([
+        fetchJson('/api/v1/users').then((r) => r.data),
+        fetchJson('/api/v1/books').then((r) => r.data),
+      ]);
+      renderLoanForm();
+      renderBooksTable();
+      renderUsersTable();
+      await loadLoans();
+      await loadDebts();
+    }
+
+    // ---------- Préstamos ----------
+    function renderLoanForm() {
+      document.getElementById('loanUserId').innerHTML = allUsers
+        .filter((u) => u.status === 'ACTIVE')
+        .map((u) => `<option value="${u.id}">${u.name}</option>`)
+        .join('');
+      document.getElementById('loanBookId').innerHTML = allBooks
+        .map((b) => `<option value="${b.id}">${b.title} (${b.availableCopies}/${b.totalCopies} disp.)</option>`)
+        .join('');
+    }
+
+    async function loadLoans() {
+      const overdue = document.getElementById('onlyOverdue').checked;
+      const { data: loans } = await fetchJson('/api/v1/loans' + (overdue ? '?overdue=true' : ''));
+      allLoans = loans;
+      const userName = (id) => allUsers.find((u) => u.id === id)?.name ?? id;
+
+      document.getElementById('loansTableBody').innerHTML = loans
+        .slice()
+        .reverse()
+        .map((l) => {
+          const badge = loanBadge(l);
+          const action = l.status === 'ACTIVE'
+            ? `<button class="success" data-return-loan="${l.id}">Devolver</button>`
+            : '';
+          return `<tr>
+            <td>${userName(l.userId)}</td>
+            <td>${l.bookTitle ?? l.bookCopyId}</td>
+            <td>${fmtDate(l.dueDate)}</td>
+            <td>${badge}</td>
+            <td>${action}</td>
+          </tr>`;
+        })
+        .join('');
+
+      document.querySelectorAll('[data-return-loan]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const { ok, data } = await fetchJson(`/api/v1/loans/${btn.dataset.returnLoan}/return`, { method: 'POST' });
+          const message = ok
+            ? data.fineAmount > 0
+              ? `Devolución registrada con atraso: se generó una deuda de $${data.fineAmount}.`
+              : 'Devolución registrada a tiempo, sin multas.'
+            : errorMessage(data);
+          showResult(document.getElementById('loanResult'), ok, message);
+          if (ok) await loadAll();
+        });
+      });
+    }
+
+    document.getElementById('onlyOverdue').addEventListener('change', loadLoans);
+
+    document.getElementById('loanSubmit').addEventListener('click', async () => {
+      const userId = document.getElementById('loanUserId').value;
+      const bookId = document.getElementById('loanBookId').value;
+      const userName = allUsers.find((u) => u.id === userId)?.name ?? '';
+      const bookTitle = allBooks.find((b) => b.id === bookId)?.title ?? '';
+      const { ok, data } = await fetchJson('/api/v1/loans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, bookId }),
+      });
+      const message = ok
+        ? `Préstamo registrado: "${bookTitle}" para ${userName}. Vence el ${fmtDate(data.dueDate)}.`
+        : errorMessage(data);
+      showResult(document.getElementById('loanResult'), ok, message);
+      if (ok) await loadAll();
+    });
+
+    // ---------- Libros ----------
+    let editingBookId = null;
+
+    function renderBooksTable() {
+      document.getElementById('booksTableBody').innerHTML = allBooks
+        .map(
+          (b) => `<tr>
+            <td>${b.title}</td>
+            <td>${b.author}</td>
+            <td>${b.availableCopies}/${b.totalCopies}</td>
+            <td>
+              <div class="inline-stock">
+                <input type="number" min="1" value="1" id="stock-${b.id}">
+                <button class="secondary" data-add-stock="${b.id}">Agregar</button>
+              </div>
+            </td>
+            <td class="row-actions">
+              <button class="secondary" data-edit-book="${b.id}">Editar</button>
+              <button class="danger" data-delete-book="${b.id}">Eliminar</button>
+            </td>
+          </tr>`
+        )
+        .join('');
+
+      document.querySelectorAll('[data-delete-book]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const book = allBooks.find((b) => b.id === btn.dataset.deleteBook);
+          const { ok, data } = await fetchJson(`/api/v1/books/${btn.dataset.deleteBook}`, { method: 'DELETE' });
+          const message = ok ? `Se eliminó "${book?.title ?? ''}" del catálogo.` : errorMessage(data);
+          showResult(document.getElementById('bookResult'), ok, message);
+          await loadAll();
+        });
+      });
+
+      document.querySelectorAll('[data-edit-book]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const book = allBooks.find((b) => b.id === btn.dataset.editBook);
+          if (!book) return;
+          editingBookId = book.id;
+          document.getElementById('bookTitle').value = book.title;
+          document.getElementById('bookAuthor').value = book.author;
+          document.getElementById('bookCopiesLabel').style.display = 'none';
+          document.getElementById('bookCopies').style.display = 'none';
+          document.getElementById('bookFormTitle').textContent = 'Editar libro';
+          document.getElementById('bookSubmit').textContent = 'Guardar cambios';
+          document.getElementById('bookCancelEdit').style.display = 'block';
+        });
+      });
+
+      document.querySelectorAll('[data-add-stock]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const bookId = btn.dataset.addStock;
+          const book = allBooks.find((b) => b.id === bookId);
+          const quantity = Number(document.getElementById(`stock-${bookId}`).value);
+          const { ok, data } = await fetchJson(`/api/v1/books/${bookId}/stock`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quantity }),
+          });
+          const message = ok
+            ? `Se agregaron ${quantity} copia${quantity === 1 ? '' : 's'} a "${book?.title ?? ''}".`
+            : errorMessage(data);
+          showResult(document.getElementById('bookResult'), ok, message);
+          await loadAll();
+        });
+      });
+    }
+
+    function resetBookForm() {
+      editingBookId = null;
+      document.getElementById('bookTitle').value = '';
+      document.getElementById('bookAuthor').value = '';
+      document.getElementById('bookCopies').value = '1';
+      document.getElementById('bookCopiesLabel').style.display = 'block';
+      document.getElementById('bookCopies').style.display = 'block';
+      document.getElementById('bookFormTitle').textContent = 'Agregar libro';
+      document.getElementById('bookSubmit').textContent = 'Agregar libro';
+      document.getElementById('bookCancelEdit').style.display = 'none';
+    }
+
+    document.getElementById('bookCancelEdit').addEventListener('click', resetBookForm);
+
+    document.getElementById('bookSubmit').addEventListener('click', async () => {
+      const title = document.getElementById('bookTitle').value;
+      const author = document.getElementById('bookAuthor').value;
+      const isEditing = !!editingBookId;
+      const url = isEditing ? `/api/v1/books/${editingBookId}` : '/api/v1/books';
+      const method = isEditing ? 'PUT' : 'POST';
+      const initialCopies = Number(document.getElementById('bookCopies').value);
+      const body = isEditing ? { title, author } : { title, author, initialCopies };
+      const { ok, data } = await fetchJson(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const message = ok
+        ? isEditing
+          ? `Se actualizó "${data.title}".`
+          : `Se agregó "${data.title}" al catálogo con ${initialCopies} copia${initialCopies === 1 ? '' : 's'}.`
+        : errorMessage(data);
+      showResult(document.getElementById('bookResult'), ok, message);
+      if (ok) {
+        resetBookForm();
+        await loadAll();
+      }
+    });
+
+    // ---------- Usuarios ----------
+    let editingUserId = null;
+
+    function renderUsersTable() {
+      document.getElementById('usersTableBody').innerHTML = allUsers
+        .map((u) => {
+          const badge = u.status === 'ACTIVE'
+            ? '<span class="badge badge-active">Activo</span>'
+            : '<span class="badge badge-inactive">Inactivo</span>';
+          const statusBtn = u.status === 'ACTIVE'
+            ? `<button class="secondary" data-toggle-status="${u.id}" data-next-status="INACTIVE">Desactivar</button>`
+            : `<button class="secondary" data-toggle-status="${u.id}" data-next-status="ACTIVE">Activar</button>`;
+          return `<tr>
+            <td>${u.name}</td>
+            <td>${u.email}</td>
+            <td>${badge}</td>
+            <td class="row-actions">
+              <button class="ghost" data-view-user="${u.id}">Ver detalle</button>
+              <button class="secondary" data-edit-user="${u.id}">Editar</button>
+              ${statusBtn}
+              <button class="danger" data-delete-user="${u.id}">Eliminar</button>
+            </td>
+          </tr>`;
+        })
+        .join('');
+
+      document.querySelectorAll('[data-delete-user]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const user = allUsers.find((u) => u.id === btn.dataset.deleteUser);
+          const { ok, data } = await fetchJson(`/api/v1/users/${btn.dataset.deleteUser}`, { method: 'DELETE' });
+          const message = ok ? `Se eliminó a ${user?.name ?? ''} del fichero.` : errorMessage(data);
+          showResult(document.getElementById('userResult'), ok, message);
+          await loadAll();
+        });
+      });
+
+      document.querySelectorAll('[data-toggle-status]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const user = allUsers.find((u) => u.id === btn.dataset.toggleStatus);
+          const nextStatus = btn.dataset.nextStatus;
+          const { ok, data } = await fetchJson(`/api/v1/users/${btn.dataset.toggleStatus}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: nextStatus }),
+          });
+          const message = ok
+            ? `${user?.name ?? 'El socio'} fue ${nextStatus === 'ACTIVE' ? 'activado' : 'desactivado'}.`
+            : errorMessage(data);
+          showResult(document.getElementById('userResult'), ok, message);
+          await loadAll();
+        });
+      });
+
+      document.querySelectorAll('[data-edit-user]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const user = allUsers.find((u) => u.id === btn.dataset.editUser);
+          if (!user) return;
+          editingUserId = user.id;
+          document.getElementById('userName').value = user.name;
+          document.getElementById('userEmail').value = user.email;
+          document.getElementById('userFormTitle').textContent = 'Editar usuario';
+          document.getElementById('userSubmit').textContent = 'Guardar cambios';
+          document.getElementById('userCancelEdit').style.display = 'block';
+        });
+      });
+
+      document.querySelectorAll('[data-view-user]').forEach((btn) => {
+        btn.addEventListener('click', () => openUserDetail(btn.dataset.viewUser));
+      });
+    }
+
+    function resetUserForm() {
+      editingUserId = null;
+      document.getElementById('userName').value = '';
+      document.getElementById('userEmail').value = '';
+      document.getElementById('userFormTitle').textContent = 'Agregar usuario';
+      document.getElementById('userSubmit').textContent = 'Agregar usuario';
+      document.getElementById('userCancelEdit').style.display = 'none';
+    }
+
+    document.getElementById('userCancelEdit').addEventListener('click', resetUserForm);
+
+    document.getElementById('userSubmit').addEventListener('click', async () => {
+      const name = document.getElementById('userName').value;
+      const email = document.getElementById('userEmail').value;
+      const isEditing = !!editingUserId;
+      const url = isEditing ? `/api/v1/users/${editingUserId}` : '/api/v1/users';
+      const method = isEditing ? 'PUT' : 'POST';
+      const { ok, data } = await fetchJson(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email }),
+      });
+      const message = ok
+        ? isEditing
+          ? `Se actualizaron los datos de ${data.name}.`
+          : `Se registró a ${data.name} como socio.`
+        : errorMessage(data);
+      showResult(document.getElementById('userResult'), ok, message);
+      if (ok) {
+        resetUserForm();
+        await loadAll();
+      }
+    });
+
+    // ---------- Detalle de usuario (modal) ----------
+    async function openUserDetail(userId) {
+      const user = allUsers.find((u) => u.id === userId);
+      const [loansRes, debtsRes] = await Promise.all([
+        fetchJson(`/api/v1/users/${userId}/loans`),
+        fetchJson(`/api/v1/users/${userId}/debts`),
+      ]);
+
+      document.getElementById('userDetailName').textContent = user ? user.name : userId;
+
+      document.getElementById('userDetailLoans').innerHTML = loansRes.data
+        .map((l) => `<tr><td>${l.bookTitle ?? l.bookCopyId}</td><td>${fmtDate(l.dueDate)}</td><td>${loanBadge(l)}</td></tr>`)
+        .join('') || '<tr><td colspan="3" class="empty-note">Sin préstamos.</td></tr>';
+
+      document.getElementById('userDetailDebts').innerHTML = debtsRes.data
+        .map((d) => `<tr>
+          <td>${d.amount}</td>
+          <td>${fmtDate(d.createdAt)}</td>
+          <td>${d.paid ? '<span class="badge badge-paid">Pagada</span>' : '<span class="badge badge-unpaid">Impaga</span>'}</td>
+          <td>${d.paid ? '' : `<button class="success" data-pay-debt="${d.id}">Marcar pagada</button>`}</td>
+        </tr>`)
+        .join('') || '<tr><td colspan="4" class="empty-note">Sin deudas.</td></tr>';
+
+      document.querySelectorAll('[data-pay-debt]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const { ok, data } = await fetchJson(`/api/v1/debts/${btn.dataset.payDebt}/pay`, { method: 'POST' });
+          const message = ok ? `Se registró el pago de $${data.amount}.` : errorMessage(data);
+          await openUserDetail(userId);
+          showResult(document.getElementById('modalResult'), ok, message);
+          await loadDebts();
+        });
+      });
+
+      document.getElementById('userDetailOverlay').classList.add('open');
+    }
+
+    document.getElementById('userDetailClose').addEventListener('click', () => {
+      document.getElementById('userDetailOverlay').classList.remove('open');
+    });
+
+    // ---------- Deudas ----------
+    async function loadDebts() {
+      const { data: debts } = await fetchJson('/api/v1/debts');
+      const userName = (id) => allUsers.find((u) => u.id === id)?.name ?? id;
+
+      document.getElementById('debtsTableBody').innerHTML = debts
+        .slice()
+        .reverse()
+        .map((d) => `<tr>
+          <td>${userName(d.userId)}</td>
+          <td>${d.amount}</td>
+          <td>${fmtDate(d.createdAt)}</td>
+          <td>${d.paid ? '<span class="badge badge-paid">Pagada</span>' : '<span class="badge badge-unpaid">Impaga</span>'}</td>
+          <td>${d.paid ? '' : `<button class="success" data-pay-debt-global="${d.id}">Marcar pagada</button>`}</td>
+        </tr>`)
+        .join('');
+
+      document.querySelectorAll('[data-pay-debt-global]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const { ok, data } = await fetchJson(`/api/v1/debts/${btn.dataset.payDebtGlobal}/pay`, { method: 'POST' });
+          const message = ok ? `Se registró el pago de $${data.amount} de ${userName(data.userId)}.` : errorMessage(data);
+          await loadDebts();
+          showResult(document.getElementById('debtResult'), ok, message);
+        });
+      });
+    }
+
+    loadAll();
+  </script>
+</body>
+</html>
