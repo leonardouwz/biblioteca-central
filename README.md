@@ -5,8 +5,9 @@ Sistema de Gestión de Préstamos de Biblioteca. Arquitectura N-Capas (Presentac
 ```
 biblioteca-n-capas/
   backend/     API Express + TS (presentation / domain / infrastructure)
-  frontend/    HTML/CSS/JS estático, sin framework ni build
-  database/    Esquema SQL + archivo de datos SQLite
+               backend/database/schema.postgres.sql viaja con el módulo (deploy autocontenido)
+  frontend/    HTML/CSS/JS estático, sin framework ni build (wrangler.jsonc para Cloudflare Workers)
+  database/    Esquema SQL (SQLite) + archivo de datos, solo para desarrollo local
 ```
 
 ## Ejecutar en local
@@ -17,36 +18,35 @@ npm install
 npm run dev
 ```
 
-Abrir `http://localhost:3000` (el backend sirve el frontend estático y expone la API en `/api/v1`).
+Abrir `http://localhost:3000` (el backend sirve el frontend estático y expone la API en `/api/v1`). Sin `DATABASE_URL` configurada, usa SQLite local automáticamente — no hace falta Supabase para desarrollar.
 
 La base de datos SQLite se crea sola en `database/biblioteca.sqlite` la primera vez que arranca el backend, aplicando `database/schema.sql`.
 
-## Despliegue por módulos
+## Arquitectura de despliegue (producción)
 
-Cada carpeta se puede desplegar de forma independiente:
+```
+Cloudflare Workers (frontend estático)
+        │  fetch('https://biblioteca-backend-....run.app/api/v1/...')
+        ▼
+Google Cloud Run (backend Express)
+        │  DATABASE_URL (Secret Manager)
+        ▼
+Supabase (Postgres, vía pooler Supavisor)
+```
 
-- **backend/**: cualquier host Node (Railway, Render, VPS, etc.). Variables de entorno:
-  - `PORT` (default `3000`)
-  - `DATABASE_PATH` (default `../database/biblioteca.sqlite`) — apuntar a un volumen persistente en producción.
-  - `SCHEMA_PATH` (default `../database/schema.sql`)
-- **frontend/**: es HTML/CSS/JS puro, se puede servir desde cualquier hosting estático (Netlify, Vercel, S3, nginx) o dejar que el propio backend lo sirva (comportamiento actual). Si se separa a otro dominio, hay que editar las URLs `fetch('/api/v1/...')` para apuntar a la URL pública del backend.
-- **database/**: `schema.sql` es la fuente de verdad del esquema; `biblioteca.sqlite` es el archivo de datos. Para producción con múltiples instancias del backend, reemplazar SQLite por un servidor de base de datos aparte (Postgres, etc.) implementando las mismas interfaces de repositorio (`IBookRepository`, `IUserRepository`, `ILoanRepository`, `IDebtRepository`) — el resto de la app no cambia gracias a la Inversión de Dependencias.
+- **Frontend** — https://biblioteca-central.readuls.workers.dev
+  Desplegado como Worker de assets estáticos (sin build, `frontend/wrangler.jsonc`). `frontend/index.html` apunta al backend vía la constante `API_BASE_URL` (buscarla si el backend cambia de URL).
+  Redeploy: `cd frontend && npx wrangler deploy`
 
-## Despliegue en Render (link público)
+- **Backend** — https://biblioteca-backend-438047115829.us-central1.run.app
+  Desplegado en Cloud Run directo desde el código fuente (Google Buildpacks, sin Dockerfile). CORS abierto (`cors()` sin restricción de origen — no hay autenticación en la API). El módulo es autocontenido: `backend/database/schema.postgres.sql` viaja dentro de `backend/` para que el deploy funcione sin las carpetas hermanas.
+  Redeploy: `gcloud run deploy biblioteca-backend --source backend --region us-central1 --project biblioteca-central-2026 --allow-unauthenticated --set-secrets=DATABASE_URL=database-url:latest`
 
-1. Subir el repo a GitHub.
-2. En [Render](https://render.com) → **New → Web Service** → conectar el repo.
-3. Configurar:
-   - **Root Directory**: `backend`
-   - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm start`
-   - **Environment**: Node (Render detecta la versión vía `engines` en `backend/package.json`, ya fijada en `>=22.5.0` porque el proyecto usa el módulo nativo `node:sqlite`)
-   - No hace falta configurar variables de entorno: Render inyecta `PORT` solo, y `DATABASE_PATH`/`SCHEMA_PATH` resuelven solos relativo al repo.
-4. Deploy. La URL pública sirve tanto la API como el frontend.
+- **Base de datos** — proyecto Supabase `biblioteca-central` (Postgres 17). La connection string vive en Secret Manager (`database-url` en el proyecto GCP), nunca en el código. Esquema en `backend/database/schema.postgres.sql`.
 
-**Importante — plan gratuito de Render:**
-- El servicio "duerme" tras ~15 min sin tráfico y tarda ~30-50s en responder la primera vez que alguien entra después de eso. Antes de presentar, abrí el link vos mismo unos minutos antes para "despertarlo".
-- El disco es efímero: si Render reinicia o redepliega el servicio, `database/biblioteca.sqlite` vuelve a crearse vacío (se recrea solo desde `schema.sql`). Para una demo esto es aceptable; si más adelante querés que los datos persistan entre reinicios, hay que agregar un disco persistente en el plan pago de Render y apuntar `DATABASE_PATH` ahí.
+Al arrancar, el backend elige automáticamente: si existe `DATABASE_URL` usa Postgres (`Postgres*Repository`), si no, SQLite local (`Sqlite*Repository`) — mismo patrón Repository detrás de las mismas interfaces (`IBookRepository`, `IUserRepository`, `ILoanRepository`, `IDebtRepository`), gracias a la Inversión de Dependencias.
+
+**Nota sobre el plan gratuito de Cloud Run**: la primera petición tras un rato de inactividad puede tardar unos segundos (cold start). Para la presentación, abrí el link unos minutos antes.
 
 ## Modelo de negocio
 

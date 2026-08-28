@@ -2,3 +2,5 @@ node_modules/
 dist/
 database/*.sqlite
 database/*.sqlite-*
+.wrangler/
+.dev.vars
