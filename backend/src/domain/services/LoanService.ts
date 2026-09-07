@@ -13,6 +13,16 @@ export interface LoanWithBookTitle extends Loan {
   bookTitle: string;
 }
 
+/**
+ * Función STATELESS (pura): mismo input -> mismo output, sin leer ni escribir
+ * estado externo (BD, disco, red). Calcula la multa por atraso en centavos.
+ */
+export function calculateFine(dueDate: Date, returnDate: Date, dailyRate = DAILY_FINE_RATE): number {
+  if (returnDate <= dueDate) return 0;
+  const daysLate = Math.ceil((returnDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+  return daysLate * dailyRate;
+}
+
 export class LoanService {
   constructor(
     private readonly loanRepository: ILoanRepository,
@@ -92,10 +102,8 @@ export class LoanService {
       throw new BusinessError("El préstamo no existe.");
     }
 
-    let fineAmount = 0;
-    if (returnDate > loan.dueDate) {
-      const daysLate = Math.ceil((returnDate.getTime() - loan.dueDate.getTime()) / (1000 * 60 * 60 * 24));
-      fineAmount = daysLate * DAILY_FINE_RATE;
+    const fineAmount = calculateFine(loan.dueDate, returnDate);
+    if (fineAmount > 0) {
       await this.debtRepository.create({
         userId: loan.userId,
         loanId: loan.id,

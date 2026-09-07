@@ -12,7 +12,10 @@ import { PostgresBookRepository } from "./infrastructure/repositories/PostgresBo
 import { PostgresUserRepository } from "./infrastructure/repositories/PostgresUserRepository";
 import { PostgresLoanRepository } from "./infrastructure/repositories/PostgresLoanRepository";
 import { PostgresDebtRepository } from "./infrastructure/repositories/PostgresDebtRepository";
+import { SqliteAccountRepository } from "./infrastructure/repositories/SqliteAccountRepository";
+import { PostgresAccountRepository } from "./infrastructure/repositories/PostgresAccountRepository";
 import { IBookRepository } from "./domain/interfaces/IBookRepository";
+import { IAccountRepository } from "./domain/interfaces/IAccountRepository";
 import { IUserRepository } from "./domain/interfaces/IUserRepository";
 import { ILoanRepository } from "./domain/interfaces/ILoanRepository";
 import { IDebtRepository } from "./domain/interfaces/IDebtRepository";
@@ -21,16 +24,19 @@ import { BookService } from "./domain/services/BookService";
 import { UserService } from "./domain/services/UserService";
 import { LoanService } from "./domain/services/LoanService";
 import { DebtService } from "./domain/services/DebtService";
+import { AuthService } from "./domain/services/AuthService";
 
 import { BookController } from "./presentation/controllers/BookController";
 import { UserController } from "./presentation/controllers/UserController";
 import { LoanController } from "./presentation/controllers/LoanController";
 import { DebtController } from "./presentation/controllers/DebtController";
+import { AuthController } from "./presentation/controllers/AuthController";
 
 import { createBookRoutes } from "./presentation/routes/bookRoutes";
 import { createUserRoutes } from "./presentation/routes/userRoutes";
 import { createLoanRoutes } from "./presentation/routes/loanRoutes";
 import { createDebtRoutes } from "./presentation/routes/debtRoutes";
+import { createAuthRoutes } from "./presentation/routes/authRoutes";
 
 async function main(): Promise<void> {
   // --- Infraestructura: Postgres (Supabase) en producción si hay DATABASE_URL, SQLite local en desarrollo ---
@@ -38,6 +44,7 @@ async function main(): Promise<void> {
   let userRepository: IUserRepository;
   let loanRepository: ILoanRepository;
   let debtRepository: IDebtRepository;
+  let accountRepository: IAccountRepository;
 
   if (process.env.DATABASE_URL) {
     const pool = await createPostgresPool();
@@ -45,6 +52,7 @@ async function main(): Promise<void> {
     userRepository = new PostgresUserRepository(pool);
     loanRepository = new PostgresLoanRepository(pool);
     debtRepository = new PostgresDebtRepository(pool);
+    accountRepository = new PostgresAccountRepository(pool);
     console.log("Conectado a Postgres (Supabase).");
   } else {
     const db = createDatabaseConnection();
@@ -52,20 +60,25 @@ async function main(): Promise<void> {
     userRepository = new SqliteUserRepository(db);
     loanRepository = new SqliteLoanRepository(db);
     debtRepository = new SqliteDebtRepository(db);
+    accountRepository = new SqliteAccountRepository(db);
     console.log("Conectado a SQLite local.");
   }
+
+  const authSecret = process.env.AUTH_SECRET || "dev-secret-cambiar-en-produccion";
 
   // --- Dominio (Inyección manual: Repositorio -> Servicio) ---
   const bookService = new BookService(bookRepository);
   const loanService = new LoanService(loanRepository, bookRepository, userRepository, debtRepository);
   const userService = new UserService(userRepository, loanService, debtRepository);
   const debtService = new DebtService(debtRepository);
+  const authService = new AuthService(accountRepository, authSecret);
 
   // --- Presentación (Servicio -> Controlador) ---
   const bookController = new BookController(bookService);
   const userController = new UserController(userService);
   const loanController = new LoanController(loanService);
   const debtController = new DebtController(debtService);
+  const authController = new AuthController(authService, authSecret);
 
   // --- Aplicación Express ---
   const app = express();
@@ -76,6 +89,7 @@ async function main(): Promise<void> {
   app.use("/api/v1", createUserRoutes(userController));
   app.use("/api/v1", createLoanRoutes(loanController));
   app.use("/api/v1", createDebtRoutes(debtController));
+  app.use("/api/v1", createAuthRoutes(authController));
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {

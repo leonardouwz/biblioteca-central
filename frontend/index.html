@@ -316,6 +316,41 @@
     </div>
   </header>
 
+  <!-- ==================== SESIÓN ==================== -->
+  <section id="authCard" class="card">
+    <div id="authLoggedOut">
+      <h2>Iniciar sesión</h2>
+      <div style="display:flex; gap:24px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:240px;">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" type="email" autocomplete="username" />
+          <label for="loginPassword">Contraseña</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" />
+          <button id="loginSubmit">Entrar</button>
+        </div>
+        <div style="flex:1; min-width:240px;">
+          <h3 style="margin-top:0;">¿No tienes cuenta? Regístrate</h3>
+          <label for="regEmail">Email</label>
+          <input id="regEmail" type="email" autocomplete="username" />
+          <label for="regPassword">Contraseña (mín. 6)</label>
+          <input id="regPassword" type="password" autocomplete="new-password" />
+          <label for="regRole">Rol</label>
+          <select id="regRole">
+            <option value="USUARIO">Usuario</option>
+            <option value="BIBLIOTECARIO">Bibliotecario</option>
+            <option value="ADMINISTRADOR">Administrador</option>
+          </select>
+          <button class="secondary" id="regSubmit">Crear cuenta</button>
+        </div>
+      </div>
+      <div id="authResult" class="result" style="display:none"></div>
+    </div>
+    <div id="authLoggedIn" style="display:none; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <span>Sesión iniciada: <strong id="authEmail"></strong> · rol <strong id="authRole"></strong></span>
+      <button class="secondary" id="logoutBtn">Cerrar sesión</button>
+    </div>
+  </section>
+
   <div class="tabs">
     <button class="tab-btn active" data-tab="loans">Préstamos</button>
     <button class="tab-btn" data-tab="books">Libros</button>
@@ -834,6 +869,60 @@
       });
     }
 
+    // ---------- Sesión (autenticación básica) ----------
+    function renderSession() {
+      const token = localStorage.getItem('authToken');
+      const email = localStorage.getItem('authEmail');
+      const role = localStorage.getItem('authRole');
+      const loggedIn = !!token;
+      document.getElementById('authLoggedOut').style.display = loggedIn ? 'none' : 'block';
+      document.getElementById('authLoggedIn').style.display = loggedIn ? 'flex' : 'none';
+      if (loggedIn) {
+        document.getElementById('authEmail').textContent = email || '';
+        document.getElementById('authRole').textContent = role || '';
+      }
+    }
+
+    function saveSession(data) {
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('authEmail', data.account.email);
+      localStorage.setItem('authRole', data.account.role);
+      renderSession();
+    }
+
+    document.getElementById('loginSubmit').addEventListener('click', async () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const { ok, data } = await fetchJson('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      if (ok) saveSession(data);
+      showResult(document.getElementById('authResult'), ok, ok ? `Bienvenido, ${data.account.email}.` : errorMessage(data));
+    });
+
+    document.getElementById('regSubmit').addEventListener('click', async () => {
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      const role = document.getElementById('regRole').value;
+      const { ok, data } = await fetchJson('/api/v1/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role }),
+      });
+      if (ok) saveSession(data);
+      showResult(document.getElementById('authResult'), ok, ok ? `Cuenta creada como ${data.account.role}.` : errorMessage(data));
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authEmail');
+      localStorage.removeItem('authRole');
+      renderSession();
+    });
+
+    renderSession();
     loadAll();
   </script>
 </body>

@@ -40,6 +40,14 @@ CREATE TABLE IF NOT EXISTS debts (
   paid_at TIMESTAMPTZ
 );
 
+CREATE TABLE IF NOT EXISTS accounts (
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL CHECK (role IN ('USUARIO', 'BIBLIOTECARIO', 'ADMINISTRADOR')),
+  created_at TIMESTAMPTZ NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_book_copies_book_id ON book_copies(book_id);
 CREATE INDEX IF NOT EXISTS idx_loans_user_id ON loans(user_id);
 CREATE INDEX IF NOT EXISTS idx_loans_book_copy_id ON loans(book_copy_id);
