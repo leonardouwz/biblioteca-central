@@ -85,10 +85,10 @@ async function main(): Promise<void> {
   app.use(cors());
   app.use(express.json());
   app.use(express.static(path.join(__dirname, "..", "..", "frontend")));
-  app.use("/api/v1", createBookRoutes(bookController));
-  app.use("/api/v1", createUserRoutes(userController));
-  app.use("/api/v1", createLoanRoutes(loanController));
-  app.use("/api/v1", createDebtRoutes(debtController));
+  app.use("/api/v1", createBookRoutes(bookController, authSecret));
+  app.use("/api/v1", createUserRoutes(userController, authSecret));
+  app.use("/api/v1", createLoanRoutes(loanController, authSecret));
+  app.use("/api/v1", createDebtRoutes(debtController, authSecret));
   app.use("/api/v1", createAuthRoutes(authController));
 
   const PORT = process.env.PORT || 3000;

@@ -351,6 +351,10 @@
     </div>
   </section>
 
+  <p id="gateMsg" class="result" style="display:none">
+    Inicia sesión como <strong>bibliotecario</strong> o <strong>administrador</strong> para gestionar préstamos, catálogo y socios.
+  </p>
+
   <div class="tabs">
     <button class="tab-btn active" data-tab="loans">Préstamos</button>
     <button class="tab-btn" data-tab="books">Libros</button>
@@ -500,9 +504,15 @@
 
     const API_BASE_URL = 'https://biblioteca-backend-438047115829.us-central1.run.app';
 
-    async function fetchJson(path, options) {
-      const res = await fetch(API_BASE_URL + path, options);
-      const data = res.status === 204 ? null : await res.json();
+    async function fetchJson(path, options = {}) {
+      const token = localStorage.getItem('authToken');
+      const headers = { ...(options.headers || {}) };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      const res = await fetch(API_BASE_URL + path, { ...options, headers });
+      const data = res.status === 204 ? null : await res.json().catch(() => null);
+      if (res.status === 401) {
+        clearSession();
+      }
       return { ok: res.ok, data };
     }
 
@@ -870,6 +880,15 @@
     }
 
     // ---------- Sesión (autenticación básica) ----------
+    const STAFF_ROLES = ['BIBLIOTECARIO', 'ADMINISTRADOR'];
+
+    function setStaffView(isStaff) {
+      document.querySelector('.tabs').style.display = isStaff ? '' : 'none';
+      document.querySelectorAll('.tab-panel').forEach((p) => { p.style.display = isStaff ? '' : 'none'; });
+      document.getElementById('gateMsg').style.display =
+        (!isStaff && localStorage.getItem('authToken')) ? 'block' : 'none';
+    }
+
     function renderSession() {
       const token = localStorage.getItem('authToken');
       const email = localStorage.getItem('authEmail');
@@ -881,6 +900,16 @@
         document.getElementById('authEmail').textContent = email || '';
         document.getElementById('authRole').textContent = role || '';
       }
+      const isStaff = loggedIn && STAFF_ROLES.includes(role);
+      setStaffView(isStaff);
+      if (isStaff) loadAll();
+    }
+
+    function clearSession() {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authEmail');
+      localStorage.removeItem('authRole');
+      renderSession();
     }
 
     function saveSession(data) {
@@ -915,15 +944,9 @@
       showResult(document.getElementById('authResult'), ok, ok ? `Cuenta creada como ${data.account.role}.` : errorMessage(data));
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authEmail');
-      localStorage.removeItem('authRole');
-      renderSession();
-    });
+    document.getElementById('logoutBtn').addEventListener('click', clearSession);
 
     renderSession();
-    loadAll();
   </script>
 </body>
 </html>

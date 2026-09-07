@@ -1,9 +1,12 @@
 import { Router } from "express";
 import { DebtController } from "../controllers/DebtController";
+import { requireAuth, STAFF } from "../middleware/requireAuth";
 
-export function createDebtRoutes(debtController: DebtController): Router {
+export function createDebtRoutes(debtController: DebtController, secret: string): Router {
   const router = Router();
-  router.get("/debts", debtController.getAll);
-  router.post("/debts/:id/pay", debtController.pay);
+  const staff = requireAuth(secret, ...STAFF);
+
+  router.get("/debts", staff, debtController.getAll);
+  router.post("/debts/:id/pay", staff, debtController.pay);
   return router;
 }
