@@ -19,7 +19,7 @@ export class UserService {
   async getUserById(id: string): Promise<User> {
     const user = await this.userRepository.findById(id);
     if (!user) {
-      throw new BusinessError("El usuario no existe.");
+      throw new BusinessError("USER_NOT_FOUND");
     }
     return user;
   }
@@ -47,7 +47,7 @@ export class UserService {
       status: (await this.getUserById(id)).status,
     });
     if (!updated) {
-      throw new BusinessError("El usuario no existe.");
+      throw new BusinessError("USER_NOT_FOUND");
     }
     return updated;
   }
@@ -55,7 +55,7 @@ export class UserService {
   async setStatus(id: string, status: User["status"]): Promise<User> {
     const updated = await this.userRepository.setStatus(id, status);
     if (!updated) {
-      throw new BusinessError("El usuario no existe.");
+      throw new BusinessError("USER_NOT_FOUND");
     }
     return updated;
   }
@@ -63,27 +63,27 @@ export class UserService {
   async deleteUser(id: string): Promise<void> {
     const activeLoans = (await this.loanService.getLoansByUserId(id)).filter((l) => l.status === "ACTIVE");
     if (activeLoans.length > 0) {
-      throw new BusinessError("No se puede eliminar un usuario con préstamos activos.");
+      throw new BusinessError("USER_HAS_ACTIVE_LOANS");
     }
     if (await this.debtRepository.hasUnpaidByUserId(id)) {
-      throw new BusinessError("No se puede eliminar un usuario con deudas impagas.");
+      throw new BusinessError("USER_DELETE_HAS_UNPAID_DEBT");
     }
     const deleted = await this.userRepository.delete(id);
     if (!deleted) {
-      throw new BusinessError("El usuario no existe.");
+      throw new BusinessError("USER_NOT_FOUND");
     }
   }
 
   private async validate(name: string, email: string, ignoreUserId?: string): Promise<void> {
     if (!name.trim()) {
-      throw new BusinessError("El nombre es requerido.");
+      throw new BusinessError("USER_NAME_REQUIRED");
     }
     if (!email.trim() || !email.includes("@")) {
-      throw new BusinessError("El email no es válido.");
+      throw new BusinessError("EMAIL_INVALID");
     }
     const existing = await this.userRepository.findByEmail(email);
     if (existing && existing.id !== ignoreUserId) {
-      throw new BusinessError("Ya existe un usuario con ese email.");
+      throw new BusinessError("USER_EMAIL_TAKEN");
     }
   }
 }

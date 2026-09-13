@@ -10,7 +10,8 @@ const LOAN_PERIOD_DAYS = 14;
 const DAILY_FINE_RATE = 500;
 
 export interface LoanWithBookTitle extends Loan {
-  bookTitle: string;
+  /** `null` si el libro fue eliminado; el frontend decide cómo mostrarlo (i18n). */
+  bookTitle: string | null;
 }
 
 /**
@@ -45,29 +46,29 @@ export class LoanService {
   async createLoan(userId: string, bookId: string): Promise<Loan> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new BusinessError("El usuario no existe.");
+      throw new BusinessError("USER_NOT_FOUND");
     }
     if (user.status === "INACTIVE") {
-      throw new BusinessError("El usuario está desactivado y no puede solicitar préstamos.");
+      throw new BusinessError("USER_INACTIVE");
     }
 
     if (await this.debtRepository.hasUnpaidByUserId(userId)) {
-      throw new BusinessError("El usuario tiene deudas pendientes y no puede solicitar préstamos.");
+      throw new BusinessError("USER_HAS_UNPAID_DEBT");
     }
 
     const activeLoans = await this.loanRepository.countActiveByUserId(userId);
     if (activeLoans >= MAX_ACTIVE_LOANS) {
-      throw new BusinessError(`El usuario ya tiene ${MAX_ACTIVE_LOANS} préstamos activos.`);
+      throw new BusinessError("LOAN_MAX_ACTIVE", { max: MAX_ACTIVE_LOANS, count: MAX_ACTIVE_LOANS });
     }
 
     const book = await this.bookRepository.findById(bookId);
     if (!book) {
-      throw new BusinessError("El libro no existe.");
+      throw new BusinessError("BOOK_NOT_FOUND");
     }
 
     const availableCopy = await this.bookRepository.findAvailableCopy(bookId);
     if (!availableCopy) {
-      throw new BusinessError("No hay copias disponibles de este libro.");
+      throw new BusinessError("BOOK_NO_COPIES_AVAILABLE");
     }
 
     await this.bookRepository.setCopyStatus(availableCopy.id, "LOANED");
@@ -89,17 +90,17 @@ export class LoanService {
   async returnLoan(loanId: string): Promise<{ loan: Loan; fineAmount: number }> {
     const loan = await this.loanRepository.findById(loanId);
     if (!loan) {
-      throw new BusinessError("El préstamo no existe.");
+      throw new BusinessError("LOAN_NOT_FOUND");
     }
     if (loan.status === "RETURNED") {
-      throw new BusinessError("Este préstamo ya fue devuelto.");
+      throw new BusinessError("LOAN_ALREADY_RETURNED");
     }
 
     const returnDate = new Date();
     await this.bookRepository.setCopyStatus(loan.bookCopyId, "AVAILABLE");
     const updated = await this.loanRepository.markReturned(loanId, returnDate);
     if (!updated) {
-      throw new BusinessError("El préstamo no existe.");
+      throw new BusinessError("LOAN_NOT_FOUND");
     }
 
     const fineAmount = calculateFine(loan.dueDate, returnDate);
@@ -124,6 +125,6 @@ export class LoanService {
   private async withBookTitle(loan: Loan): Promise<LoanWithBookTitle> {
     const copy = await this.bookRepository.findCopyById(loan.bookCopyId);
     const book = copy ? await this.bookRepository.findById(copy.bookId) : null;
-    return { ...loan, bookTitle: book?.title ?? "(desconocido)" };
+    return { ...loan, bookTitle: book?.title ?? null };
   }
 }

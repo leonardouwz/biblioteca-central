@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { verifyToken, TokenPayload } from "../../domain/services/authTokens";
 import { Role } from "../../domain/entities/Account";
+import { t } from "../../domain/i18n/t";
 
 export interface AuthedRequest {
   auth?: TokenPayload;
@@ -16,11 +17,11 @@ export function requireAuth(secret: string, ...roles: Role[]): RequestHandler {
     const token = (req.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
     const payload = verifyToken(token, secret);
     if (!payload) {
-      res.status(401).json({ error: "Sesión requerida. Inicia sesión." });
+      res.status(401).json({ code: "AUTH_REQUIRED", error: t("AUTH_REQUIRED", req.locale) });
       return;
     }
     if (roles.length > 0 && !roles.includes(payload.role)) {
-      res.status(403).json({ error: "No tienes permiso para realizar esta acción." });
+      res.status(403).json({ code: "AUTH_FORBIDDEN", error: t("AUTH_FORBIDDEN", req.locale) });
       return;
     }
     (req as typeof req & AuthedRequest).auth = payload;

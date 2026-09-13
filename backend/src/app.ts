@@ -37,6 +37,7 @@ import { createUserRoutes } from "./presentation/routes/userRoutes";
 import { createLoanRoutes } from "./presentation/routes/loanRoutes";
 import { createDebtRoutes } from "./presentation/routes/debtRoutes";
 import { createAuthRoutes } from "./presentation/routes/authRoutes";
+import { resolveLocale } from "./presentation/middleware/locale";
 
 async function main(): Promise<void> {
   // --- Infraestructura: Postgres (Supabase) en producción si hay DATABASE_URL, SQLite local en desarrollo ---
@@ -84,6 +85,7 @@ async function main(): Promise<void> {
   const app = express();
   app.use(cors());
   app.use(express.json());
+  app.use(resolveLocale);
   app.use(express.static(path.join(__dirname, "..", "..", "frontend")));
   app.use("/api/v1", createBookRoutes(bookController, authSecret));
   app.use("/api/v1", createUserRoutes(userController, authSecret));

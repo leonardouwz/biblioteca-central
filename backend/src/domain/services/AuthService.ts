@@ -22,13 +22,13 @@ export class AuthService {
   async register(email: string, password: string, requestedRole?: string): Promise<AuthResult> {
     const normalizedEmail = email.trim().toLowerCase();
     if (!normalizedEmail.includes("@")) {
-      throw new BusinessError("El email no es válido.");
+      throw new BusinessError("EMAIL_INVALID");
     }
     if (password.length < 6) {
-      throw new BusinessError("La contraseña debe tener al menos 6 caracteres.");
+      throw new BusinessError("PASSWORD_TOO_SHORT");
     }
     if (await this.accountRepository.findByEmail(normalizedEmail)) {
-      throw new BusinessError("Ya existe una cuenta con ese email.");
+      throw new BusinessError("ACCOUNT_EMAIL_TAKEN");
     }
 
     const isFirstAccount = (await this.accountRepository.countAll()) === 0;
@@ -51,7 +51,7 @@ export class AuthService {
   async login(email: string, password: string): Promise<AuthResult> {
     const account = await this.accountRepository.findByEmail(email.trim().toLowerCase());
     if (!account || !verifyPassword(password, account.passwordHash)) {
-      throw new BusinessError("Email o contraseña incorrectos.");
+      throw new BusinessError("AUTH_INVALID_CREDENTIALS");
     }
     return this.buildResult(account);
   }

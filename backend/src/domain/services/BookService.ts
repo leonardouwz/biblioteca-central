@@ -18,7 +18,7 @@ export class BookService {
   async getBookById(id: string): Promise<BookSummary> {
     const book = await this.bookRepository.findById(id);
     if (!book) {
-      throw new BusinessError("El libro no existe.");
+      throw new BusinessError("BOOK_NOT_FOUND");
     }
     return this.withStock(book);
   }
@@ -34,11 +34,11 @@ export class BookService {
 
   async updateBook(id: string, title: string, author: string): Promise<Book> {
     if (!title.trim() || !author.trim()) {
-      throw new BusinessError("Título y autor son requeridos.");
+      throw new BusinessError("BOOK_TITLE_AUTHOR_REQUIRED");
     }
     const updated = await this.bookRepository.update(id, { title, author });
     if (!updated) {
-      throw new BusinessError("El libro no existe.");
+      throw new BusinessError("BOOK_NOT_FOUND");
     }
     return updated;
   }
@@ -46,10 +46,10 @@ export class BookService {
   async addStock(bookId: string, quantity: number): Promise<BookSummary> {
     const book = await this.bookRepository.findById(bookId);
     if (!book) {
-      throw new BusinessError("El libro no existe.");
+      throw new BusinessError("BOOK_NOT_FOUND");
     }
     if (quantity <= 0) {
-      throw new BusinessError("La cantidad a agregar debe ser mayor a cero.");
+      throw new BusinessError("BOOK_QUANTITY_INVALID");
     }
     await this.bookRepository.addCopies(bookId, quantity);
     return this.withStock(book);
@@ -58,20 +58,20 @@ export class BookService {
   async deleteBook(id: string): Promise<void> {
     const copies = await this.bookRepository.findCopiesByBookId(id);
     if (copies.some((copy) => copy.status === "LOANED")) {
-      throw new BusinessError("No se puede eliminar un libro con copias actualmente prestadas.");
+      throw new BusinessError("BOOK_HAS_LOANED_COPIES");
     }
     const deleted = await this.bookRepository.delete(id);
     if (!deleted) {
-      throw new BusinessError("El libro no existe.");
+      throw new BusinessError("BOOK_NOT_FOUND");
     }
   }
 
   private validate(title: string, author: string, initialCopies: number): void {
     if (!title.trim() || !author.trim()) {
-      throw new BusinessError("Título y autor son requeridos.");
+      throw new BusinessError("BOOK_TITLE_AUTHOR_REQUIRED");
     }
     if (initialCopies < 0) {
-      throw new BusinessError("Las copias no pueden ser negativas.");
+      throw new BusinessError("BOOK_COPIES_NEGATIVE");
     }
   }
 

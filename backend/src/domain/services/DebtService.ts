@@ -12,7 +12,7 @@ export class DebtService {
   async markAsPaid(id: string): Promise<Debt> {
     const updated = await this.debtRepository.markPaid(id, new Date());
     if (!updated) {
-      throw new BusinessError("La deuda no existe.");
+      throw new BusinessError("DEBT_NOT_FOUND");
     }
     return updated;
   }

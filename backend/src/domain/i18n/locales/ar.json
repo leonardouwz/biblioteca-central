@@ -1,0 +1,44 @@
+{
+  "BOOK_NOT_FOUND": { "text": "الكتاب غير موجود.", "mt": true },
+  "BOOK_TITLE_AUTHOR_REQUIRED": { "text": "العنوان والمؤلف مطلوبان.", "mt": true },
+  "BOOK_QUANTITY_INVALID": { "text": "يجب أن تكون الكمية المضافة أكبر من صفر.", "mt": true },
+  "BOOK_HAS_LOANED_COPIES": { "text": "لا يمكن حذف كتاب توجد نسخ منه معارة حاليًا.", "mt": true },
+  "BOOK_COPIES_NEGATIVE": { "text": "لا يمكن أن يكون عدد النسخ سالبًا.", "mt": true },
+  "BOOK_NO_COPIES_AVAILABLE": { "text": "لا توجد نسخ متاحة من هذا الكتاب.", "mt": true },
+
+  "USER_NOT_FOUND": { "text": "المستخدم غير موجود.", "mt": true },
+  "USER_INACTIVE": { "text": "المستخدم غير نشط ولا يمكنه طلب إعارة.", "mt": true },
+  "USER_HAS_UNPAID_DEBT": { "text": "على المستخدم ديون غير مسددة ولا يمكنه طلب إعارة.", "mt": true },
+  "USER_HAS_ACTIVE_LOANS": { "text": "لا يمكن حذف مستخدم لديه إعارات نشطة.", "mt": true },
+  "USER_DELETE_HAS_UNPAID_DEBT": { "text": "لا يمكن حذف مستخدم لديه ديون غير مسددة.", "mt": true },
+  "USER_NAME_REQUIRED": { "text": "الاسم مطلوب.", "mt": true },
+  "USER_EMAIL_TAKEN": { "text": "يوجد مستخدم آخر بهذا البريد الإلكتروني.", "mt": true },
+
+  "LOAN_MAX_ACTIVE": {
+    "one": "لدى المستخدم بالفعل إعارة واحدة نشطة ({max}).",
+    "other": "لدى المستخدم بالفعل {max} إعارات نشطة.",
+    "mt": true
+  },
+  "LOAN_NOT_FOUND": { "text": "الإعارة غير موجودة.", "mt": true },
+  "LOAN_ALREADY_RETURNED": { "text": "تم إرجاع هذه الإعارة بالفعل.", "mt": true },
+
+  "DEBT_NOT_FOUND": { "text": "الدين غير موجود.", "mt": true },
+
+  "EMAIL_INVALID": { "text": "البريد الإلكتروني غير صالح.", "mt": true },
+  "PASSWORD_TOO_SHORT": { "text": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.", "mt": true },
+  "ACCOUNT_EMAIL_TAKEN": { "text": "يوجد حساب آخر بهذا البريد الإلكتروني.", "mt": true },
+  "AUTH_INVALID_CREDENTIALS": { "text": "البريد الإلكتروني أو كلمة المرور غير صحيحة.", "mt": true },
+  "AUTH_SESSION_INVALID": { "text": "الجلسة غير صالحة أو منتهية الصلاحية.", "mt": true },
+  "AUTH_REQUIRED": { "text": "يجب تسجيل الدخول.", "mt": true },
+  "AUTH_FORBIDDEN": { "text": "ليس لديك صلاحية لتنفيذ هذا الإجراء.", "mt": true },
+
+  "INTERNAL_ERROR": { "text": "خطأ داخلي في الخادم.", "mt": true },
+
+  "BODY_LOAN_INVALID": { "text": "الحقلان userId وbookId مطلوبان ويجب أن يكونا نصيّين.", "mt": true },
+  "BODY_AUTH_INVALID": { "text": "البريد الإلكتروني وكلمة المرور مطلوبان.", "mt": true },
+  "BODY_BOOK_CREATE_INVALID": { "text": "العنوان والمؤلف وعدد النسخ الأولي مطلوبة.", "mt": true },
+  "BODY_BOOK_UPDATE_INVALID": { "text": "العنوان والمؤلف مطلوبان.", "mt": true },
+  "BODY_STOCK_INVALID": { "text": "الكمية (رقم) مطلوبة.", "mt": true },
+  "BODY_USER_INVALID": { "text": "الاسم والبريد الإلكتروني مطلوبان.", "mt": true },
+  "BODY_STATUS_INVALID": { "text": "يجب أن تكون الحالة ACTIVE أو INACTIVE.", "mt": true }
+}
