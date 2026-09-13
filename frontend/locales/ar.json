@@ -1,0 +1,551 @@
+{
+  "meta.title": {
+    "text": "بيبليوتيكا سنترال",
+    "mt": true
+  },
+  "meta.tagline": {
+    "text": "تتبع الإعارات · الفهرس · سجلات الأعضاء",
+    "mt": true
+  },
+  "common.language": {
+    "text": "اللغة",
+    "mt": true
+  },
+  "common.unexpectedError": {
+    "text": "حدث خطأ غير متوقع.",
+    "mt": true
+  },
+  "common.close": {
+    "text": "إغلاق",
+    "mt": true
+  },
+  "nav.loans": {
+    "text": "الإعارات",
+    "mt": true
+  },
+  "nav.books": {
+    "text": "الكتب",
+    "mt": true
+  },
+  "nav.users": {
+    "text": "الأعضاء",
+    "mt": true
+  },
+  "nav.debts": {
+    "text": "الديون",
+    "mt": true
+  },
+  "auth.loginTitle": {
+    "text": "تسجيل الدخول",
+    "mt": true
+  },
+  "auth.email": {
+    "text": "البريد الإلكتروني",
+    "mt": true
+  },
+  "auth.password": {
+    "text": "كلمة المرور",
+    "mt": true
+  },
+  "auth.loginSubmit": {
+    "text": "دخول",
+    "mt": true
+  },
+  "auth.registerTitle": {
+    "text": "ليس لديك حساب؟ سجّل الآن",
+    "mt": true
+  },
+  "auth.registerPasswordHint": {
+    "text": "كلمة المرور (6 أحرف على الأقل)",
+    "mt": true
+  },
+  "auth.role": {
+    "text": "الدور",
+    "mt": true
+  },
+  "auth.roleUser": {
+    "text": "عضو",
+    "mt": true
+  },
+  "auth.roleLibrarian": {
+    "text": "أمين مكتبة",
+    "mt": true
+  },
+  "auth.roleAdmin": {
+    "text": "مدير",
+    "mt": true
+  },
+  "auth.registerSubmit": {
+    "text": "إنشاء حساب",
+    "mt": true
+  },
+  "auth.sessionActive": {
+    "text": "تم تسجيل الدخول: {email} · الدور {role}",
+    "mt": true
+  },
+  "auth.logout": {
+    "text": "تسجيل الخروج",
+    "mt": true
+  },
+  "auth.gateMessage": {
+    "text": "سجّل الدخول كـ {librarian} أو {admin} لإدارة الإعارات والفهرس والأعضاء.",
+    "mt": true
+  },
+  "errors.BOOK_NOT_FOUND": {
+    "text": "الكتاب غير موجود.",
+    "mt": true
+  },
+  "errors.BOOK_TITLE_AUTHOR_REQUIRED": {
+    "text": "العنوان والمؤلف مطلوبان.",
+    "mt": true
+  },
+  "errors.BOOK_QUANTITY_INVALID": {
+    "text": "يجب أن تكون الكمية المضافة أكبر من صفر.",
+    "mt": true
+  },
+  "errors.BOOK_HAS_LOANED_COPIES": {
+    "text": "لا يمكن حذف كتاب توجد نسخ منه معارة حاليًا.",
+    "mt": true
+  },
+  "errors.BOOK_COPIES_NEGATIVE": {
+    "text": "لا يمكن أن يكون عدد النسخ سالبًا.",
+    "mt": true
+  },
+  "errors.BOOK_NO_COPIES_AVAILABLE": {
+    "text": "لا توجد نسخ متاحة من هذا الكتاب.",
+    "mt": true
+  },
+  "errors.USER_NOT_FOUND": {
+    "text": "المستخدم غير موجود.",
+    "mt": true
+  },
+  "errors.USER_INACTIVE": {
+    "text": "المستخدم غير نشط ولا يمكنه طلب إعارة.",
+    "mt": true
+  },
+  "errors.USER_HAS_UNPAID_DEBT": {
+    "text": "على المستخدم ديون غير مسددة ولا يمكنه طلب إعارة.",
+    "mt": true
+  },
+  "errors.USER_HAS_ACTIVE_LOANS": {
+    "text": "لا يمكن حذف مستخدم لديه إعارات نشطة.",
+    "mt": true
+  },
+  "errors.USER_DELETE_HAS_UNPAID_DEBT": {
+    "text": "لا يمكن حذف مستخدم لديه ديون غير مسددة.",
+    "mt": true
+  },
+  "errors.USER_NAME_REQUIRED": {
+    "text": "الاسم مطلوب.",
+    "mt": true
+  },
+  "errors.USER_EMAIL_TAKEN": {
+    "text": "يوجد مستخدم آخر بهذا البريد الإلكتروني.",
+    "mt": true
+  },
+  "errors.LOAN_MAX_ACTIVE": {
+    "one": "لدى المستخدم بالفعل إعارة واحدة نشطة ({max}).",
+    "other": "لدى المستخدم بالفعل {max} إعارات نشطة.",
+    "mt": true
+  },
+  "errors.LOAN_NOT_FOUND": {
+    "text": "الإعارة غير موجودة.",
+    "mt": true
+  },
+  "errors.LOAN_ALREADY_RETURNED": {
+    "text": "تم إرجاع هذه الإعارة بالفعل.",
+    "mt": true
+  },
+  "errors.DEBT_NOT_FOUND": {
+    "text": "الدين غير موجود.",
+    "mt": true
+  },
+  "errors.EMAIL_INVALID": {
+    "text": "البريد الإلكتروني غير صالح.",
+    "mt": true
+  },
+  "errors.PASSWORD_TOO_SHORT": {
+    "text": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.",
+    "mt": true
+  },
+  "errors.ACCOUNT_EMAIL_TAKEN": {
+    "text": "يوجد حساب آخر بهذا البريد الإلكتروني.",
+    "mt": true
+  },
+  "errors.AUTH_INVALID_CREDENTIALS": {
+    "text": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+    "mt": true
+  },
+  "errors.AUTH_SESSION_INVALID": {
+    "text": "الجلسة غير صالحة أو منتهية الصلاحية.",
+    "mt": true
+  },
+  "errors.AUTH_REQUIRED": {
+    "text": "يجب تسجيل الدخول.",
+    "mt": true
+  },
+  "errors.AUTH_FORBIDDEN": {
+    "text": "ليس لديك صلاحية لتنفيذ هذا الإجراء.",
+    "mt": true
+  },
+  "errors.INTERNAL_ERROR": {
+    "text": "خطأ داخلي في الخادم.",
+    "mt": true
+  },
+  "errors.BODY_LOAN_INVALID": {
+    "text": "الحقلان userId وbookId مطلوبان ويجب أن يكونا نصيّين.",
+    "mt": true
+  },
+  "errors.BODY_AUTH_INVALID": {
+    "text": "البريد الإلكتروني وكلمة المرور مطلوبان.",
+    "mt": true
+  },
+  "errors.BODY_BOOK_CREATE_INVALID": {
+    "text": "العنوان والمؤلف وعدد النسخ الأولي مطلوبة.",
+    "mt": true
+  },
+  "errors.BODY_BOOK_UPDATE_INVALID": {
+    "text": "العنوان والمؤلف مطلوبان.",
+    "mt": true
+  },
+  "errors.BODY_STOCK_INVALID": {
+    "text": "الكمية (رقم) مطلوبة.",
+    "mt": true
+  },
+  "errors.BODY_USER_INVALID": {
+    "text": "الاسم والبريد الإلكتروني مطلوبان.",
+    "mt": true
+  },
+  "errors.BODY_STATUS_INVALID": {
+    "text": "يجب أن تكون الحالة ACTIVE أو INACTIVE.",
+    "mt": true
+  },
+  "nav.tablist": {
+    "text": "أقسام الإدارة",
+    "mt": true
+  },
+  "auth.welcome": {
+    "text": "أهلاً وسهلاً، {email}.",
+    "mt": true
+  },
+  "auth.accountCreated": {
+    "text": "تم إنشاء الحساب باسم {role}.",
+    "mt": true
+  },
+  "loans.requestTitle": {
+    "text": "التقدم بطلب للحصول على قرض",
+    "mt": true
+  },
+  "loans.user": {
+    "text": "مستخدم",
+    "mt": true
+  },
+  "loans.book": {
+    "text": "كتاب",
+    "mt": true
+  },
+  "loans.submit": {
+    "text": "طلب قرض ( {days} أيام)",
+    "mt": true
+  },
+  "loans.historyTitle": {
+    "text": "تاريخ القروض",
+    "mt": true
+  },
+  "loans.onlyOverdue": {
+    "text": "لا تُظهر إلا المهزومين",
+    "mt": true
+  },
+  "loans.colUser": {
+    "text": "مستخدم",
+    "mt": true
+  },
+  "loans.colBook": {
+    "text": "كتاب",
+    "mt": true
+  },
+  "loans.colDue": {
+    "text": "نضج",
+    "mt": true
+  },
+  "loans.colStatus": {
+    "text": "ولاية",
+    "mt": true
+  },
+  "loans.returnAction": {
+    "text": "يعود",
+    "mt": true
+  },
+  "loans.returnedLate": {
+    "text": "تم تسجيل الإقرار متأخراً: تم إنشاء دين بقيمة {amount}.",
+    "mt": true
+  },
+  "loans.returnedOnTime": {
+    "text": "تم تسجيل الإرجاع في الوقت المحدد، دون غرامات.",
+    "mt": true
+  },
+  "loans.created": {
+    "text": "تم تسجيل القرض: \" {book} \" للمستخدم {user}. تاريخ الاستحقاق {date}.",
+    "mt": true
+  },
+  "loans.badgeReturned": {
+    "text": "عاد",
+    "mt": true
+  },
+  "loans.badgeOverdue": {
+    "text": "مهزوم",
+    "mt": true
+  },
+  "loans.badgeActive": {
+    "text": "أصل",
+    "mt": true
+  },
+  "loans.unknownBook": {
+    "text": "(تم حذف الكتاب)",
+    "mt": true
+  },
+  "loans.availableOf": {
+    "text": "{available} / {total} متاح",
+    "mt": true
+  },
+  "books.addTitle": {
+    "text": "أضف كتابًا",
+    "mt": true
+  },
+  "books.editTitle": {
+    "text": "تحرير كتاب",
+    "mt": true
+  },
+  "books.titleField": {
+    "text": "مؤهل",
+    "mt": true
+  },
+  "books.authorField": {
+    "text": "مؤلف",
+    "mt": true
+  },
+  "books.initialCopies": {
+    "text": "النسخ الأولية",
+    "mt": true
+  },
+  "books.submitAdd": {
+    "text": "أضف كتابًا",
+    "mt": true
+  },
+  "books.submitSave": {
+    "text": "حفظ التغييرات",
+    "mt": true
+  },
+  "books.cancelEdit": {
+    "text": "إلغاء التعديل",
+    "mt": true
+  },
+  "books.catalogTitle": {
+    "text": "الكتالوج",
+    "mt": true
+  },
+  "books.colTitle": {
+    "text": "مؤهل",
+    "mt": true
+  },
+  "books.colAuthor": {
+    "text": "مؤلف",
+    "mt": true
+  },
+  "books.colCopies": {
+    "text": "نسخ",
+    "mt": true
+  },
+  "books.colAddStock": {
+    "text": "أضف المخزون",
+    "mt": true
+  },
+  "books.addStockAction": {
+    "text": "يضيف",
+    "mt": true
+  },
+  "books.editAction": {
+    "text": "يحرر",
+    "mt": true
+  },
+  "books.deleteAction": {
+    "text": "اِسْتَبْعَد",
+    "mt": true
+  },
+  "books.deleted": {
+    "text": "تمت إزالة \" {title} \" من الكتالوج.",
+    "mt": true
+  },
+  "books.stockAdded": {
+    "text": "تمت إضافة {qty} نسخة إلى \" {title} \".",
+    "mt": true
+  },
+  "books.updated": {
+    "text": "تم تحديث \" {title} \".",
+    "mt": true
+  },
+  "books.created": {
+    "text": "تمت إضافة \" {title} \" إلى الكتالوج بعدد {qty} من النسخ.",
+    "mt": true
+  },
+  "users.addTitle": {
+    "text": "إضافة مستخدم",
+    "mt": true
+  },
+  "users.editTitle": {
+    "text": "تعديل المستخدم",
+    "mt": true
+  },
+  "users.name": {
+    "text": "اسم",
+    "mt": true
+  },
+  "users.email": {
+    "text": "بريد إلكتروني",
+    "mt": true
+  },
+  "users.submitAdd": {
+    "text": "إضافة مستخدم",
+    "mt": true
+  },
+  "users.submitSave": {
+    "text": "حفظ التغييرات",
+    "mt": true
+  },
+  "users.cancelEdit": {
+    "text": "إلغاء التعديل",
+    "mt": true
+  },
+  "users.listTitle": {
+    "text": "المستخدمون المسجلون",
+    "mt": true
+  },
+  "users.colName": {
+    "text": "اسم",
+    "mt": true
+  },
+  "users.colEmail": {
+    "text": "بريد إلكتروني",
+    "mt": true
+  },
+  "users.colStatus": {
+    "text": "ولاية",
+    "mt": true
+  },
+  "users.viewDetail": {
+    "text": "عرض التفاصيل",
+    "mt": true
+  },
+  "users.editAction": {
+    "text": "يحرر",
+    "mt": true
+  },
+  "users.deactivate": {
+    "text": "إلغاء التفعيل",
+    "mt": true
+  },
+  "users.activate": {
+    "text": "فعل",
+    "mt": true
+  },
+  "users.deleteAction": {
+    "text": "اِسْتَبْعَد",
+    "mt": true
+  },
+  "users.statusActive": {
+    "text": "أصل",
+    "mt": true
+  },
+  "users.statusInactive": {
+    "text": "عاطل",
+    "mt": true
+  },
+  "users.deleted": {
+    "text": "تمت إزالة {name} من الملف.",
+    "mt": true
+  },
+  "users.statusChangedActive": {
+    "text": "تم تفعيل {name}.",
+    "mt": true
+  },
+  "users.statusChangedInactive": {
+    "text": "تم تعطيل {name}.",
+    "mt": true
+  },
+  "users.defaultName": {
+    "text": "الشريك",
+    "mt": true
+  },
+  "users.updated": {
+    "text": "تم تحديث بيانات {name}.",
+    "mt": true
+  },
+  "users.created": {
+    "text": "تم تسجيل {name} كشريك.",
+    "mt": true
+  },
+  "users.detailTitle": {
+    "text": "استمارة العضوية",
+    "mt": true
+  },
+  "users.detailLoans": {
+    "text": "القروض",
+    "mt": true
+  },
+  "users.detailDebts": {
+    "text": "الديون",
+    "mt": true
+  },
+  "users.detailClose": {
+    "text": "يغلق",
+    "mt": true
+  },
+  "users.noLoans": {
+    "text": "لا قروض.",
+    "mt": true
+  },
+  "users.noDebts": {
+    "text": "لا ديون.",
+    "mt": true
+  },
+  "debts.title": {
+    "text": "جميع الديون",
+    "mt": true
+  },
+  "debts.colUser": {
+    "text": "مستخدم",
+    "mt": true
+  },
+  "debts.colAmount": {
+    "text": "كمية",
+    "mt": true
+  },
+  "debts.colCreated": {
+    "text": "تم إنشاؤه",
+    "mt": true
+  },
+  "debts.colStatus": {
+    "text": "ولاية",
+    "mt": true
+  },
+  "debts.markPaid": {
+    "text": "علامة مدفوعة",
+    "mt": true
+  },
+  "debts.paid": {
+    "text": "مدفوع",
+    "mt": true
+  },
+  "debts.unpaid": {
+    "text": "بدون أجر",
+    "mt": true
+  },
+  "debts.paidMessage": {
+    "text": "تم تسجيل عملية الدفع بمبلغ {amount}.",
+    "mt": true
+  },
+  "debts.paidMessageFor": {
+    "text": "تم تسجيل عملية الدفع بمبلغ {amount} من {user}.",
+    "mt": true
+  }
+}

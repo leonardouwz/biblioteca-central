@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Biblioteca Central</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --paper: #f1ecdc;
@@ -20,7 +20,7 @@
     --stamp-soft: #f3e2dc;
     --line: #d9cfb8;
     --font-stamp: 'Special Elite', 'Courier New', monospace;
-    --font-body: 'Archivo', system-ui, sans-serif;
+    --font-body: 'Archivo', 'Noto Sans Arabic', system-ui, sans-serif;
     --font-mono: 'Space Mono', 'Courier New', monospace;
   }
 
@@ -42,6 +42,10 @@
     background-size: 100% 2.1em;
     background-position: 0 148px;
   }
+
+  /* [ar] la tipografía "de máquina de escribir" no tiene glifos árabes: en RTL
+     se usa la fuente base (Noto Sans Arabic) para los títulos también. */
+  html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] .tab-btn { font-family: var(--font-body); }
 
   ::selection { background: var(--pine); color: var(--paper); }
 
@@ -75,6 +79,7 @@
     color: var(--pine);
     transform: rotate(-6deg);
   }
+  .masthead-titles { flex: 1; }
   h1 {
     font-family: var(--font-stamp);
     font-size: 1.65rem;
@@ -90,14 +95,18 @@
     letter-spacing: 0.04em;
   }
 
+  .lang-switch { flex: none; display: flex; flex-direction: column; gap: 3px; }
+  .lang-switch label { margin: 0; font-size: 0.68rem; }
+  .lang-switch select { margin-top: 0; width: auto; min-width: 130px; }
+
   h2 {
     font-family: var(--font-stamp);
     font-weight: 400;
     font-size: 1rem;
     letter-spacing: 0.02em;
     margin: 0 0 10px;
-    padding-left: 14px;
-    border-left: 3px solid var(--oak);
+    padding-inline-start: 14px;
+    border-inline-start: 3px solid var(--oak);
   }
   .section-title { margin-top: 28px; }
 
@@ -134,6 +143,7 @@
   }
 
   label { display: block; margin-top: 14px; font-weight: 600; font-size: 0.82rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+  .checkbox-label { display: inline-block; font-weight: normal; text-transform: none; margin-inline-start: 12px; }
   select, input {
     margin-top: 5px;
     padding: 9px 10px;
@@ -186,14 +196,14 @@
     white-space: pre-wrap;
     font-family: var(--font-mono);
     font-size: 0.78rem;
-    border-left: 3px solid;
+    border-inline-start: 3px solid;
   }
   .ok { background: var(--pine-soft); color: var(--pine); border-color: var(--pine); }
   .error { background: var(--stamp-soft); color: var(--stamp); border-color: var(--stamp); }
 
   table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
   th {
-    text-align: left;
+    text-align: start;
     padding: 10px 14px;
     font-family: var(--font-stamp);
     font-weight: 400;
@@ -282,7 +292,7 @@
 
   .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid var(--ink); }
   .modal-head .eyebrow { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--oak); margin: 0 0 4px; }
-  .modal h2 { border-left: none; padding-left: 0; margin: 0; font-size: 1.2rem; }
+  .modal h2 { border-inline-start: none; padding-inline-start: 0; margin: 0; font-size: 1.2rem; }
   .modal-close { flex: none; margin: 0; }
 
   .modal h3 {
@@ -310,172 +320,215 @@
 <body>
   <header class="masthead">
     <div class="masthead-mark" aria-hidden="true">B°</div>
-    <div>
-      <h1>Biblioteca Central</h1>
-      <p class="tagline">registro de préstamos · catálogo · fichero de socios</p>
+    <div class="masthead-titles">
+      <h1 data-i18n="meta.title">Biblioteca Central</h1>
+      <p class="tagline" data-i18n="meta.tagline">registro de préstamos · catálogo · fichero de socios</p>
+    </div>
+    <div class="lang-switch">
+      <label for="langSelect" data-i18n="common.language">Idioma</label>
+      <select id="langSelect">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="ar">العربية</option>
+      </select>
     </div>
   </header>
 
   <!-- ==================== SESIÓN ==================== -->
   <section id="authCard" class="card">
     <div id="authLoggedOut">
-      <h2>Iniciar sesión</h2>
+      <h2 data-i18n="auth.loginTitle">Iniciar sesión</h2>
       <div style="display:flex; gap:24px; flex-wrap:wrap;">
         <div style="flex:1; min-width:240px;">
-          <label for="loginEmail">Email</label>
+          <label for="loginEmail" data-i18n="auth.email">Email</label>
           <input id="loginEmail" type="email" autocomplete="username" />
-          <label for="loginPassword">Contraseña</label>
+          <label for="loginPassword" data-i18n="auth.password">Contraseña</label>
           <input id="loginPassword" type="password" autocomplete="current-password" />
-          <button id="loginSubmit">Entrar</button>
+          <button id="loginSubmit" data-i18n="auth.loginSubmit">Entrar</button>
         </div>
         <div style="flex:1; min-width:240px;">
-          <h3 style="margin-top:0;">¿No tienes cuenta? Regístrate</h3>
-          <label for="regEmail">Email</label>
+          <h3 style="margin-top:0;" data-i18n="auth.registerTitle">¿No tienes cuenta? Regístrate</h3>
+          <label for="regEmail" data-i18n="auth.email">Email</label>
           <input id="regEmail" type="email" autocomplete="username" />
-          <label for="regPassword">Contraseña (mín. 6)</label>
+          <label for="regPassword" data-i18n="auth.registerPasswordHint">Contraseña (mín. 6)</label>
           <input id="regPassword" type="password" autocomplete="new-password" />
-          <label for="regRole">Rol</label>
+          <label for="regRole" data-i18n="auth.role">Rol</label>
           <select id="regRole">
-            <option value="USUARIO">Usuario</option>
-            <option value="BIBLIOTECARIO">Bibliotecario</option>
-            <option value="ADMINISTRADOR">Administrador</option>
+            <option value="USUARIO" data-i18n="auth.roleUser">Usuario</option>
+            <option value="BIBLIOTECARIO" data-i18n="auth.roleLibrarian">Bibliotecario</option>
+            <option value="ADMINISTRADOR" data-i18n="auth.roleAdmin">Administrador</option>
           </select>
-          <button class="secondary" id="regSubmit">Crear cuenta</button>
+          <button class="secondary" id="regSubmit" data-i18n="auth.registerSubmit">Crear cuenta</button>
         </div>
       </div>
-      <div id="authResult" class="result" style="display:none"></div>
+      <div id="authResult" class="result" role="status" aria-live="polite" style="display:none"></div>
     </div>
     <div id="authLoggedIn" style="display:none; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-      <span>Sesión iniciada: <strong id="authEmail"></strong> · rol <strong id="authRole"></strong></span>
-      <button class="secondary" id="logoutBtn">Cerrar sesión</button>
+      <span id="authSessionLabel"></span>
+      <button class="secondary" id="logoutBtn" data-i18n="auth.logout">Cerrar sesión</button>
     </div>
   </section>
 
-  <p id="gateMsg" class="result" style="display:none">
-    Inicia sesión como <strong>bibliotecario</strong> o <strong>administrador</strong> para gestionar préstamos, catálogo y socios.
-  </p>
+  <p id="gateMsg" class="result" role="status" aria-live="polite" style="display:none"></p>
 
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="loans">Préstamos</button>
-    <button class="tab-btn" data-tab="books">Libros</button>
-    <button class="tab-btn" data-tab="users">Usuarios</button>
-    <button class="tab-btn" data-tab="debts">Deudas</button>
+  <div class="tabs" role="tablist" data-i18n-aria-label="nav.tablist">
+    <button class="tab-btn active" id="tabbtn-loans" role="tab" aria-selected="true" aria-controls="tab-loans" data-tab="loans" data-i18n="nav.loans">Préstamos</button>
+    <button class="tab-btn" id="tabbtn-books" role="tab" aria-selected="false" aria-controls="tab-books" data-tab="books" data-i18n="nav.books">Libros</button>
+    <button class="tab-btn" id="tabbtn-users" role="tab" aria-selected="false" aria-controls="tab-users" data-tab="users" data-i18n="nav.users">Usuarios</button>
+    <button class="tab-btn" id="tabbtn-debts" role="tab" aria-selected="false" aria-controls="tab-debts" data-tab="debts" data-i18n="nav.debts">Deudas</button>
   </div>
 
   <!-- ==================== PRÉSTAMOS ==================== -->
-  <section id="tab-loans" class="tab-panel active">
+  <section id="tab-loans" class="tab-panel active" role="tabpanel" aria-labelledby="tabbtn-loans">
     <div class="card">
-      <h2>Solicitar préstamo</h2>
-      <label for="loanUserId">Usuario</label>
+      <h2 data-i18n="loans.requestTitle">Solicitar préstamo</h2>
+      <label for="loanUserId" data-i18n="loans.user">Usuario</label>
       <select id="loanUserId"></select>
 
-      <label for="loanBookId">Libro</label>
+      <label for="loanBookId" data-i18n="loans.book">Libro</label>
       <select id="loanBookId"></select>
 
-      <button id="loanSubmit">Solicitar préstamo (14 días)</button>
-      <div id="loanResult" class="result" style="display:none"></div>
+      <button id="loanSubmit"></button>
+      <div id="loanResult" class="result" role="status" aria-live="polite" style="display:none"></div>
     </div>
 
     <h2 class="section-title">
-      Historial de préstamos
-      <label style="display:inline-block; font-weight:normal; margin-left:12px;">
-        <input type="checkbox" id="onlyOverdue"> mostrar solo vencidos
+      <span data-i18n="loans.historyTitle">Historial de préstamos</span>
+      <label class="checkbox-label">
+        <input type="checkbox" id="onlyOverdue"> <span data-i18n="loans.onlyOverdue">mostrar solo vencidos</span>
       </label>
     </h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Usuario</th><th>Libro</th><th>Vencimiento</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr>
+        <th data-i18n="loans.colUser">Usuario</th>
+        <th data-i18n="loans.colBook">Libro</th>
+        <th data-i18n="loans.colDue">Vencimiento</th>
+        <th data-i18n="loans.colStatus">Estado</th>
+        <th></th>
+      </tr></thead>
       <tbody id="loansTableBody"></tbody>
     </table></div>
   </section>
 
   <!-- ==================== LIBROS ==================== -->
-  <section id="tab-books" class="tab-panel">
+  <section id="tab-books" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-books">
     <div class="card">
-      <h2 id="bookFormTitle">Agregar libro</h2>
-      <label for="bookTitle">Título</label>
+      <h2 id="bookFormTitle" data-i18n="books.addTitle">Agregar libro</h2>
+      <label for="bookTitle" data-i18n="books.titleField">Título</label>
       <input id="bookTitle" type="text">
 
-      <label for="bookAuthor">Autor</label>
+      <label for="bookAuthor" data-i18n="books.authorField">Autor</label>
       <input id="bookAuthor" type="text">
 
-      <label for="bookCopies" id="bookCopiesLabel">Copias iniciales</label>
+      <label for="bookCopies" id="bookCopiesLabel" data-i18n="books.initialCopies">Copias iniciales</label>
       <input id="bookCopies" type="number" min="0" value="1">
 
-      <button id="bookSubmit">Agregar libro</button>
-      <button id="bookCancelEdit" class="cancel" style="display:none">Cancelar edición</button>
-      <div id="bookResult" class="result" style="display:none"></div>
+      <button id="bookSubmit" data-i18n="books.submitAdd">Agregar libro</button>
+      <button id="bookCancelEdit" class="cancel" style="display:none" data-i18n="books.cancelEdit">Cancelar edición</button>
+      <div id="bookResult" class="result" role="status" aria-live="polite" style="display:none"></div>
     </div>
 
-    <h2 class="section-title">Catálogo</h2>
+    <h2 class="section-title" data-i18n="books.catalogTitle">Catálogo</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Título</th><th>Autor</th><th>Copias</th><th>Agregar stock</th><th></th></tr></thead>
+      <thead><tr>
+        <th data-i18n="books.colTitle">Título</th>
+        <th data-i18n="books.colAuthor">Autor</th>
+        <th data-i18n="books.colCopies">Copias</th>
+        <th data-i18n="books.colAddStock">Agregar stock</th>
+        <th></th>
+      </tr></thead>
       <tbody id="booksTableBody"></tbody>
     </table></div>
   </section>
 
   <!-- ==================== USUARIOS ==================== -->
-  <section id="tab-users" class="tab-panel">
+  <section id="tab-users" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-users">
     <div class="card">
-      <h2 id="userFormTitle">Agregar usuario</h2>
-      <label for="userName">Nombre</label>
+      <h2 id="userFormTitle" data-i18n="users.addTitle">Agregar usuario</h2>
+      <label for="userName" data-i18n="users.name">Nombre</label>
       <input id="userName" type="text">
 
-      <label for="userEmail">Email</label>
+      <label for="userEmail" data-i18n="users.email">Email</label>
       <input id="userEmail" type="email">
 
-      <button id="userSubmit">Agregar usuario</button>
-      <button id="userCancelEdit" class="cancel" style="display:none">Cancelar edición</button>
-      <div id="userResult" class="result" style="display:none"></div>
+      <button id="userSubmit" data-i18n="users.submitAdd">Agregar usuario</button>
+      <button id="userCancelEdit" class="cancel" style="display:none" data-i18n="users.cancelEdit">Cancelar edición</button>
+      <div id="userResult" class="result" role="status" aria-live="polite" style="display:none"></div>
     </div>
 
-    <h2 class="section-title">Usuarios registrados</h2>
+    <h2 class="section-title" data-i18n="users.listTitle">Usuarios registrados</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Nombre</th><th>Email</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr>
+        <th data-i18n="users.colName">Nombre</th>
+        <th data-i18n="users.colEmail">Email</th>
+        <th data-i18n="users.colStatus">Estado</th>
+        <th></th>
+      </tr></thead>
       <tbody id="usersTableBody"></tbody>
     </table></div>
   </section>
 
   <!-- ==================== DEUDAS ==================== -->
-  <section id="tab-debts" class="tab-panel">
-    <h2 class="section-title">Todas las deudas</h2>
-    <div id="debtResult" class="result" style="display:none"></div>
+  <section id="tab-debts" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-debts">
+    <h2 class="section-title" data-i18n="debts.title">Todas las deudas</h2>
+    <div id="debtResult" class="result" role="status" aria-live="polite" style="display:none"></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Usuario</th><th>Monto</th><th>Generada</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr>
+        <th data-i18n="debts.colUser">Usuario</th>
+        <th data-i18n="debts.colAmount">Monto</th>
+        <th data-i18n="debts.colCreated">Generada</th>
+        <th data-i18n="debts.colStatus">Estado</th>
+        <th></th>
+      </tr></thead>
       <tbody id="debtsTableBody"></tbody>
     </table></div>
   </section>
 
   <!-- ==================== MODAL DETALLE USUARIO ==================== -->
   <div class="modal-overlay" id="userDetailOverlay">
-    <div class="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="userDetailName">
       <div class="modal-head">
         <div>
-          <p class="eyebrow">Ficha de socio</p>
+          <p class="eyebrow" data-i18n="users.detailTitle">Ficha de socio</p>
           <h2><span id="userDetailName"></span></h2>
         </div>
-        <button class="secondary modal-close" id="userDetailClose">Cerrar</button>
+        <button class="secondary modal-close" id="userDetailClose" data-i18n="users.detailClose">Cerrar</button>
       </div>
-      <h3>Préstamos</h3>
+      <h3 data-i18n="users.detailLoans">Préstamos</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Libro</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+        <thead><tr>
+          <th data-i18n="loans.colBook">Libro</th>
+          <th data-i18n="loans.colDue">Vencimiento</th>
+          <th data-i18n="loans.colStatus">Estado</th>
+        </tr></thead>
         <tbody id="userDetailLoans"></tbody>
       </table></div>
-      <h3>Deudas</h3>
+      <h3 data-i18n="users.detailDebts">Deudas</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Monto</th><th>Generada</th><th>Estado</th><th></th></tr></thead>
+        <thead><tr>
+          <th data-i18n="debts.colAmount">Monto</th>
+          <th data-i18n="debts.colCreated">Generada</th>
+          <th data-i18n="debts.colStatus">Estado</th>
+          <th></th>
+        </tr></thead>
         <tbody id="userDetailDebts"></tbody>
       </table></div>
-      <div id="modalResult" class="result" style="display:none"></div>
+      <div id="modalResult" class="result" role="status" aria-live="polite" style="display:none"></div>
     </div>
   </div>
 
+  <script src="format.js"></script>
+  <script src="i18n.js"></script>
   <script>
-    // ---------- Navegación entre pestañas ----------
+    const { t, formatCurrency, formatDate, translateError, setLocale, getLocale } = window.I18n;
+
+    // ---------- Navegación entre pestañas (patrón ARIA tablist) ----------
     document.querySelectorAll('.tab-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach((b) => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
         document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
         btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
       });
     });
@@ -486,34 +539,32 @@
       el.textContent = message;
     }
 
-    function errorMessage(data) {
-      return data?.error ?? 'Ocurrió un error inesperado.';
-    }
-
-    function fmtDate(iso) {
-      return new Date(iso).toLocaleDateString();
-    }
-
     function loanBadge(l) {
-      if (l.status === 'RETURNED') return '<span class="badge badge-returned">Devuelto</span>';
+      if (l.status === 'RETURNED') return `<span class="badge badge-returned">${t('loans.badgeReturned')}</span>`;
       const isOverdue = new Date(l.dueDate).getTime() < Date.now();
       return isOverdue
-        ? '<span class="badge badge-overdue">Vencido</span>'
-        : '<span class="badge badge-active">Activo</span>';
+        ? `<span class="badge badge-overdue">${t('loans.badgeOverdue')}</span>`
+        : `<span class="badge badge-active">${t('loans.badgeActive')}</span>`;
     }
 
     const API_BASE_URL = 'https://biblioteca-backend-438047115829.us-central1.run.app';
+    const LOAN_PERIOD_DAYS = 14;
 
     async function fetchJson(path, options = {}) {
       const token = localStorage.getItem('authToken');
       const headers = { ...(options.headers || {}) };
       if (token) headers['Authorization'] = 'Bearer ' + token;
-      const res = await fetch(API_BASE_URL + path, { ...options, headers });
+      const sep = path.includes('?') ? '&' : '?';
+      const res = await fetch(API_BASE_URL + path + sep + 'lang=' + getLocale(), { ...options, headers });
       const data = res.status === 204 ? null : await res.json().catch(() => null);
       if (res.status === 401) {
         clearSession();
       }
       return { ok: res.ok, data };
+    }
+
+    function errorMessage(data) {
+      return translateError(data);
     }
 
     let allUsers = [];
@@ -539,8 +590,9 @@
         .map((u) => `<option value="${u.id}">${u.name}</option>`)
         .join('');
       document.getElementById('loanBookId').innerHTML = allBooks
-        .map((b) => `<option value="${b.id}">${b.title} (${b.availableCopies}/${b.totalCopies} disp.)</option>`)
+        .map((b) => `<option value="${b.id}">${b.title} (${t('loans.availableOf', { available: b.availableCopies, total: b.totalCopies })})</option>`)
         .join('');
+      document.getElementById('loanSubmit').textContent = t('loans.submit', { days: LOAN_PERIOD_DAYS });
     }
 
     async function loadLoans() {
@@ -555,12 +607,12 @@
         .map((l) => {
           const badge = loanBadge(l);
           const action = l.status === 'ACTIVE'
-            ? `<button class="success" data-return-loan="${l.id}">Devolver</button>`
+            ? `<button class="success" data-return-loan="${l.id}">${t('loans.returnAction')}</button>`
             : '';
           return `<tr>
             <td>${userName(l.userId)}</td>
-            <td>${l.bookTitle ?? l.bookCopyId}</td>
-            <td>${fmtDate(l.dueDate)}</td>
+            <td>${l.bookTitle ?? t('loans.unknownBook')}</td>
+            <td>${formatDate(l.dueDate)}</td>
             <td>${badge}</td>
             <td>${action}</td>
           </tr>`;
@@ -572,8 +624,8 @@
           const { ok, data } = await fetchJson(`/api/v1/loans/${btn.dataset.returnLoan}/return`, { method: 'POST' });
           const message = ok
             ? data.fineAmount > 0
-              ? `Devolución registrada con atraso: se generó una deuda de $${data.fineAmount}.`
-              : 'Devolución registrada a tiempo, sin multas.'
+              ? t('loans.returnedLate', { amount: formatCurrency(data.fineAmount) })
+              : t('loans.returnedOnTime')
             : errorMessage(data);
           showResult(document.getElementById('loanResult'), ok, message);
           if (ok) await loadAll();
@@ -594,7 +646,7 @@
         body: JSON.stringify({ userId, bookId }),
       });
       const message = ok
-        ? `Préstamo registrado: "${bookTitle}" para ${userName}. Vence el ${fmtDate(data.dueDate)}.`
+        ? t('loans.created', { book: bookTitle, user: userName, date: formatDate(data.dueDate) })
         : errorMessage(data);
       showResult(document.getElementById('loanResult'), ok, message);
       if (ok) await loadAll();
@@ -613,12 +665,12 @@
             <td>
               <div class="inline-stock">
                 <input type="number" min="1" value="1" id="stock-${b.id}">
-                <button class="secondary" data-add-stock="${b.id}">Agregar</button>
+                <button class="secondary" data-add-stock="${b.id}">${t('books.addStockAction')}</button>
               </div>
             </td>
             <td class="row-actions">
-              <button class="secondary" data-edit-book="${b.id}">Editar</button>
-              <button class="danger" data-delete-book="${b.id}">Eliminar</button>
+              <button class="secondary" data-edit-book="${b.id}">${t('books.editAction')}</button>
+              <button class="danger" data-delete-book="${b.id}">${t('books.deleteAction')}</button>
             </td>
           </tr>`
         )
@@ -628,7 +680,7 @@
         btn.addEventListener('click', async () => {
           const book = allBooks.find((b) => b.id === btn.dataset.deleteBook);
           const { ok, data } = await fetchJson(`/api/v1/books/${btn.dataset.deleteBook}`, { method: 'DELETE' });
-          const message = ok ? `Se eliminó "${book?.title ?? ''}" del catálogo.` : errorMessage(data);
+          const message = ok ? t('books.deleted', { title: book?.title ?? '' }) : errorMessage(data);
           showResult(document.getElementById('bookResult'), ok, message);
           await loadAll();
         });
@@ -643,8 +695,8 @@
           document.getElementById('bookAuthor').value = book.author;
           document.getElementById('bookCopiesLabel').style.display = 'none';
           document.getElementById('bookCopies').style.display = 'none';
-          document.getElementById('bookFormTitle').textContent = 'Editar libro';
-          document.getElementById('bookSubmit').textContent = 'Guardar cambios';
+          document.getElementById('bookFormTitle').textContent = t('books.editTitle');
+          document.getElementById('bookSubmit').textContent = t('books.submitSave');
           document.getElementById('bookCancelEdit').style.display = 'block';
         });
       });
@@ -660,7 +712,7 @@
             body: JSON.stringify({ quantity }),
           });
           const message = ok
-            ? `Se agregaron ${quantity} copia${quantity === 1 ? '' : 's'} a "${book?.title ?? ''}".`
+            ? t('books.stockAdded', { qty: quantity, count: quantity, title: book?.title ?? '' })
             : errorMessage(data);
           showResult(document.getElementById('bookResult'), ok, message);
           await loadAll();
@@ -675,8 +727,8 @@
       document.getElementById('bookCopies').value = '1';
       document.getElementById('bookCopiesLabel').style.display = 'block';
       document.getElementById('bookCopies').style.display = 'block';
-      document.getElementById('bookFormTitle').textContent = 'Agregar libro';
-      document.getElementById('bookSubmit').textContent = 'Agregar libro';
+      document.getElementById('bookFormTitle').textContent = t('books.addTitle');
+      document.getElementById('bookSubmit').textContent = t('books.submitAdd');
       document.getElementById('bookCancelEdit').style.display = 'none';
     }
 
@@ -697,8 +749,8 @@
       });
       const message = ok
         ? isEditing
-          ? `Se actualizó "${data.title}".`
-          : `Se agregó "${data.title}" al catálogo con ${initialCopies} copia${initialCopies === 1 ? '' : 's'}.`
+          ? t('books.updated', { title: data.title })
+          : t('books.created', { title: data.title, qty: initialCopies, count: initialCopies })
         : errorMessage(data);
       showResult(document.getElementById('bookResult'), ok, message);
       if (ok) {
@@ -714,20 +766,20 @@
       document.getElementById('usersTableBody').innerHTML = allUsers
         .map((u) => {
           const badge = u.status === 'ACTIVE'
-            ? '<span class="badge badge-active">Activo</span>'
-            : '<span class="badge badge-inactive">Inactivo</span>';
+            ? `<span class="badge badge-active">${t('users.statusActive')}</span>`
+            : `<span class="badge badge-inactive">${t('users.statusInactive')}</span>`;
           const statusBtn = u.status === 'ACTIVE'
-            ? `<button class="secondary" data-toggle-status="${u.id}" data-next-status="INACTIVE">Desactivar</button>`
-            : `<button class="secondary" data-toggle-status="${u.id}" data-next-status="ACTIVE">Activar</button>`;
+            ? `<button class="secondary" data-toggle-status="${u.id}" data-next-status="INACTIVE">${t('users.deactivate')}</button>`
+            : `<button class="secondary" data-toggle-status="${u.id}" data-next-status="ACTIVE">${t('users.activate')}</button>`;
           return `<tr>
             <td>${u.name}</td>
             <td>${u.email}</td>
             <td>${badge}</td>
             <td class="row-actions">
-              <button class="ghost" data-view-user="${u.id}">Ver detalle</button>
-              <button class="secondary" data-edit-user="${u.id}">Editar</button>
+              <button class="ghost" data-view-user="${u.id}">${t('users.viewDetail')}</button>
+              <button class="secondary" data-edit-user="${u.id}">${t('users.editAction')}</button>
               ${statusBtn}
-              <button class="danger" data-delete-user="${u.id}">Eliminar</button>
+              <button class="danger" data-delete-user="${u.id}">${t('users.deleteAction')}</button>
             </td>
           </tr>`;
         })
@@ -737,7 +789,7 @@
         btn.addEventListener('click', async () => {
           const user = allUsers.find((u) => u.id === btn.dataset.deleteUser);
           const { ok, data } = await fetchJson(`/api/v1/users/${btn.dataset.deleteUser}`, { method: 'DELETE' });
-          const message = ok ? `Se eliminó a ${user?.name ?? ''} del fichero.` : errorMessage(data);
+          const message = ok ? t('users.deleted', { name: user?.name ?? '' }) : errorMessage(data);
           showResult(document.getElementById('userResult'), ok, message);
           await loadAll();
         });
@@ -752,8 +804,11 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: nextStatus }),
           });
+          const name = user?.name ?? t('users.defaultName');
           const message = ok
-            ? `${user?.name ?? 'El socio'} fue ${nextStatus === 'ACTIVE' ? 'activado' : 'desactivado'}.`
+            ? nextStatus === 'ACTIVE'
+              ? t('users.statusChangedActive', { name })
+              : t('users.statusChangedInactive', { name })
             : errorMessage(data);
           showResult(document.getElementById('userResult'), ok, message);
           await loadAll();
@@ -767,8 +822,8 @@
           editingUserId = user.id;
           document.getElementById('userName').value = user.name;
           document.getElementById('userEmail').value = user.email;
-          document.getElementById('userFormTitle').textContent = 'Editar usuario';
-          document.getElementById('userSubmit').textContent = 'Guardar cambios';
+          document.getElementById('userFormTitle').textContent = t('users.editTitle');
+          document.getElementById('userSubmit').textContent = t('users.submitSave');
           document.getElementById('userCancelEdit').style.display = 'block';
         });
       });
@@ -782,8 +837,8 @@
       editingUserId = null;
       document.getElementById('userName').value = '';
       document.getElementById('userEmail').value = '';
-      document.getElementById('userFormTitle').textContent = 'Agregar usuario';
-      document.getElementById('userSubmit').textContent = 'Agregar usuario';
+      document.getElementById('userFormTitle').textContent = t('users.addTitle');
+      document.getElementById('userSubmit').textContent = t('users.submitAdd');
       document.getElementById('userCancelEdit').style.display = 'none';
     }
 
@@ -802,8 +857,8 @@
       });
       const message = ok
         ? isEditing
-          ? `Se actualizaron los datos de ${data.name}.`
-          : `Se registró a ${data.name} como socio.`
+          ? t('users.updated', { name: data.name })
+          : t('users.created', { name: data.name })
         : errorMessage(data);
       showResult(document.getElementById('userResult'), ok, message);
       if (ok) {
@@ -823,22 +878,22 @@
       document.getElementById('userDetailName').textContent = user ? user.name : userId;
 
       document.getElementById('userDetailLoans').innerHTML = loansRes.data
-        .map((l) => `<tr><td>${l.bookTitle ?? l.bookCopyId}</td><td>${fmtDate(l.dueDate)}</td><td>${loanBadge(l)}</td></tr>`)
-        .join('') || '<tr><td colspan="3" class="empty-note">Sin préstamos.</td></tr>';
+        .map((l) => `<tr><td>${l.bookTitle ?? t('loans.unknownBook')}</td><td>${formatDate(l.dueDate)}</td><td>${loanBadge(l)}</td></tr>`)
+        .join('') || `<tr><td colspan="3" class="empty-note">${t('users.noLoans')}</td></tr>`;
 
       document.getElementById('userDetailDebts').innerHTML = debtsRes.data
         .map((d) => `<tr>
-          <td>${d.amount}</td>
-          <td>${fmtDate(d.createdAt)}</td>
-          <td>${d.paid ? '<span class="badge badge-paid">Pagada</span>' : '<span class="badge badge-unpaid">Impaga</span>'}</td>
-          <td>${d.paid ? '' : `<button class="success" data-pay-debt="${d.id}">Marcar pagada</button>`}</td>
+          <td>${formatCurrency(d.amount)}</td>
+          <td>${formatDate(d.createdAt)}</td>
+          <td>${d.paid ? `<span class="badge badge-paid">${t('debts.paid')}</span>` : `<span class="badge badge-unpaid">${t('debts.unpaid')}</span>`}</td>
+          <td>${d.paid ? '' : `<button class="success" data-pay-debt="${d.id}">${t('debts.markPaid')}</button>`}</td>
         </tr>`)
-        .join('') || '<tr><td colspan="4" class="empty-note">Sin deudas.</td></tr>';
+        .join('') || `<tr><td colspan="4" class="empty-note">${t('users.noDebts')}</td></tr>`;
 
       document.querySelectorAll('[data-pay-debt]').forEach((btn) => {
         btn.addEventListener('click', async () => {
           const { ok, data } = await fetchJson(`/api/v1/debts/${btn.dataset.payDebt}/pay`, { method: 'POST' });
-          const message = ok ? `Se registró el pago de $${data.amount}.` : errorMessage(data);
+          const message = ok ? t('debts.paidMessage', { amount: formatCurrency(data.amount) }) : errorMessage(data);
           await openUserDetail(userId);
           showResult(document.getElementById('modalResult'), ok, message);
           await loadDebts();
@@ -862,17 +917,19 @@
         .reverse()
         .map((d) => `<tr>
           <td>${userName(d.userId)}</td>
-          <td>${d.amount}</td>
-          <td>${fmtDate(d.createdAt)}</td>
-          <td>${d.paid ? '<span class="badge badge-paid">Pagada</span>' : '<span class="badge badge-unpaid">Impaga</span>'}</td>
-          <td>${d.paid ? '' : `<button class="success" data-pay-debt-global="${d.id}">Marcar pagada</button>`}</td>
+          <td>${formatCurrency(d.amount)}</td>
+          <td>${formatDate(d.createdAt)}</td>
+          <td>${d.paid ? `<span class="badge badge-paid">${t('debts.paid')}</span>` : `<span class="badge badge-unpaid">${t('debts.unpaid')}</span>`}</td>
+          <td>${d.paid ? '' : `<button class="success" data-pay-debt-global="${d.id}">${t('debts.markPaid')}</button>`}</td>
         </tr>`)
         .join('');
 
       document.querySelectorAll('[data-pay-debt-global]').forEach((btn) => {
         btn.addEventListener('click', async () => {
           const { ok, data } = await fetchJson(`/api/v1/debts/${btn.dataset.payDebtGlobal}/pay`, { method: 'POST' });
-          const message = ok ? `Se registró el pago de $${data.amount} de ${userName(data.userId)}.` : errorMessage(data);
+          const message = ok
+            ? t('debts.paidMessageFor', { amount: formatCurrency(data.amount), user: userName(data.userId) })
+            : errorMessage(data);
           await loadDebts();
           showResult(document.getElementById('debtResult'), ok, message);
         });
@@ -881,12 +938,17 @@
 
     // ---------- Sesión (autenticación básica) ----------
     const STAFF_ROLES = ['BIBLIOTECARIO', 'ADMINISTRADOR'];
+    const ROLE_LABEL_KEY = { USUARIO: 'auth.roleUser', BIBLIOTECARIO: 'auth.roleLibrarian', ADMINISTRADOR: 'auth.roleAdmin' };
 
     function setStaffView(isStaff) {
       document.querySelector('.tabs').style.display = isStaff ? '' : 'none';
       document.querySelectorAll('.tab-panel').forEach((p) => { p.style.display = isStaff ? '' : 'none'; });
-      document.getElementById('gateMsg').style.display =
-        (!isStaff && localStorage.getItem('authToken')) ? 'block' : 'none';
+      const showGate = !isStaff && !!localStorage.getItem('authToken');
+      const gate = document.getElementById('gateMsg');
+      gate.style.display = showGate ? 'block' : 'none';
+      if (showGate) {
+        gate.textContent = t('auth.gateMessage', { librarian: t('auth.roleLibrarian'), admin: t('auth.roleAdmin') });
+      }
     }
 
     function renderSession() {
@@ -897,8 +959,8 @@
       document.getElementById('authLoggedOut').style.display = loggedIn ? 'none' : 'block';
       document.getElementById('authLoggedIn').style.display = loggedIn ? 'flex' : 'none';
       if (loggedIn) {
-        document.getElementById('authEmail').textContent = email || '';
-        document.getElementById('authRole').textContent = role || '';
+        const roleLabel = t(ROLE_LABEL_KEY[role] || 'auth.roleUser');
+        document.getElementById('authSessionLabel').textContent = t('auth.sessionActive', { email, role: roleLabel });
       }
       const isStaff = loggedIn && STAFF_ROLES.includes(role);
       setStaffView(isStaff);
@@ -928,7 +990,7 @@
         body: JSON.stringify({ email, password }),
       });
       if (ok) saveSession(data);
-      showResult(document.getElementById('authResult'), ok, ok ? `Bienvenido, ${data.account.email}.` : errorMessage(data));
+      showResult(document.getElementById('authResult'), ok, ok ? t('auth.welcome', { email: data.account.email }) : errorMessage(data));
     });
 
     document.getElementById('regSubmit').addEventListener('click', async () => {
@@ -941,12 +1003,27 @@
         body: JSON.stringify({ email, password, role }),
       });
       if (ok) saveSession(data);
-      showResult(document.getElementById('authResult'), ok, ok ? `Cuenta creada como ${data.account.role}.` : errorMessage(data));
+      showResult(document.getElementById('authResult'), ok, ok ? t('auth.accountCreated', { role: t(ROLE_LABEL_KEY[data.account?.role] || 'auth.roleUser') }) : errorMessage(data));
     });
 
     document.getElementById('logoutBtn').addEventListener('click', clearSession);
 
-    renderSession();
+    // ---------- Selector de idioma ----------
+    const langSelect = document.getElementById('langSelect');
+    langSelect.addEventListener('change', async () => {
+      await setLocale(langSelect.value);
+      renderSession(); // vuelve a traducir textos generados dinámicamente (sesión, gate, tablas ya cargadas se refrescan con loadAll)
+    });
+
+    document.addEventListener('i18n:changed', () => {
+      document.title = t('meta.title');
+      langSelect.value = getLocale();
+    });
+
+    (async () => {
+      await window.I18n.initI18n();
+      renderSession();
+    })();
   </script>
 </body>
 </html>
