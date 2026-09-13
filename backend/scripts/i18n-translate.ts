@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
-const TARGET_LANGS: Record<string, string> = { en: "en", ar: "ar" }; // locale -> código ISO de la API
+const TARGET_LANGS: Record<string, string> = { en: "en", ar: "ar", fr: "fr" }; // locale -> código ISO de la API
 
 const CATALOG_DIRS = [
   path.join(__dirname, "..", "src", "domain", "i18n", "locales"),

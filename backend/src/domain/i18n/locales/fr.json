@@ -1,0 +1,43 @@
+{
+  "BOOK_NOT_FOUND": "Le livre n'existe pas.",
+  "BOOK_TITLE_AUTHOR_REQUIRED": "Le titre et l'auteur sont requis.",
+  "BOOK_QUANTITY_INVALID": "La quantité à ajouter doit être supérieure à zéro.",
+  "BOOK_HAS_LOANED_COPIES": "Impossible de supprimer un livre dont des exemplaires sont actuellement empruntés.",
+  "BOOK_COPIES_NEGATIVE": "Le nombre d'exemplaires ne peut pas être négatif.",
+  "BOOK_NO_COPIES_AVAILABLE": "Aucun exemplaire de ce livre n'est disponible.",
+
+  "USER_NOT_FOUND": "L'utilisateur n'existe pas.",
+  "USER_INACTIVE": "L'utilisateur est désactivé et ne peut pas emprunter.",
+  "USER_HAS_UNPAID_DEBT": "L'utilisateur a des dettes impayées et ne peut pas emprunter.",
+  "USER_HAS_ACTIVE_LOANS": "Impossible de supprimer un utilisateur ayant des emprunts actifs.",
+  "USER_DELETE_HAS_UNPAID_DEBT": "Impossible de supprimer un utilisateur ayant des dettes impayées.",
+  "USER_NAME_REQUIRED": "Le nom est requis.",
+  "USER_EMAIL_TAKEN": "Un utilisateur avec cet email existe déjà.",
+
+  "LOAN_MAX_ACTIVE": {
+    "one": "L'utilisateur a déjà {max} emprunt actif.",
+    "other": "L'utilisateur a déjà {max} emprunts actifs."
+  },
+  "LOAN_NOT_FOUND": "L'emprunt n'existe pas.",
+  "LOAN_ALREADY_RETURNED": "Cet emprunt a déjà été retourné.",
+
+  "DEBT_NOT_FOUND": "La dette n'existe pas.",
+
+  "EMAIL_INVALID": "L'email n'est pas valide.",
+  "PASSWORD_TOO_SHORT": "Le mot de passe doit contenir au moins 6 caractères.",
+  "ACCOUNT_EMAIL_TAKEN": "Un compte avec cet email existe déjà.",
+  "AUTH_INVALID_CREDENTIALS": "Email ou mot de passe incorrect.",
+  "AUTH_SESSION_INVALID": "Session invalide ou expirée.",
+  "AUTH_REQUIRED": "Connexion requise.",
+  "AUTH_FORBIDDEN": "Vous n'avez pas la permission d'effectuer cette action.",
+
+  "INTERNAL_ERROR": "Erreur interne du serveur.",
+
+  "BODY_LOAN_INVALID": "userId et bookId sont requis et doivent être des chaînes.",
+  "BODY_AUTH_INVALID": "email (string) et password (string) sont requis.",
+  "BODY_BOOK_CREATE_INVALID": "title (string), author (string) et initialCopies (number) sont requis.",
+  "BODY_BOOK_UPDATE_INVALID": "title (string) et author (string) sont requis.",
+  "BODY_STOCK_INVALID": "quantity (number) est requis.",
+  "BODY_USER_INVALID": "name (string) et email (string) sont requis.",
+  "BODY_STATUS_INVALID": "status doit être ACTIVE ou INACTIVE."
+}

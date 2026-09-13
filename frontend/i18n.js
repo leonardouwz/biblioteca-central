@@ -5,7 +5,7 @@
  * vía atributos `data-i18n*`. Usa las funciones puras de `format.js`.
  */
 (function () {
-  const SUPPORTED = ["es", "en", "ar"];
+  const SUPPORTED = ["es", "en", "ar", "fr"];
   const DEFAULT_LOCALE = "es";
   const STORAGE_KEY = "locale";
 

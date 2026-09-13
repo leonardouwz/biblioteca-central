@@ -5,6 +5,7 @@ import { t, baseKeys, keysOf, SUPPORTED_LOCALES, LOCALE_META } from "./t";
 test("t: interpola placeholders", () => {
   assert.equal(t("USER_NOT_FOUND", "es"), "El usuario no existe.");
   assert.equal(t("USER_NOT_FOUND", "en"), "The user does not exist.");
+  assert.equal(t("USER_NOT_FOUND", "fr"), "L'utilisateur n'existe pas.");
 });
 
 test("t: pluraliza LOAN_MAX_ACTIVE según count", () => {
@@ -22,7 +23,7 @@ test("t: clave desconocida devuelve el propio código en vez de romper", () => {
   assert.equal(t("NO_EXISTE_ESTA_CLAVE", "es"), "NO_EXISTE_ESTA_CLAVE");
 });
 
-test("baseKeys/keysOf: los 3 locales cubren exactamente las claves del locale base", () => {
+test("baseKeys/keysOf: todos los locales cubren exactamente las claves del locale base", () => {
   const base = new Set(baseKeys());
   for (const locale of SUPPORTED_LOCALES) {
     const keys = new Set(keysOf(locale));
@@ -31,8 +32,9 @@ test("baseKeys/keysOf: los 3 locales cubren exactamente las claves del locale ba
   }
 });
 
-test("LOCALE_META: es/en son ltr, ar es rtl", () => {
+test("LOCALE_META: es/en/fr son ltr, ar es rtl", () => {
   assert.equal(LOCALE_META.es.dir, "ltr");
   assert.equal(LOCALE_META.en.dir, "ltr");
+  assert.equal(LOCALE_META.fr.dir, "ltr");
   assert.equal(LOCALE_META.ar.dir, "rtl");
 });

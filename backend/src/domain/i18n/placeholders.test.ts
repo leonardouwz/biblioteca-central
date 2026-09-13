@@ -4,6 +4,7 @@ import { placeholdersOf, placeholderMismatches } from "./placeholders";
 import es from "./locales/es.json";
 import en from "./locales/en.json";
 import ar from "./locales/ar.json";
+import fr from "./locales/fr.json";
 
 test("placeholdersOf: extrae nombres de {placeholder} de string, {text} y {one,other}", () => {
   assert.deepEqual(placeholdersOf("Hola {name}"), new Set(["name"]));
@@ -26,7 +27,8 @@ test("placeholderMismatches: detecta cuando una traducción no preserva los plac
   assert.deepEqual(placeholderMismatches(base, bien), []);
 });
 
-test("catálogos backend: en/ar preservan los mismos placeholders que es.json", () => {
+test("catálogos backend: en/ar/fr preservan los mismos placeholders que es.json", () => {
   assert.deepEqual(placeholderMismatches(es, en), []);
   assert.deepEqual(placeholderMismatches(es, ar), []);
+  assert.deepEqual(placeholderMismatches(es, fr), []);
 });

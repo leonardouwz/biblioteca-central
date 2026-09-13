@@ -14,6 +14,7 @@ import { placeholderMismatches } from "../src/domain/i18n/placeholders";
 import esBackend from "../src/domain/i18n/locales/es.json";
 import enBackend from "../src/domain/i18n/locales/en.json";
 import arBackend from "../src/domain/i18n/locales/ar.json";
+import frBackend from "../src/domain/i18n/locales/fr.json";
 
 let problems = 0;
 
@@ -37,6 +38,7 @@ for (const locale of SUPPORTED_LOCALES) {
 for (const [locale, dict] of [
   ["en", enBackend],
   ["ar", arBackend],
+  ["fr", frBackend],
 ] as const) {
   const mismatches = placeholderMismatches(esBackend, dict);
   report(`backend/${locale}.json placeholders`, mismatches);

@@ -1,9 +1,10 @@
 import es from "./locales/es.json";
 import en from "./locales/en.json";
 import ar from "./locales/ar.json";
+import fr from "./locales/fr.json";
 
-export type Locale = "es" | "en" | "ar";
-export const SUPPORTED_LOCALES: Locale[] = ["es", "en", "ar"];
+export type Locale = "es" | "en" | "ar" | "fr";
+export const SUPPORTED_LOCALES: Locale[] = ["es", "en", "ar", "fr"];
 export const DEFAULT_LOCALE: Locale = "es";
 
 /** Metadatos por locale que NO dependen de listar códigos a mano en el frontend. */
@@ -11,6 +12,7 @@ export const LOCALE_META: Record<Locale, { dir: "ltr" | "rtl"; label: string }> 
   es: { dir: "ltr", label: "Español" },
   en: { dir: "ltr", label: "English" },
   ar: { dir: "rtl", label: "العربية" },
+  fr: { dir: "ltr", label: "Français" },
 };
 
 type PluralEntry = { one?: string; other: string; mt?: boolean };
@@ -18,7 +20,7 @@ type PluralEntry = { one?: string; other: string; mt?: boolean };
 type MtEntry = { text: string; mt?: boolean };
 type Entry = string | PluralEntry | MtEntry;
 
-const CATALOGS: Record<Locale, Record<string, Entry>> = { es, en, ar };
+const CATALOGS: Record<Locale, Record<string, Entry>> = { es, en, ar, fr };
 
 const isPlural = (e: Entry): e is PluralEntry => typeof e === "object" && "other" in e;
 const isMt = (e: Entry): e is MtEntry => typeof e === "object" && "text" in e;

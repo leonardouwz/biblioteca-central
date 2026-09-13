@@ -1,5 +1,6 @@
 {
   "es": { "dir": "ltr", "label": "Español" },
   "en": { "dir": "ltr", "label": "English" },
-  "ar": { "dir": "rtl", "label": "العربية" }
+  "ar": { "dir": "rtl", "label": "العربية" },
+  "fr": { "dir": "ltr", "label": "Français" }
 }
