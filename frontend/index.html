@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Biblioteca Central</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%23e4ece7' stroke='%231f4b3f' stroke-width='5'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='30' text-anchor='middle' fill='%231f4b3f'%3EB%C2%B0%3C/text%3E%3C/svg%3E">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
@@ -357,7 +359,7 @@
           <select id="regRole">
             <option value="USUARIO" data-i18n="auth.roleUser">Usuario</option>
             <option value="BIBLIOTECARIO" data-i18n="auth.roleLibrarian">Bibliotecario</option>
-            <option value="ADMINISTRADOR" data-i18n="auth.roleAdmin">Administrador</option>
+            <!-- Sin opción "Administrador": el autorregistro nunca puede pedir ese rol (ver AuthService.resolveRole). -->
           </select>
           <button class="secondary" id="regSubmit" data-i18n="auth.registerSubmit">Crear cuenta</button>
         </div>

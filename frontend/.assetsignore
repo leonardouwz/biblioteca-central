@@ -1,4 +1,7 @@
 .wrangler
+.wrangler/**
 wrangler.jsonc
 .assetsignore
 node_modules
+*.test.js
+package.json

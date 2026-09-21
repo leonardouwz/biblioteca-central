@@ -38,6 +38,7 @@ import { createLoanRoutes } from "./presentation/routes/loanRoutes";
 import { createDebtRoutes } from "./presentation/routes/debtRoutes";
 import { createAuthRoutes } from "./presentation/routes/authRoutes";
 import { resolveLocale } from "./presentation/middleware/locale";
+import { t } from "./domain/i18n/t";
 
 async function main(): Promise<void> {
   // --- Infraestructura: Postgres (Supabase) en producción si hay DATABASE_URL, SQLite local en desarrollo ---
@@ -66,6 +67,14 @@ async function main(): Promise<void> {
   }
 
   const authSecret = process.env.AUTH_SECRET || "dev-secret-cambiar-en-produccion";
+  if (!process.env.AUTH_SECRET) {
+    // AUTH_SECRET firma los tokens de sesión: con el valor por defecto
+    // (público en este repo), cualquiera puede forjar un token válido.
+    console.warn(
+      "⚠ AUTH_SECRET no está configurada — usando el secreto de desarrollo por defecto. " +
+        "Esto es inseguro fuera de un entorno local; configura la variable de entorno en producción."
+    );
+  }
 
   // --- Dominio (Inyección manual: Repositorio -> Servicio) ---
   const bookService = new BookService(bookRepository);
@@ -83,6 +92,7 @@ async function main(): Promise<void> {
 
   // --- Aplicación Express ---
   const app = express();
+  app.disable("x-powered-by"); // no anunciar el framework/versión al mundo
   app.use(cors());
   app.use(express.json());
   app.use(resolveLocale);
@@ -92,6 +102,18 @@ async function main(): Promise<void> {
   app.use("/api/v1", createLoanRoutes(loanController, authSecret));
   app.use("/api/v1", createDebtRoutes(debtController, authSecret));
   app.use("/api/v1", createAuthRoutes(authController));
+
+  // --- Errores: todo lo que caiga hasta acá responde en el mismo formato
+  // JSON {code, error} que el resto de la API, nunca la página HTML por
+  // defecto de Express (que además revela detalles internos). ---
+  app.use((req, res) => {
+    res.status(404).json({ code: "ROUTE_NOT_FOUND", error: t("ROUTE_NOT_FOUND", req.locale) });
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error(error);
+    res.status(500).json({ code: "INTERNAL_ERROR", error: t("INTERNAL_ERROR", req.locale) });
+  });
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {

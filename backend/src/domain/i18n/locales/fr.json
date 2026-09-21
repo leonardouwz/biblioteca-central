@@ -32,6 +32,7 @@
   "AUTH_FORBIDDEN": "Vous n'avez pas la permission d'effectuer cette action.",
 
   "INTERNAL_ERROR": "Erreur interne du serveur.",
+  "ROUTE_NOT_FOUND": "Cette ressource n'existe pas.",
 
   "BODY_LOAN_INVALID": "userId et bookId sont requis et doivent être des chaînes.",
   "BODY_AUTH_INVALID": "email (string) et password (string) sont requis.",

@@ -1,5 +1,5 @@
 import { IAccountRepository } from "../interfaces/IAccountRepository";
-import { Account, PublicAccount, Role, ROLES, toPublicAccount } from "../entities/Account";
+import { Account, PublicAccount, Role, toPublicAccount } from "../entities/Account";
 import { BusinessError } from "../errors/BusinessError";
 import { hashPassword, newSalt, verifyPassword, signToken } from "./authTokens";
 import { isValidEmail } from "../validation/patterns";
@@ -59,7 +59,10 @@ export class AuthService {
 
   private resolveRole(requested: string | undefined, isFirstAccount: boolean): Role {
     if (isFirstAccount) return "ADMINISTRADOR";
-    if (requested && (ROLES as string[]).includes(requested)) return requested as Role;
+    // Autorregistro nunca puede pedir ADMINISTRADOR (evita que cualquier
+    // visitante se autoasigne el rol más alto); BIBLIOTECARIO sigue
+    // disponible para que el personal se pueda registrar sin invitación.
+    if (requested === "BIBLIOTECARIO") return "BIBLIOTECARIO";
     return "USUARIO";
   }
 

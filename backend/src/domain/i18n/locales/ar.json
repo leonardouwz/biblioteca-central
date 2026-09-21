@@ -33,6 +33,7 @@
   "AUTH_FORBIDDEN": { "text": "ليس لديك صلاحية لتنفيذ هذا الإجراء.", "mt": true },
 
   "INTERNAL_ERROR": { "text": "خطأ داخلي في الخادم.", "mt": true },
+  "ROUTE_NOT_FOUND": { "text": "هذا المورد غير موجود.", "mt": true },
 
   "BODY_LOAN_INVALID": { "text": "الحقلان userId وbookId مطلوبان ويجب أن يكونا نصيّين.", "mt": true },
   "BODY_AUTH_INVALID": { "text": "البريد الإلكتروني وكلمة المرور مطلوبان.", "mt": true },

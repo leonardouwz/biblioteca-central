@@ -7,6 +7,14 @@ export interface BookSummary extends Book {
   availableCopies: number;
 }
 
+// Tope defensivo: sin esto, `addCopies` inserta una fila por unidad en un
+// loop `for` — un request directo a la API con `quantity: 1e30` (JSON no
+// tiene límite de tamaño de número) lo dejaría corriendo casi para siempre.
+const MAX_STOCK_QUANTITY = 10_000;
+
+const isValidQuantity = (value: number): boolean =>
+  Number.isInteger(value) && Number.isFinite(value) && value >= 0 && value <= MAX_STOCK_QUANTITY;
+
 export class BookService {
   constructor(private readonly bookRepository: IBookRepository) {}
 
@@ -48,7 +56,7 @@ export class BookService {
     if (!book) {
       throw new BusinessError("BOOK_NOT_FOUND");
     }
-    if (quantity <= 0) {
+    if (!isValidQuantity(quantity) || quantity === 0) {
       throw new BusinessError("BOOK_QUANTITY_INVALID");
     }
     await this.bookRepository.addCopies(bookId, quantity);
@@ -70,7 +78,7 @@ export class BookService {
     if (!title.trim() || !author.trim()) {
       throw new BusinessError("BOOK_TITLE_AUTHOR_REQUIRED");
     }
-    if (initialCopies < 0) {
+    if (!isValidQuantity(initialCopies)) {
       throw new BusinessError("BOOK_COPIES_NEGATIVE");
     }
   }
