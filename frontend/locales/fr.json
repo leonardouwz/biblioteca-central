@@ -5,6 +5,11 @@
   "common.unexpectedError": "Une erreur inattendue est survenue.",
   "common.close": "Fermer",
 
+  "validation.emailInvalid": "L'email n'a pas un format valide.",
+  "validation.passwordWeak": "Le mot de passe doit contenir au moins 6 caractères, avec au moins une lettre et un chiffre.",
+  "validation.nameInvalid": "Le nom ne peut contenir que des lettres, des espaces et des tirets (2 à 60 caractères).",
+  "validation.integerInvalid": "Doit être un nombre entier, sans décimales ni signes.",
+
   "nav.tablist": "Sections de gestion",
   "nav.loans": "Emprunts",
   "nav.books": "Livres",

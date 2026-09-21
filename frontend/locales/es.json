@@ -5,6 +5,11 @@
   "common.unexpectedError": "Ocurrió un error inesperado.",
   "common.close": "Cerrar",
 
+  "validation.emailInvalid": "El email no tiene un formato válido.",
+  "validation.passwordWeak": "La contraseña debe tener al menos 6 caracteres, con al menos una letra y un número.",
+  "validation.nameInvalid": "El nombre solo puede tener letras, espacios y guiones (2 a 60 caracteres).",
+  "validation.integerInvalid": "Debe ser un número entero, sin decimales ni signos.",
+
   "nav.tablist": "Secciones de gestión",
   "nav.loans": "Préstamos",
   "nav.books": "Libros",

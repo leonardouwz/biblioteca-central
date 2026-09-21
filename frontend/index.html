@@ -519,9 +519,18 @@
   </div>
 
   <script src="format.js"></script>
+  <script src="validators.js"></script>
   <script src="i18n.js"></script>
   <script>
     const { t, formatCurrency, formatDate, translateError, setLocale, getLocale } = window.I18n;
+    const { isValidEmail, isValidPassword, isValidName, isNonNegativeInteger } = window.Validators;
+
+    /** Valida `value` con `check` (una de las funciones de validators.js); si falla, muestra el error en `resultEl` y corta el flujo. */
+    function validateField(value, check, messageKey, resultEl) {
+      if (check(value)) return true;
+      showResult(resultEl, false, t(messageKey));
+      return false;
+    }
 
     // ---------- Navegación entre pestañas (patrón ARIA tablist) ----------
     document.querySelectorAll('.tab-btn').forEach((btn) => {
@@ -706,7 +715,9 @@
         btn.addEventListener('click', async () => {
           const bookId = btn.dataset.addStock;
           const book = allBooks.find((b) => b.id === bookId);
-          const quantity = Number(document.getElementById(`stock-${bookId}`).value);
+          const rawQuantity = document.getElementById(`stock-${bookId}`).value;
+          if (!validateField(rawQuantity, isNonNegativeInteger, 'validation.integerInvalid', document.getElementById('bookResult'))) return;
+          const quantity = Number(rawQuantity);
           const { ok, data } = await fetchJson(`/api/v1/books/${bookId}/stock`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -739,9 +750,11 @@
       const title = document.getElementById('bookTitle').value;
       const author = document.getElementById('bookAuthor').value;
       const isEditing = !!editingBookId;
+      const rawCopies = document.getElementById('bookCopies').value;
+      if (!isEditing && !validateField(rawCopies, isNonNegativeInteger, 'validation.integerInvalid', document.getElementById('bookResult'))) return;
       const url = isEditing ? `/api/v1/books/${editingBookId}` : '/api/v1/books';
       const method = isEditing ? 'PUT' : 'POST';
-      const initialCopies = Number(document.getElementById('bookCopies').value);
+      const initialCopies = Number(rawCopies);
       const body = isEditing ? { title, author } : { title, author, initialCopies };
       const { ok, data } = await fetchJson(url, {
         method,
@@ -848,6 +861,9 @@
     document.getElementById('userSubmit').addEventListener('click', async () => {
       const name = document.getElementById('userName').value;
       const email = document.getElementById('userEmail').value;
+      const userResultEl = document.getElementById('userResult');
+      if (!validateField(name, isValidName, 'validation.nameInvalid', userResultEl)) return;
+      if (!validateField(email, isValidEmail, 'validation.emailInvalid', userResultEl)) return;
       const isEditing = !!editingUserId;
       const url = isEditing ? `/api/v1/users/${editingUserId}` : '/api/v1/users';
       const method = isEditing ? 'PUT' : 'POST';
@@ -985,6 +1001,9 @@
     document.getElementById('loginSubmit').addEventListener('click', async () => {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
+      // Solo se valida el formato del email: la contraseña no se valida por
+      // patrón aquí para no bloquear el login de cuentas ya existentes.
+      if (!validateField(email, isValidEmail, 'validation.emailInvalid', document.getElementById('authResult'))) return;
       const { ok, data } = await fetchJson('/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -998,6 +1017,9 @@
       const email = document.getElementById('regEmail').value;
       const password = document.getElementById('regPassword').value;
       const role = document.getElementById('regRole').value;
+      const authResultEl = document.getElementById('authResult');
+      if (!validateField(email, isValidEmail, 'validation.emailInvalid', authResultEl)) return;
+      if (!validateField(password, isValidPassword, 'validation.passwordWeak', authResultEl)) return;
       const { ok, data } = await fetchJson('/api/v1/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

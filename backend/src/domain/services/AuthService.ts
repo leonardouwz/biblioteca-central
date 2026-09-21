@@ -2,6 +2,7 @@ import { IAccountRepository } from "../interfaces/IAccountRepository";
 import { Account, PublicAccount, Role, ROLES, toPublicAccount } from "../entities/Account";
 import { BusinessError } from "../errors/BusinessError";
 import { hashPassword, newSalt, verifyPassword, signToken } from "./authTokens";
+import { isValidEmail } from "../validation/patterns";
 
 export interface AuthResult {
   account: PublicAccount;
@@ -21,7 +22,7 @@ export class AuthService {
    */
   async register(email: string, password: string, requestedRole?: string): Promise<AuthResult> {
     const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail.includes("@")) {
+    if (!isValidEmail(normalizedEmail)) {
       throw new BusinessError("EMAIL_INVALID");
     }
     if (password.length < 6) {

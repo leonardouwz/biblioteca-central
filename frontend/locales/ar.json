@@ -19,6 +19,22 @@
     "text": "إغلاق",
     "mt": true
   },
+  "validation.emailInvalid": {
+    "text": "صيغة البريد الإلكتروني غير صحيحة.",
+    "mt": true
+  },
+  "validation.passwordWeak": {
+    "text": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل، وتحتوي على حرف ورقم واحد على الأقل.",
+    "mt": true
+  },
+  "validation.nameInvalid": {
+    "text": "يجب أن يحتوي الاسم على أحرف ومسافات وشرطات فقط (من 2 إلى 60 حرفًا).",
+    "mt": true
+  },
+  "validation.integerInvalid": {
+    "text": "يجب أن يكون رقمًا صحيحًا، بدون فواصل عشرية أو إشارات.",
+    "mt": true
+  },
   "nav.loans": {
     "text": "الإعارات",
     "mt": true

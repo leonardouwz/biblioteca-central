@@ -5,6 +5,11 @@
   "common.unexpectedError": "An unexpected error occurred.",
   "common.close": "Close",
 
+  "validation.emailInvalid": "The email is not properly formatted.",
+  "validation.passwordWeak": "The password must be at least 6 characters long, with at least one letter and one number.",
+  "validation.nameInvalid": "The name can only contain letters, spaces and hyphens (2 to 60 characters).",
+  "validation.integerInvalid": "Must be a whole number, no decimals or signs.",
+
   "nav.tablist": "Management sections",
   "nav.loans": "Loans",
   "nav.books": "Books",

@@ -4,6 +4,7 @@ import { User } from "../entities/User";
 import { Debt } from "../entities/Debt";
 import { BusinessError } from "../errors/BusinessError";
 import { LoanService, LoanWithBookTitle } from "./LoanService";
+import { isValidEmail, isValidName } from "../validation/patterns";
 
 export class UserService {
   constructor(
@@ -75,10 +76,10 @@ export class UserService {
   }
 
   private async validate(name: string, email: string, ignoreUserId?: string): Promise<void> {
-    if (!name.trim()) {
+    if (!isValidName(name)) {
       throw new BusinessError("USER_NAME_REQUIRED");
     }
-    if (!email.trim() || !email.includes("@")) {
+    if (!isValidEmail(email)) {
       throw new BusinessError("EMAIL_INVALID");
     }
     const existing = await this.userRepository.findByEmail(email);
