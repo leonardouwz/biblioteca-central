@@ -8,10 +8,15 @@
   const SUPPORTED = ["es", "en", "ar", "fr"];
   const DEFAULT_LOCALE = "es";
   const STORAGE_KEY = "locale";
+  const RATES_STORAGE_KEY = "exchangeRates";
+  const RATES_TTL_MS = 6 * 60 * 60 * 1000; // 6h: no hace falta más fresco para mostrar montos, y evita pegarle a la API en cada carga
+  const RATES_API_URL = "https://open.er-api.com/v6/latest/PEN"; // gratis, sin API key; PEN es la moneda en la que se guardan los montos
 
   let currentLocale = DEFAULT_LOCALE;
   let catalog = {};
   let meta = {};
+  let currentCurrency = I18nFormat.BASE_CURRENCY;
+  let ratesFromPEN = { [I18nFormat.BASE_CURRENCY]: 1 };
 
   function detectInitialLocale() {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -51,8 +56,43 @@
     return I18nFormat.translate(catalog, key, currentLocale, params);
   }
 
+  /**
+   * Carga las tasas de cambio (base PEN) desde localStorage si están
+   * frescas, o desde la API si no. Ante cualquier falla (sin red, API
+   * caída) deja `ratesFromPEN` como esté — `formatCurrency` cae de vuelta a
+   * mostrar en PEN en vez de una conversión inventada.
+   */
+  async function loadExchangeRates() {
+    try {
+      const cached = JSON.parse(localStorage.getItem(RATES_STORAGE_KEY) || "null");
+      if (cached && Date.now() - cached.fetchedAt < RATES_TTL_MS) {
+        ratesFromPEN = cached.rates;
+        return;
+      }
+    } catch {
+      /* localStorage o JSON corrupto: seguimos a pedirlas de nuevo */
+    }
+    try {
+      const res = await fetch(RATES_API_URL);
+      const data = await res.json();
+      if (data.result === "success" && data.rates) {
+        ratesFromPEN = { [I18nFormat.BASE_CURRENCY]: 1, ...data.rates };
+        localStorage.setItem(RATES_STORAGE_KEY, JSON.stringify({ rates: ratesFromPEN, fetchedAt: Date.now() }));
+      }
+    } catch {
+      /* sin red / API caída: nos quedamos con lo último conocido (o solo PEN) */
+    }
+  }
+
+  /** `amount` siempre viene en PEN desde el backend; se convierte a la moneda del idioma activo. */
   function formatCurrency(amount) {
-    return I18nFormat.formatCurrency(amount, currentLocale);
+    const rate = ratesFromPEN[currentCurrency];
+    if (rate === undefined) {
+      // No hay tasa para esta moneda (aún no cargó, o la API falló): mejor
+      // mostrar el monto real en soles que una "conversión" al 1:1 falsa.
+      return I18nFormat.formatCurrency(amount, currentLocale, I18nFormat.BASE_CURRENCY);
+    }
+    return I18nFormat.formatCurrency(I18nFormat.convertAmount(amount, rate), currentLocale, currentCurrency);
   }
 
   function formatDate(iso) {
@@ -72,8 +112,14 @@
     if (!SUPPORTED.includes(locale)) locale = DEFAULT_LOCALE;
     catalog = await loadJson(`locales/${locale}.json`);
     currentLocale = locale;
+    currentCurrency = (meta[locale] && meta[locale].currency) || I18nFormat.BASE_CURRENCY;
     localStorage.setItem(STORAGE_KEY, locale);
     applyDirection(locale);
+    // Solo hace falta la tasa de cambio si el idioma no muestra en la moneda
+    // base — evita una llamada de red innecesaria para el caso más común (es/PEN).
+    if (currentCurrency !== I18nFormat.BASE_CURRENCY) {
+      await loadExchangeRates();
+    }
     translateDom();
     document.dispatchEvent(new CustomEvent("i18n:changed", { detail: { locale } }));
   }

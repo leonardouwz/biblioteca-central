@@ -1,6 +1,6 @@
 {
-  "es": { "dir": "ltr", "label": "Español" },
-  "en": { "dir": "ltr", "label": "English" },
-  "ar": { "dir": "rtl", "label": "العربية" },
-  "fr": { "dir": "ltr", "label": "Français" }
+  "es": { "dir": "ltr", "label": "Español", "currency": "PEN" },
+  "en": { "dir": "ltr", "label": "English", "currency": "USD" },
+  "ar": { "dir": "rtl", "label": "العربية", "currency": "USD" },
+  "fr": { "dir": "ltr", "label": "Français", "currency": "EUR" }
 }

@@ -11,7 +11,7 @@
     root.I18nFormat = factory();
   }
 })(typeof self !== "undefined" ? self : this, function () {
-  const CURRENCY = "PEN";
+  const BASE_CURRENCY = "PEN"; // moneda en la que se guardan los montos en la base de datos
 
   function interpolate(template, params) {
     if (!params) return template;
@@ -48,8 +48,14 @@
     return interpolate(entry, params);
   }
 
-  function formatCurrency(amount, locale) {
-    return new Intl.NumberFormat(locale, { style: "currency", currency: CURRENCY }).format(amount);
+  /** Formatea `amount` ya convertido (si aplica) en la moneda/locale dados. No convierte nada por sí sola. */
+  function formatCurrency(amount, locale, currency = BASE_CURRENCY) {
+    return new Intl.NumberFormat(locale, { style: "currency", currency }).format(amount);
+  }
+
+  /** Convierte un monto en PEN a otra moneda dada una tasa (PEN -> destino). Pura: no sabe de dónde sale `rate`. */
+  function convertAmount(amountInPEN, rate) {
+    return amountInPEN * rate;
   }
 
   function formatDate(iso, locale, timeZone) {
@@ -60,5 +66,5 @@
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   }
 
-  return { interpolate, translate, formatCurrency, formatDate, detectTimeZone, CURRENCY };
+  return { interpolate, translate, formatCurrency, convertAmount, formatDate, detectTimeZone, BASE_CURRENCY };
 });

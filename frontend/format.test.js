@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { translate, formatCurrency, formatDate, interpolate } = require("./format.js");
+const { translate, formatCurrency, convertAmount, formatDate, interpolate } = require("./format.js");
 
 test("interpolate: sustituye placeholders conocidos y deja el resto intacto", () => {
   assert.equal(interpolate("Hola {name}", { name: "Ana" }), "Hola Ana");
@@ -29,9 +29,20 @@ test("translate: clave desconocida devuelve la clave, no rompe", () => {
   assert.equal(translate({}, "no.existe", "es"), "no.existe");
 });
 
-test("formatCurrency: PEN en es vs en (símbolo y separadores)", () => {
+test("formatCurrency: no convierte nada, solo formatea en la moneda/locale dados", () => {
+  assert.match(formatCurrency(1500, "es-PE", "PEN"), /S\/\s*1,500\.00/);
+  assert.match(formatCurrency(1500, "en", "USD"), /\$1,500\.00/);
+  assert.match(formatCurrency(1500, "fr", "EUR"), /1.500,00/); // separador de miles no-break space en fr
+});
+
+test("formatCurrency: usa PEN por defecto si no se pasa moneda", () => {
   assert.match(formatCurrency(1500, "es-PE"), /S\/\s*1,500\.00/);
-  assert.match(formatCurrency(1500, "en"), /PEN|S\/|1,500\.00/);
+});
+
+test("convertAmount: multiplica por la tasa, sin saber de dónde sale", () => {
+  assert.equal(convertAmount(100, 0.3), 30);
+  assert.equal(convertAmount(0, 5), 0);
+  assert.equal(convertAmount(1500, 1), 1500); // tasa 1 = misma moneda, sin cambio
 });
 
 test("formatDate: usa el locale pedido y una zona horaria fija (reproducible)", () => {
