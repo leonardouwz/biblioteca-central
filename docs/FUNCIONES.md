@@ -10,30 +10,39 @@ Documento de entrega. Se identifican **2 funciones stateless** (sin estado) y
 
 ---
 
-## 1. STATELESS — `calculateFine(dueDate, returnDate, dailyRate?)`
+## 1. STATELESS — `calculateFine(dueDate, asOfDate, hourlyRate, multiplier)`
 
 - **Archivo:** `backend/src/domain/services/LoanService.ts`
 - **Tipo:** nueva (extraída de la lógica que estaba embebida en `returnLoan`).
+- **Actualizada (ver `docs/prestamos-configuracion.md`):** ahora cobra por
+  hora (no por día) y con un multiplicador configurable, y se usa también
+  para calcular una multa *provisional* antes de devolver el préstamo.
 
 ```ts
-export function calculateFine(dueDate: Date, returnDate: Date, dailyRate = DAILY_FINE_RATE): number {
-  if (returnDate <= dueDate) return 0;
-  const daysLate = Math.ceil((returnDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-  return daysLate * dailyRate;
+export function calculateFine(dueDate: Date, asOfDate: Date, hourlyRate: number, multiplier: number): number {
+  if (asOfDate <= dueDate) return 0;
+  const hoursLate = Math.ceil((asOfDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60));
+  return Math.round(hoursLate * hourlyRate * multiplier);
 }
 ```
 
-**Por qué es stateless:** recibe dos fechas y una tarifa y devuelve un número.
-No consulta la tabla `loans` ni `debts`, no usa `Date.now()`, no guarda nada.
-Con los mismos argumentos devuelve siempre lo mismo.
+**Por qué es stateless:** recibe dos fechas, una tarifa y un multiplicador y
+devuelve un número. No consulta la tabla `loans` ni `debts`, no usa
+`Date.now()` internamente (el caller decide qué fecha pasar), no guarda
+nada. Con los mismos argumentos devuelve siempre lo mismo — por eso puede
+usarse tanto para la multa real (`returnDate`) como para la previsualización
+(`new Date()`, sin crear ninguna deuda).
 
-**Uso real:** `LoanService.returnLoan()` la llama para saber cuánta multa
-generar al devolver un préstamo con atraso.
+**Uso real:** `LoanService.returnLoan()` la llama con la tarifa/multiplicador
+vigentes (`Settings`) para generar la deuda; `LoanService.getAllLoans()` /
+`getLoansByUserId()` la llaman con "ahora" para el campo `provisionalFine`.
 
 **Prueba:** `backend/src/domain/services/LoanService.test.ts`
 ```
-0 días de atraso  → 0
-3 días de atraso  → 3 * 500 = 1500
+sin atraso              → 0
+ceil(2h de atraso)      → 2h * tarifa
+ceil(2h01 de atraso)    → 3h * tarifa (la fracción de hora redondea hacia arriba)
+con multiplicador 2     → el doble
 ```
 
 ---

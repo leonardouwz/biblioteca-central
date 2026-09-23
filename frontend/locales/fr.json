@@ -15,6 +15,7 @@
   "nav.books": "Livres",
   "nav.users": "Membres",
   "nav.debts": "Dettes",
+  "nav.settings": "Configuration",
 
   "auth.loginTitle": "Se connecter",
   "auth.email": "Email",
@@ -52,6 +53,7 @@
   "loans.badgeActive": "Actif",
   "loans.unknownBook": "(livre supprimé)",
   "loans.availableOf": "{available}/{total} disp.",
+  "loans.provisionalFine": "Amende estimée en cas de retour aujourd'hui : {amount}",
 
   "books.addTitle": "Ajouter un livre",
   "books.editTitle": "Modifier le livre",
@@ -122,6 +124,15 @@
   "debts.paidMessage": "Paiement de {amount} enregistré.",
   "debts.paidMessageFor": "Paiement de {amount} par {user} enregistré.",
 
+  "settings.title": "Configuration",
+  "settings.description": "Ces valeurs s'appliquent aux nouveaux emprunts et aux amendes calculées à partir de maintenant.",
+  "settings.hourlyRate": "Tarif horaire de retard",
+  "settings.debtMultiplier": "Multiplicateur de dette",
+  "settings.maxActiveLoans": "Emprunts actifs maximum par membre",
+  "settings.loanPeriodDays": "Durée de l'emprunt (jours)",
+  "settings.save": "Enregistrer la configuration",
+  "settings.saved": "Configuration mise à jour.",
+
   "errors.BOOK_NOT_FOUND": "Le livre n'existe pas.",
   "errors.BOOK_TITLE_AUTHOR_REQUIRED": "Le titre et l'auteur sont requis.",
   "errors.BOOK_QUANTITY_INVALID": "La quantité à ajouter doit être supérieure à zéro.",
@@ -141,7 +152,9 @@
   },
   "errors.LOAN_NOT_FOUND": "L'emprunt n'existe pas.",
   "errors.LOAN_ALREADY_RETURNED": "Cet emprunt a déjà été retourné.",
+  "errors.USER_HAS_OVERDUE_LOAN": "L'utilisateur a un emprunt en retard non retourné et ne peut pas en demander un autre.",
   "errors.DEBT_NOT_FOUND": "La dette n'existe pas.",
+  "errors.SETTINGS_INVALID": "Les valeurs de configuration ne sont pas valides.",
   "errors.EMAIL_INVALID": "L'email n'est pas valide.",
   "errors.PASSWORD_TOO_SHORT": "Le mot de passe doit contenir au moins 6 caractères.",
   "errors.ACCOUNT_EMAIL_TAKEN": "Un compte avec cet email existe déjà.",
@@ -150,11 +163,13 @@
   "errors.AUTH_REQUIRED": "Connexion requise.",
   "errors.AUTH_FORBIDDEN": "Vous n'avez pas la permission d'effectuer cette action.",
   "errors.INTERNAL_ERROR": "Erreur interne du serveur.",
+  "errors.ROUTE_NOT_FOUND": "Cette ressource n'existe pas.",
   "errors.BODY_LOAN_INVALID": "userId et bookId sont requis et doivent être des chaînes.",
   "errors.BODY_AUTH_INVALID": "email (string) et password (string) sont requis.",
   "errors.BODY_BOOK_CREATE_INVALID": "title (string), author (string) et initialCopies (number) sont requis.",
   "errors.BODY_BOOK_UPDATE_INVALID": "title (string) et author (string) sont requis.",
   "errors.BODY_STOCK_INVALID": "quantity (number) est requis.",
   "errors.BODY_USER_INVALID": "name (string) et email (string) sont requis.",
-  "errors.BODY_STATUS_INVALID": "status doit être ACTIVE ou INACTIVE."
+  "errors.BODY_STATUS_INVALID": "status doit être ACTIVE ou INACTIVE.",
+  "errors.BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans et loanPeriodDays (number) sont requis."
 }

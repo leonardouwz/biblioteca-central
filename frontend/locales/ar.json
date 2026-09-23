@@ -51,6 +51,10 @@
     "text": "الديون",
     "mt": true
   },
+  "nav.settings": {
+    "text": "الإعدادات",
+    "mt": true
+  },
   "auth.loginTitle": {
     "text": "تسجيل الدخول",
     "mt": true
@@ -172,8 +176,16 @@
     "text": "تم إرجاع هذه الإعارة بالفعل.",
     "mt": true
   },
+  "errors.USER_HAS_OVERDUE_LOAN": {
+    "text": "على المستخدم إعارة متأخرة لم تُرجع بعد ولا يمكنه طلب إعارة أخرى.",
+    "mt": true
+  },
   "errors.DEBT_NOT_FOUND": {
     "text": "الدين غير موجود.",
+    "mt": true
+  },
+  "errors.SETTINGS_INVALID": {
+    "text": "قيم الإعدادات غير صالحة.",
     "mt": true
   },
   "errors.EMAIL_INVALID": {
@@ -208,6 +220,10 @@
     "text": "خطأ داخلي في الخادم.",
     "mt": true
   },
+  "errors.ROUTE_NOT_FOUND": {
+    "text": "هذا المورد غير موجود.",
+    "mt": true
+  },
   "errors.BODY_LOAN_INVALID": {
     "text": "الحقلان userId وbookId مطلوبان ويجب أن يكونا نصيّين.",
     "mt": true
@@ -234,6 +250,10 @@
   },
   "errors.BODY_STATUS_INVALID": {
     "text": "يجب أن تكون الحالة ACTIVE أو INACTIVE.",
+    "mt": true
+  },
+  "errors.BODY_SETTINGS_INVALID": {
+    "text": "الحقول hourlyLateFeeRate وdebtMultiplier وmaxActiveLoans وloanPeriodDays (أرقام) مطلوبة.",
     "mt": true
   },
   "nav.tablist": {
@@ -322,6 +342,10 @@
   },
   "loans.availableOf": {
     "text": "{available} / {total} متاح",
+    "mt": true
+  },
+  "loans.provisionalFine": {
+    "text": "الغرامة المقدّرة إذا تم الإرجاع اليوم: {amount}",
     "mt": true
   },
   "books.addTitle": {
@@ -562,6 +586,38 @@
   },
   "debts.paidMessageFor": {
     "text": "تم تسجيل عملية الدفع بمبلغ {amount} من {user}.",
+    "mt": true
+  },
+  "settings.title": {
+    "text": "الإعدادات",
+    "mt": true
+  },
+  "settings.description": {
+    "text": "تؤثر هذه القيم على الإعارات الجديدة والغرامات التي تُحسب من الآن فصاعدًا.",
+    "mt": true
+  },
+  "settings.hourlyRate": {
+    "text": "تعرفة التأخير بالساعة",
+    "mt": true
+  },
+  "settings.debtMultiplier": {
+    "text": "مضاعف الدين",
+    "mt": true
+  },
+  "settings.maxActiveLoans": {
+    "text": "الحد الأقصى للإعارات النشطة لكل مستخدم",
+    "mt": true
+  },
+  "settings.loanPeriodDays": {
+    "text": "مدة الإعارة (أيام)",
+    "mt": true
+  },
+  "settings.save": {
+    "text": "حفظ الإعدادات",
+    "mt": true
+  },
+  "settings.saved": {
+    "text": "تم تحديث الإعدادات.",
     "mt": true
   }
 }

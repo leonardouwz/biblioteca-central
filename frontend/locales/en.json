@@ -15,6 +15,7 @@
   "nav.books": "Books",
   "nav.users": "Members",
   "nav.debts": "Debts",
+  "nav.settings": "Settings",
 
   "auth.loginTitle": "Sign in",
   "auth.email": "Email",
@@ -52,6 +53,7 @@
   "loans.badgeActive": "Active",
   "loans.unknownBook": "(deleted book)",
   "loans.availableOf": "{available}/{total} avail.",
+  "loans.provisionalFine": "Estimated fine if returned today: {amount}",
 
   "books.addTitle": "Add book",
   "books.editTitle": "Edit book",
@@ -122,6 +124,15 @@
   "debts.paidMessage": "Payment of {amount} recorded.",
   "debts.paidMessageFor": "Payment of {amount} by {user} recorded.",
 
+  "settings.title": "Settings",
+  "settings.description": "These values affect new loans and any fines calculated from now on.",
+  "settings.hourlyRate": "Hourly late fee rate",
+  "settings.debtMultiplier": "Debt multiplier",
+  "settings.maxActiveLoans": "Max active loans per member",
+  "settings.loanPeriodDays": "Loan period (days)",
+  "settings.save": "Save settings",
+  "settings.saved": "Settings updated.",
+
   "errors.BOOK_NOT_FOUND": "The book does not exist.",
   "errors.BOOK_TITLE_AUTHOR_REQUIRED": "Title and author are required.",
   "errors.BOOK_QUANTITY_INVALID": "The quantity to add must be greater than zero.",
@@ -141,7 +152,9 @@
   },
   "errors.LOAN_NOT_FOUND": "The loan does not exist.",
   "errors.LOAN_ALREADY_RETURNED": "This loan has already been returned.",
+  "errors.USER_HAS_OVERDUE_LOAN": "The member has an overdue loan that hasn't been returned and cannot request another.",
   "errors.DEBT_NOT_FOUND": "The debt does not exist.",
+  "errors.SETTINGS_INVALID": "The configuration values are not valid.",
   "errors.EMAIL_INVALID": "The email is not valid.",
   "errors.PASSWORD_TOO_SHORT": "The password must be at least 6 characters long.",
   "errors.ACCOUNT_EMAIL_TAKEN": "An account with that email already exists.",
@@ -150,11 +163,13 @@
   "errors.AUTH_REQUIRED": "Session required. Please log in.",
   "errors.AUTH_FORBIDDEN": "You don't have permission to perform this action.",
   "errors.INTERNAL_ERROR": "Internal server error.",
+  "errors.ROUTE_NOT_FOUND": "That resource does not exist.",
   "errors.BODY_LOAN_INVALID": "userId and bookId are required and must be strings.",
   "errors.BODY_AUTH_INVALID": "email (string) and password (string) are required.",
   "errors.BODY_BOOK_CREATE_INVALID": "title (string), author (string) and initialCopies (number) are required.",
   "errors.BODY_BOOK_UPDATE_INVALID": "title (string) and author (string) are required.",
   "errors.BODY_STOCK_INVALID": "quantity (number) is required.",
   "errors.BODY_USER_INVALID": "name (string) and email (string) are required.",
-  "errors.BODY_STATUS_INVALID": "status must be ACTIVE or INACTIVE."
+  "errors.BODY_STATUS_INVALID": "status must be ACTIVE or INACTIVE.",
+  "errors.BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans and loanPeriodDays (number) are required."
 }

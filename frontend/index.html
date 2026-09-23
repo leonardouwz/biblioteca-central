@@ -264,6 +264,8 @@
   .badge-unpaid { color: var(--stamp); }
   .badge-paid { color: var(--oak); }
 
+  .provisional-fine { font-family: var(--font-mono); font-size: 0.68rem; color: var(--stamp); margin-top: 4px; }
+
   .inline-stock { display: flex; gap: 4px; align-items: center; }
   .inline-stock input { width: 60px; margin-top: 0; padding: 6px; }
 
@@ -379,6 +381,7 @@
     <button class="tab-btn" id="tabbtn-books" role="tab" aria-selected="false" aria-controls="tab-books" data-tab="books" data-i18n="nav.books">Libros</button>
     <button class="tab-btn" id="tabbtn-users" role="tab" aria-selected="false" aria-controls="tab-users" data-tab="users" data-i18n="nav.users">Usuarios</button>
     <button class="tab-btn" id="tabbtn-debts" role="tab" aria-selected="false" aria-controls="tab-debts" data-tab="debts" data-i18n="nav.debts">Deudas</button>
+    <button class="tab-btn" id="tabbtn-settings" role="tab" aria-selected="false" aria-controls="tab-settings" data-tab="settings" data-i18n="nav.settings">Configuración</button>
   </div>
 
   <!-- ==================== PRÉSTAMOS ==================== -->
@@ -487,6 +490,29 @@
     </table></div>
   </section>
 
+  <!-- ==================== CONFIGURACIÓN (solo administrador) ==================== -->
+  <section id="tab-settings" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-settings">
+    <div class="card">
+      <h2 data-i18n="settings.title">Configuración</h2>
+      <p class="tagline" data-i18n="settings.description">Estos valores afectan a los préstamos nuevos y a las multas que se calculen de aquí en adelante.</p>
+
+      <label for="settingsHourlyRate" data-i18n="settings.hourlyRate">Tarifa por hora de atraso</label>
+      <input id="settingsHourlyRate" type="number" min="0" step="0.01">
+
+      <label for="settingsMultiplier" data-i18n="settings.debtMultiplier">Multiplicador de deuda</label>
+      <input id="settingsMultiplier" type="number" min="0.01" step="0.01">
+
+      <label for="settingsMaxLoans" data-i18n="settings.maxActiveLoans">Préstamos activos máximos por usuario</label>
+      <input id="settingsMaxLoans" type="number" min="1" step="1">
+
+      <label for="settingsLoanPeriod" data-i18n="settings.loanPeriodDays">Días de préstamo</label>
+      <input id="settingsLoanPeriod" type="number" min="1" step="1">
+
+      <button id="settingsSubmit" data-i18n="settings.save">Guardar configuración</button>
+      <div id="settingsResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+    </div>
+  </section>
+
   <!-- ==================== MODAL DETALLE USUARIO ==================== -->
   <div class="modal-overlay" id="userDetailOverlay">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="userDetailName">
@@ -560,7 +586,6 @@
     }
 
     const API_BASE_URL = 'https://biblioteca-backend-438047115829.us-central1.run.app';
-    const LOAN_PERIOD_DAYS = 14;
 
     async function fetchJson(path, options = {}) {
       const token = localStorage.getItem('authToken');
@@ -582,15 +607,18 @@
     let allUsers = [];
     let allBooks = [];
     let allLoans = [];
+    let currentSettings = null;
 
     async function loadAll() {
-      [allUsers, allBooks] = await Promise.all([
+      [allUsers, allBooks, currentSettings] = await Promise.all([
         fetchJson('/api/v1/users').then((r) => r.data),
         fetchJson('/api/v1/books').then((r) => r.data),
+        fetchJson('/api/v1/settings').then((r) => r.data),
       ]);
       renderLoanForm();
       renderBooksTable();
       renderUsersTable();
+      renderSettingsForm();
       await loadLoans();
       await loadDebts();
     }
@@ -604,7 +632,7 @@
       document.getElementById('loanBookId').innerHTML = allBooks
         .map((b) => `<option value="${b.id}">${b.title} (${t('loans.availableOf', { available: b.availableCopies, total: b.totalCopies })})</option>`)
         .join('');
-      document.getElementById('loanSubmit').textContent = t('loans.submit', { days: LOAN_PERIOD_DAYS });
+      document.getElementById('loanSubmit').textContent = t('loans.submit', { days: currentSettings?.loanPeriodDays ?? '' });
     }
 
     async function loadLoans() {
@@ -618,6 +646,9 @@
         .reverse()
         .map((l) => {
           const badge = loanBadge(l);
+          const provisional = l.provisionalFine != null
+            ? `<div class="provisional-fine">${t('loans.provisionalFine', { amount: formatCurrency(l.provisionalFine) })}</div>`
+            : '';
           const action = l.status === 'ACTIVE'
             ? `<button class="success" data-return-loan="${l.id}">${t('loans.returnAction')}</button>`
             : '';
@@ -625,7 +656,7 @@
             <td>${userName(l.userId)}</td>
             <td>${l.bookTitle ?? t('loans.unknownBook')}</td>
             <td>${formatDate(l.dueDate)}</td>
-            <td>${badge}</td>
+            <td>${badge}${provisional}</td>
             <td>${action}</td>
           </tr>`;
         })
@@ -955,6 +986,31 @@
       });
     }
 
+    // ---------- Configuración (solo administrador) ----------
+    function renderSettingsForm() {
+      if (!currentSettings) return;
+      document.getElementById('settingsHourlyRate').value = currentSettings.hourlyLateFeeRate;
+      document.getElementById('settingsMultiplier').value = currentSettings.debtMultiplier;
+      document.getElementById('settingsMaxLoans').value = currentSettings.maxActiveLoans;
+      document.getElementById('settingsLoanPeriod').value = currentSettings.loanPeriodDays;
+    }
+
+    document.getElementById('settingsSubmit').addEventListener('click', async () => {
+      const body = {
+        hourlyLateFeeRate: Number(document.getElementById('settingsHourlyRate').value),
+        debtMultiplier: Number(document.getElementById('settingsMultiplier').value),
+        maxActiveLoans: Number(document.getElementById('settingsMaxLoans').value),
+        loanPeriodDays: Number(document.getElementById('settingsLoanPeriod').value),
+      };
+      const { ok, data } = await fetchJson('/api/v1/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (ok) currentSettings = data;
+      showResult(document.getElementById('settingsResult'), ok, ok ? t('settings.saved') : errorMessage(data));
+    });
+
     // ---------- Sesión (autenticación básica) ----------
     const STAFF_ROLES = ['BIBLIOTECARIO', 'ADMINISTRADOR'];
     const ROLE_LABEL_KEY = { USUARIO: 'auth.roleUser', BIBLIOTECARIO: 'auth.roleLibrarian', ADMINISTRADOR: 'auth.roleAdmin' };
@@ -970,6 +1026,13 @@
       }
     }
 
+    // La pestaña "Configuración" es solo para ADMINISTRADOR, ni siquiera para bibliotecarios.
+    function setAdminView(isAdmin) {
+      const display = isAdmin ? '' : 'none';
+      document.getElementById('tabbtn-settings').style.display = display;
+      document.getElementById('tab-settings').style.display = display;
+    }
+
     function renderSession() {
       const token = localStorage.getItem('authToken');
       const email = localStorage.getItem('authEmail');
@@ -983,6 +1046,7 @@
       }
       const isStaff = loggedIn && STAFF_ROLES.includes(role);
       setStaffView(isStaff);
+      setAdminView(loggedIn && role === 'ADMINISTRADOR');
       if (isStaff) loadAll();
     }
 

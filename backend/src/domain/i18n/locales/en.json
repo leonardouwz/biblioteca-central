@@ -20,8 +20,11 @@
   },
   "LOAN_NOT_FOUND": "The loan does not exist.",
   "LOAN_ALREADY_RETURNED": "This loan has already been returned.",
+  "USER_HAS_OVERDUE_LOAN": "The user has an overdue loan that hasn't been returned and cannot request another.",
 
   "DEBT_NOT_FOUND": "The debt does not exist.",
+
+  "SETTINGS_INVALID": "The configuration values are not valid.",
 
   "EMAIL_INVALID": "The email is not valid.",
   "PASSWORD_TOO_SHORT": "The password must be at least 6 characters long.",
@@ -40,5 +43,6 @@
   "BODY_BOOK_UPDATE_INVALID": "title (string) and author (string) are required.",
   "BODY_STOCK_INVALID": "quantity (number) is required.",
   "BODY_USER_INVALID": "name (string) and email (string) are required.",
-  "BODY_STATUS_INVALID": "status must be ACTIVE or INACTIVE."
+  "BODY_STATUS_INVALID": "status must be ACTIVE or INACTIVE.",
+  "BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans and loanPeriodDays (number) are required."
 }

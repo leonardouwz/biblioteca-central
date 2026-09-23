@@ -41,13 +41,6 @@ export class SqliteLoanRepository implements ILoanRepository {
     return rows.map(toLoan);
   }
 
-  async countActiveByUserId(userId: string): Promise<number> {
-    const row = this.db
-      .prepare("SELECT COUNT(*) as count FROM loans WHERE user_id = ? AND status = 'ACTIVE'")
-      .get(userId) as { count: number };
-    return row.count;
-  }
-
   async create(loan: Omit<Loan, "id">): Promise<Loan> {
     const id = randomUUID();
     this.db

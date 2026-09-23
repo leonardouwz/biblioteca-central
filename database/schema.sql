@@ -49,6 +49,16 @@ CREATE TABLE IF NOT EXISTS accounts (
   created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS settings (
+  id TEXT PRIMARY KEY,
+  hourly_late_fee_rate REAL NOT NULL,
+  debt_multiplier REAL NOT NULL,
+  max_active_loans INTEGER NOT NULL,
+  loan_period_days INTEGER NOT NULL
+);
+INSERT OR IGNORE INTO settings (id, hourly_late_fee_rate, debt_multiplier, max_active_loans, loan_period_days)
+VALUES ('default', 5, 1, 3, 14);
+
 CREATE INDEX IF NOT EXISTS idx_book_copies_book_id ON book_copies(book_id);
 CREATE INDEX IF NOT EXISTS idx_loans_user_id ON loans(user_id);
 CREATE INDEX IF NOT EXISTS idx_loans_book_copy_id ON loans(book_copy_id);

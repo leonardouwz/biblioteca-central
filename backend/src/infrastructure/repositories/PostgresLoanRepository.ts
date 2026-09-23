@@ -41,14 +41,6 @@ export class PostgresLoanRepository implements ILoanRepository {
     return rows.map(toLoan);
   }
 
-  async countActiveByUserId(userId: string): Promise<number> {
-    const { rows } = await this.pool.query<{ count: string }>(
-      "SELECT COUNT(*) as count FROM loans WHERE user_id = $1 AND status = 'ACTIVE'",
-      [userId]
-    );
-    return Number(rows[0].count);
-  }
-
   async create(loan: Omit<Loan, "id">): Promise<Loan> {
     const id = randomUUID();
     await this.pool.query(

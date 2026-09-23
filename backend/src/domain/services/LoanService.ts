@@ -2,26 +2,35 @@ import { ILoanRepository } from "../interfaces/ILoanRepository";
 import { IBookRepository } from "../interfaces/IBookRepository";
 import { IUserRepository } from "../interfaces/IUserRepository";
 import { IDebtRepository } from "../interfaces/IDebtRepository";
+import { ISettingsRepository } from "../interfaces/ISettingsRepository";
 import { Loan } from "../entities/Loan";
+import { Settings } from "../entities/Settings";
 import { BusinessError } from "../errors/BusinessError";
-
-const MAX_ACTIVE_LOANS = 3;
-const LOAN_PERIOD_DAYS = 14;
-const DAILY_FINE_RATE = 500;
 
 export interface LoanWithBookTitle extends Loan {
   /** `null` si el libro fue eliminado; el frontend decide cómo mostrarlo (i18n). */
   bookTitle: string | null;
+  /**
+   * Multa que se generaría SI se devolviera ahora mismo. Puramente
+   * informativo: no crea ninguna deuda, solo se muestra en la UI para que
+   * el atraso no sea una sorpresa recién al devolver. `null` si el
+   * préstamo no está vencido o ya fue devuelto.
+   */
+  provisionalFine: number | null;
 }
 
 /**
- * Función STATELESS (pura): mismo input -> mismo output, sin leer ni escribir
- * estado externo (BD, disco, red). Calcula la multa por atraso en centavos.
+ * Función STATELESS (pura): mismo input -> mismo output, sin leer ni
+ * escribir estado externo (BD, disco, red). Calcula la multa por atraso
+ * en soles, por hora (la fracción de hora se redondea hacia arriba) y con
+ * un multiplicador configurable — ambos vienen de `Settings`, que el
+ * caller (el servicio) lee antes de invocar esta función; la función en sí
+ * no sabe nada de configuración persistida.
  */
-export function calculateFine(dueDate: Date, returnDate: Date, dailyRate = DAILY_FINE_RATE): number {
-  if (returnDate <= dueDate) return 0;
-  const daysLate = Math.ceil((returnDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-  return daysLate * dailyRate;
+export function calculateFine(dueDate: Date, asOfDate: Date, hourlyRate: number, multiplier: number): number {
+  if (asOfDate <= dueDate) return 0;
+  const hoursLate = Math.ceil((asOfDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60));
+  return Math.round(hoursLate * hourlyRate * multiplier);
 }
 
 export class LoanService {
@@ -29,18 +38,22 @@ export class LoanService {
     private readonly loanRepository: ILoanRepository,
     private readonly bookRepository: IBookRepository,
     private readonly userRepository: IUserRepository,
-    private readonly debtRepository: IDebtRepository
+    private readonly debtRepository: IDebtRepository,
+    private readonly settingsRepository: ISettingsRepository
   ) {}
 
   async getAllLoans(overdueOnly = false): Promise<LoanWithBookTitle[]> {
-    const loans = await this.loanRepository.findAll();
+    const [loans, settings] = await Promise.all([this.loanRepository.findAll(), this.settingsRepository.get()]);
     const filtered = overdueOnly ? loans.filter((l) => this.isOverdue(l)) : loans;
-    return Promise.all(filtered.map((loan) => this.withBookTitle(loan)));
+    return Promise.all(filtered.map((loan) => this.withBookTitle(loan, settings)));
   }
 
   async getLoansByUserId(userId: string): Promise<LoanWithBookTitle[]> {
-    const loans = await this.loanRepository.findByUserId(userId);
-    return Promise.all(loans.map((loan) => this.withBookTitle(loan)));
+    const [loans, settings] = await Promise.all([
+      this.loanRepository.findByUserId(userId),
+      this.settingsRepository.get(),
+    ]);
+    return Promise.all(loans.map((loan) => this.withBookTitle(loan, settings)));
   }
 
   async createLoan(userId: string, bookId: string): Promise<Loan> {
@@ -56,9 +69,20 @@ export class LoanService {
       throw new BusinessError("USER_HAS_UNPAID_DEBT");
     }
 
-    const activeLoans = await this.loanRepository.countActiveByUserId(userId);
-    if (activeLoans >= MAX_ACTIVE_LOANS) {
-      throw new BusinessError("LOAN_MAX_ACTIVE", { max: MAX_ACTIVE_LOANS, count: MAX_ACTIVE_LOANS });
+    const settings = await this.settingsRepository.get();
+    const userLoans = await this.loanRepository.findByUserId(userId);
+    const now = new Date();
+
+    // No basta con no tener deudas: un préstamo vencido y sin devolver
+    // todavía no genera deuda (eso pasa recién al devolverlo), pero de
+    // todas formas bloquea préstamos nuevos.
+    if (userLoans.some((l) => l.status === "ACTIVE" && l.dueDate.getTime() < now.getTime())) {
+      throw new BusinessError("USER_HAS_OVERDUE_LOAN");
+    }
+
+    const activeLoans = userLoans.filter((l) => l.status === "ACTIVE").length;
+    if (activeLoans >= settings.maxActiveLoans) {
+      throw new BusinessError("LOAN_MAX_ACTIVE", { max: settings.maxActiveLoans, count: settings.maxActiveLoans });
     }
 
     const book = await this.bookRepository.findById(bookId);
@@ -73,14 +97,13 @@ export class LoanService {
 
     await this.bookRepository.setCopyStatus(availableCopy.id, "LOANED");
 
-    const loanDate = new Date();
-    const dueDate = new Date(loanDate);
-    dueDate.setDate(dueDate.getDate() + LOAN_PERIOD_DAYS);
+    const dueDate = new Date(now);
+    dueDate.setDate(dueDate.getDate() + settings.loanPeriodDays);
 
     return this.loanRepository.create({
       userId,
       bookCopyId: availableCopy.id,
-      loanDate,
+      loanDate: now,
       dueDate,
       returnDate: null,
       status: "ACTIVE",
@@ -96,6 +119,7 @@ export class LoanService {
       throw new BusinessError("LOAN_ALREADY_RETURNED");
     }
 
+    const settings = await this.settingsRepository.get();
     const returnDate = new Date();
     await this.bookRepository.setCopyStatus(loan.bookCopyId, "AVAILABLE");
     const updated = await this.loanRepository.markReturned(loanId, returnDate);
@@ -103,7 +127,7 @@ export class LoanService {
       throw new BusinessError("LOAN_NOT_FOUND");
     }
 
-    const fineAmount = calculateFine(loan.dueDate, returnDate);
+    const fineAmount = calculateFine(loan.dueDate, returnDate, settings.hourlyLateFeeRate, settings.debtMultiplier);
     if (fineAmount > 0) {
       await this.debtRepository.create({
         userId: loan.userId,
@@ -122,9 +146,12 @@ export class LoanService {
     return loan.status === "ACTIVE" && loan.dueDate.getTime() < Date.now();
   }
 
-  private async withBookTitle(loan: Loan): Promise<LoanWithBookTitle> {
+  private async withBookTitle(loan: Loan, settings: Settings): Promise<LoanWithBookTitle> {
     const copy = await this.bookRepository.findCopyById(loan.bookCopyId);
     const book = copy ? await this.bookRepository.findById(copy.bookId) : null;
-    return { ...loan, bookTitle: book?.title ?? null };
+    const provisionalFine = this.isOverdue(loan)
+      ? calculateFine(loan.dueDate, new Date(), settings.hourlyLateFeeRate, settings.debtMultiplier)
+      : null;
+    return { ...loan, bookTitle: book?.title ?? null, provisionalFine };
   }
 }

@@ -20,8 +20,11 @@
   },
   "LOAN_NOT_FOUND": "El préstamo no existe.",
   "LOAN_ALREADY_RETURNED": "Este préstamo ya fue devuelto.",
+  "USER_HAS_OVERDUE_LOAN": "El usuario tiene un préstamo vencido sin devolver y no puede solicitar otro.",
 
   "DEBT_NOT_FOUND": "La deuda no existe.",
+
+  "SETTINGS_INVALID": "Los valores de configuración no son válidos.",
 
   "EMAIL_INVALID": "El email no es válido.",
   "PASSWORD_TOO_SHORT": "La contraseña debe tener al menos 6 caracteres.",
@@ -40,5 +43,6 @@
   "BODY_BOOK_UPDATE_INVALID": "title (string) y author (string) son requeridos.",
   "BODY_STOCK_INVALID": "quantity (number) es requerido.",
   "BODY_USER_INVALID": "name (string) y email (string) son requeridos.",
-  "BODY_STATUS_INVALID": "status debe ser ACTIVE o INACTIVE."
+  "BODY_STATUS_INVALID": "status debe ser ACTIVE o INACTIVE.",
+  "BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans y loanPeriodDays (number) son requeridos."
 }
