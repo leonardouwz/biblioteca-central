@@ -5,7 +5,9 @@
 CREATE TABLE IF NOT EXISTS books (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
-  author TEXT NOT NULL
+  author TEXT NOT NULL,
+  cover_url TEXT,
+  publish_year INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS book_copies (

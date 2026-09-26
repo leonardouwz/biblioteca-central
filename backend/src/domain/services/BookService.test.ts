@@ -23,8 +23,11 @@ class FakeBookRepository implements IBookRepository {
     this.books.push(created);
     return created;
   }
-  async update(): Promise<Book | null> {
-    return null;
+  async update(id: string, book: Omit<Book, "id">): Promise<Book | null> {
+    const existing = this.books.find((b) => b.id === id);
+    if (!existing) return null;
+    Object.assign(existing, book);
+    return existing;
   }
   async delete(): Promise<boolean> {
     return false;
@@ -75,4 +78,44 @@ test("createBook: initialCopies=0 es válido (libro sin stock inicial)", async (
   const service = new BookService(new FakeBookRepository());
   const book = await service.createBook("Libro", "Autor", 0);
   assert.equal(book.totalCopies, 0);
+});
+
+test("createBook: coverUrl/publishYear son opcionales; se guardan si vienen", async () => {
+  const service = new BookService(new FakeBookRepository());
+
+  const withoutMetadata = await service.createBook("Libro", "Autor", 0);
+  assert.equal(withoutMetadata.coverUrl, null);
+  assert.equal(withoutMetadata.publishYear, null);
+
+  const withMetadata = await service.createBook(
+    "1984",
+    "George Orwell",
+    0,
+    "https://covers.openlibrary.org/b/id/15257377-M.jpg",
+    1949
+  );
+  assert.equal(withMetadata.coverUrl, "https://covers.openlibrary.org/b/id/15257377-M.jpg");
+  assert.equal(withMetadata.publishYear, 1949);
+});
+
+test("createBook/updateBook: rechazan un publishYear fuera de rango o no entero", async () => {
+  const service = new BookService(new FakeBookRepository());
+  const nextYear = new Date().getFullYear() + 2;
+
+  await assert.rejects(() => service.createBook("Libro", "Autor", 0, null, 999), BusinessError);
+  await assert.rejects(() => service.createBook("Libro", "Autor", 0, null, nextYear), BusinessError);
+  await assert.rejects(() => service.createBook("Libro", "Autor", 0, null, 1999.5), BusinessError);
+
+  const book = await service.createBook("Libro", "Autor", 0);
+  await assert.rejects(() => service.updateBook(book.id, "Libro", "Autor", null, 500), BusinessError);
+});
+
+test("updateBook: actualiza coverUrl/publishYear junto con título/autor", async () => {
+  const service = new BookService(new FakeBookRepository());
+  const book = await service.createBook("Libro", "Autor", 0);
+
+  const updated = await service.updateBook(book.id, "Libro Editado", "Autor Editado", "https://example.com/cover.jpg", 2001);
+  assert.equal(updated.title, "Libro Editado");
+  assert.equal(updated.coverUrl, "https://example.com/cover.jpg");
+  assert.equal(updated.publishYear, 2001);
 });

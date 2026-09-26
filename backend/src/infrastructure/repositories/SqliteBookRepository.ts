@@ -8,6 +8,8 @@ interface BookRow {
   id: string;
   title: string;
   author: string;
+  cover_url: string | null;
+  publish_year: number | null;
 }
 
 interface BookCopyRow {
@@ -16,7 +18,13 @@ interface BookCopyRow {
   status: BookCopy["status"];
 }
 
-const toBook = (row: BookRow): Book => ({ id: row.id, title: row.title, author: row.author });
+const toBook = (row: BookRow): Book => ({
+  id: row.id,
+  title: row.title,
+  author: row.author,
+  coverUrl: row.cover_url,
+  publishYear: row.publish_year,
+});
 const toCopy = (row: BookCopyRow): BookCopy => ({ id: row.id, bookId: row.book_id, status: row.status });
 
 export class SqliteBookRepository implements IBookRepository {
@@ -34,14 +42,16 @@ export class SqliteBookRepository implements IBookRepository {
 
   async create(book: Omit<Book, "id">): Promise<Book> {
     const id = randomUUID();
-    this.db.prepare("INSERT INTO books (id, title, author) VALUES (?, ?, ?)").run(id, book.title, book.author);
+    this.db
+      .prepare("INSERT INTO books (id, title, author, cover_url, publish_year) VALUES (?, ?, ?, ?, ?)")
+      .run(id, book.title, book.author, book.coverUrl, book.publishYear);
     return { id, ...book };
   }
 
   async update(id: string, book: Omit<Book, "id">): Promise<Book | null> {
     const result = this.db
-      .prepare("UPDATE books SET title = ?, author = ? WHERE id = ?")
-      .run(book.title, book.author, id);
+      .prepare("UPDATE books SET title = ?, author = ?, cover_url = ?, publish_year = ? WHERE id = ?")
+      .run(book.title, book.author, book.coverUrl, book.publishYear, id);
     if (result.changes === 0) return null;
     return { id, ...book };
   }

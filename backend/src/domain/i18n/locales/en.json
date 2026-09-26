@@ -4,6 +4,7 @@
   "BOOK_QUANTITY_INVALID": "The quantity to add must be greater than zero.",
   "BOOK_HAS_LOANED_COPIES": "A book with copies currently on loan cannot be deleted.",
   "BOOK_COPIES_NEGATIVE": "Copies cannot be negative.",
+  "BOOK_PUBLISH_YEAR_INVALID": "The publish year is not valid.",
   "BOOK_NO_COPIES_AVAILABLE": "There are no available copies of this book.",
 
   "USER_NOT_FOUND": "The user does not exist.",

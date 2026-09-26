@@ -19,7 +19,7 @@ export class BookController {
   };
 
   create = async (req: Request, res: Response): Promise<void> => {
-    const { title, author, initialCopies } = req.body as CreateBookDto;
+    const { title, author, initialCopies, coverUrl, publishYear } = req.body as CreateBookDto;
 
     if (typeof title !== "string" || typeof author !== "string" || typeof initialCopies !== "number") {
       badRequest(res, req.locale, "BODY_BOOK_CREATE_INVALID");
@@ -27,14 +27,24 @@ export class BookController {
     }
 
     try {
-      res.status(201).json(await this.bookService.createBook(title, author, initialCopies));
+      res
+        .status(201)
+        .json(
+          await this.bookService.createBook(
+            title,
+            author,
+            initialCopies,
+            typeof coverUrl === "string" ? coverUrl : null,
+            typeof publishYear === "number" ? publishYear : null
+          )
+        );
     } catch (error) {
       handleBusinessError(res, error, req.locale);
     }
   };
 
   update = async (req: Request, res: Response): Promise<void> => {
-    const { title, author } = req.body as UpdateBookDto;
+    const { title, author, coverUrl, publishYear } = req.body as UpdateBookDto;
 
     if (typeof title !== "string" || typeof author !== "string") {
       badRequest(res, req.locale, "BODY_BOOK_UPDATE_INVALID");
@@ -42,7 +52,17 @@ export class BookController {
     }
 
     try {
-      res.status(200).json(await this.bookService.updateBook(req.params.id, title, author));
+      res
+        .status(200)
+        .json(
+          await this.bookService.updateBook(
+            req.params.id,
+            title,
+            author,
+            typeof coverUrl === "string" ? coverUrl : null,
+            typeof publishYear === "number" ? publishYear : null
+          )
+        );
     } catch (error) {
       handleBusinessError(res, error, req.locale);
     }

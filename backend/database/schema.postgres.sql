@@ -4,8 +4,15 @@
 CREATE TABLE IF NOT EXISTS books (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
-  author TEXT NOT NULL
+  author TEXT NOT NULL,
+  cover_url TEXT,
+  publish_year INTEGER
 );
+-- Migración aditiva para bases ya desplegadas antes de que existieran estas
+-- columnas: Postgres soporta IF NOT EXISTS en ADD COLUMN, así que no hace
+-- falta lógica condicional aparte (a diferencia de SQLite, ver Database.ts).
+ALTER TABLE books ADD COLUMN IF NOT EXISTS cover_url TEXT;
+ALTER TABLE books ADD COLUMN IF NOT EXISTS publish_year INTEGER;
 
 CREATE TABLE IF NOT EXISTS book_copies (
   id TEXT PRIMARY KEY,

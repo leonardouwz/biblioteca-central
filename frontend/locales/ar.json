@@ -40,7 +40,7 @@
     "mt": true
   },
   "nav.books": {
-    "text": "الكتب",
+    "text": "إدارة الكتب",
     "mt": true
   },
   "nav.users": {
@@ -108,7 +108,7 @@
     "mt": true
   },
   "auth.gateMessage": {
-    "text": "سجّل الدخول كـ {librarian} أو {admin} لإدارة الإعارات والفهرس والأعضاء.",
+    "text": "سجّل الدخول كـ {librarian} أو {admin} لإدارة الإعارات والكتب والأعضاء.",
     "mt": true
   },
   "errors.BOOK_NOT_FOUND": {
@@ -257,7 +257,11 @@
     "mt": true
   },
   "nav.tablist": {
-    "text": "أقسام الإدارة",
+    "text": "أقسام التطبيق",
+    "mt": true
+  },
+  "nav.catalog": {
+    "text": "الفهرس",
     "mt": true
   },
   "auth.welcome": {
@@ -266,6 +270,26 @@
   },
   "auth.accountCreated": {
     "text": "تم إنشاء الحساب باسم {role}.",
+    "mt": true
+  },
+  "catalog.title": {
+    "text": "الفهرس",
+    "mt": true
+  },
+  "catalog.searchLabel": {
+    "text": "ابحث حسب العنوان أو المؤلف",
+    "mt": true
+  },
+  "catalog.searchPlaceholder": {
+    "text": "ابحث حسب العنوان أو المؤلف…",
+    "mt": true
+  },
+  "catalog.empty": {
+    "text": "لا توجد كتب تطابق البحث.",
+    "mt": true
+  },
+  "catalog.outOfStock": {
+    "text": "غير متوفر",
     "mt": true
   },
   "loans.requestTitle": {
@@ -438,7 +462,7 @@
     "mt": true
   },
   "books.catalogTitle": {
-    "text": "الكتالوج",
+    "text": "الكتب المسجلة",
     "mt": true
   },
   "books.colTitle": {

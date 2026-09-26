@@ -4,6 +4,7 @@
   "BOOK_QUANTITY_INVALID": { "text": "يجب أن تكون الكمية المضافة أكبر من صفر.", "mt": true },
   "BOOK_HAS_LOANED_COPIES": { "text": "لا يمكن حذف كتاب توجد نسخ منه معارة حاليًا.", "mt": true },
   "BOOK_COPIES_NEGATIVE": { "text": "لا يمكن أن يكون عدد النسخ سالبًا.", "mt": true },
+  "BOOK_PUBLISH_YEAR_INVALID": { "text": "سنة النشر غير صالحة.", "mt": true },
   "BOOK_NO_COPIES_AVAILABLE": { "text": "لا توجد نسخ متاحة من هذا الكتاب.", "mt": true },
 
   "USER_NOT_FOUND": { "text": "المستخدم غير موجود.", "mt": true },

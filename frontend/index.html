@@ -301,6 +301,65 @@
   .search-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
   .search-page-info { font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink-soft); }
 
+  .catalog-search { margin: 18px 0 22px; }
+  .catalog-search input { font-size: 1rem; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .catalog-empty {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    padding: 40px 10px;
+  }
+
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 18px;
+  }
+  .catalog-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--line);
+    overflow: hidden;
+  }
+  .catalog-cover {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    background: var(--pine-soft);
+    display: block;
+  }
+  .catalog-cover-placeholder {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pine-soft);
+    color: var(--pine);
+    font-family: var(--font-stamp);
+    font-size: 2.2rem;
+  }
+  .catalog-card-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .catalog-card-title { font-size: 0.86rem; font-weight: 600; line-height: 1.3; }
+  .catalog-card-author { font-size: 0.78rem; color: var(--ink-soft); }
+  .catalog-card-year { font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-soft); }
+  .catalog-card-badge { margin-top: auto; padding-top: 6px; }
+
   .modal-overlay {
     display: none;
     position: fixed;
@@ -409,15 +468,27 @@
   <p id="gateMsg" class="result" role="status" aria-live="polite" style="display:none"></p>
 
   <div class="tabs" role="tablist" data-i18n-aria-label="nav.tablist">
-    <button class="tab-btn active" id="tabbtn-loans" role="tab" aria-selected="true" aria-controls="tab-loans" data-tab="loans" data-i18n="nav.loans">Préstamos</button>
-    <button class="tab-btn" id="tabbtn-books" role="tab" aria-selected="false" aria-controls="tab-books" data-tab="books" data-i18n="nav.books">Libros</button>
+    <button class="tab-btn active" id="tabbtn-catalog" role="tab" aria-selected="true" aria-controls="tab-catalog" data-tab="catalog" data-i18n="nav.catalog">Catálogo</button>
+    <button class="tab-btn" id="tabbtn-loans" role="tab" aria-selected="false" aria-controls="tab-loans" data-tab="loans" data-i18n="nav.loans">Préstamos</button>
+    <button class="tab-btn" id="tabbtn-books" role="tab" aria-selected="false" aria-controls="tab-books" data-tab="books" data-i18n="nav.books">Gestión de libros</button>
     <button class="tab-btn" id="tabbtn-users" role="tab" aria-selected="false" aria-controls="tab-users" data-tab="users" data-i18n="nav.users">Usuarios</button>
     <button class="tab-btn" id="tabbtn-debts" role="tab" aria-selected="false" aria-controls="tab-debts" data-tab="debts" data-i18n="nav.debts">Deudas</button>
     <button class="tab-btn" id="tabbtn-settings" role="tab" aria-selected="false" aria-controls="tab-settings" data-tab="settings" data-i18n="nav.settings">Configuración</button>
   </div>
 
+  <!-- ==================== CATÁLOGO (público, cualquier socio logueado) ==================== -->
+  <section id="tab-catalog" class="tab-panel active" role="tabpanel" aria-labelledby="tabbtn-catalog">
+    <h2 data-i18n="catalog.title">Catálogo</h2>
+    <div class="catalog-search">
+      <label for="catalogSearch" class="sr-only" data-i18n="catalog.searchLabel">Buscar por título o autor</label>
+      <input id="catalogSearch" type="text" data-i18n-placeholder="catalog.searchPlaceholder" placeholder="Buscar por título o autor…">
+    </div>
+    <div id="catalogEmpty" class="catalog-empty" style="display:none" data-i18n="catalog.empty">No hay libros que coincidan con la búsqueda.</div>
+    <div id="catalogGrid" class="catalog-grid"></div>
+  </section>
+
   <!-- ==================== PRÉSTAMOS ==================== -->
-  <section id="tab-loans" class="tab-panel active" role="tabpanel" aria-labelledby="tabbtn-loans">
+  <section id="tab-loans" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-loans">
     <div class="card">
       <h2 data-i18n="loans.requestTitle">Solicitar préstamo</h2>
       <label for="loanUserId" data-i18n="loans.user">Usuario</label>
@@ -598,6 +669,7 @@
   <script src="format.js"></script>
   <script src="validators.js"></script>
   <script src="openLibrary.js"></script>
+  <script src="catalog.js"></script>
   <script src="i18n.js"></script>
   <script>
     const { t, formatCurrency, formatDate, translateError, setLocale, getLocale } = window.I18n;
@@ -671,7 +743,54 @@
       renderSettingsForm();
       await loadLoans();
       await loadDebts();
+      await loadCatalog(); // el catálogo lee /books igual que allBooks; se refresca en cada acción de staff para no quedar desactualizado
     }
+
+    // ---------- Catálogo (público: cualquier rol logueado) ----------
+    let allCatalogBooks = [];
+
+    function renderCatalogGrid(books) {
+      const grid = document.getElementById('catalogGrid');
+      const empty = document.getElementById('catalogEmpty');
+
+      if (books.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      grid.innerHTML = books
+        .map((b) => {
+          const cover = b.coverUrl
+            ? `<img class="catalog-cover" src="${b.coverUrl}" alt="${t('books.coverAlt', { title: b.title })}">`
+            : `<div class="catalog-cover-placeholder" aria-hidden="true">${(b.title || '?').charAt(0).toUpperCase()}</div>`;
+          const badgeClass = b.availableCopies > 0 ? 'badge-active' : 'badge-unpaid';
+          const badgeText = b.availableCopies > 0
+            ? t('loans.availableOf', { available: b.availableCopies, total: b.totalCopies })
+            : t('catalog.outOfStock');
+          return `<div class="catalog-card">
+            ${cover}
+            <div class="catalog-card-body">
+              <div class="catalog-card-title">${b.title}</div>
+              <div class="catalog-card-author">${b.author}</div>
+              ${b.publishYear ? `<div class="catalog-card-year">${b.publishYear}</div>` : ''}
+              <div class="catalog-card-badge"><span class="badge ${badgeClass}">${badgeText}</span></div>
+            </div>
+          </div>`;
+        })
+        .join('');
+    }
+
+    async function loadCatalog() {
+      const { data } = await fetchJson('/api/v1/books');
+      allCatalogBooks = data || [];
+      renderCatalogGrid(Catalog.filterBooks(allCatalogBooks, document.getElementById('catalogSearch').value));
+    }
+
+    document.getElementById('catalogSearch').addEventListener('input', (e) => {
+      renderCatalogGrid(Catalog.filterBooks(allCatalogBooks, e.target.value));
+    });
 
     // ---------- Préstamos ----------
     function renderLoanForm() {
@@ -747,6 +866,11 @@
 
     // ---------- Libros ----------
     let editingBookId = null;
+    // Portada/año no tienen campo propio en el formulario: se capturan al
+    // usar la búsqueda de Open Library (o se precargan al editar un libro
+    // que ya los tenía) y viajan junto con título/autor al guardar.
+    let pendingCoverUrl = null;
+    let pendingPublishYear = null;
 
     function renderBooksTable() {
       document.getElementById('booksTableBody').innerHTML = allBooks
@@ -786,6 +910,16 @@
           editingBookId = book.id;
           document.getElementById('bookTitle').value = book.title;
           document.getElementById('bookAuthor').value = book.author;
+          pendingCoverUrl = book.coverUrl || null;
+          pendingPublishYear = book.publishYear || null;
+          const cover = document.getElementById('bookCoverPreview');
+          if (book.coverUrl) {
+            cover.src = book.coverUrl;
+            cover.alt = t('books.coverAlt', { title: book.title });
+            cover.style.display = 'block';
+          } else {
+            cover.style.display = 'none';
+          }
           document.getElementById('bookCopiesLabel').style.display = 'none';
           document.getElementById('bookCopies').style.display = 'none';
           document.getElementById('bookFormTitle').textContent = t('books.editTitle');
@@ -817,6 +951,8 @@
 
     function resetBookForm() {
       editingBookId = null;
+      pendingCoverUrl = null;
+      pendingPublishYear = null;
       document.getElementById('bookTitle').value = '';
       document.getElementById('bookAuthor').value = '';
       document.getElementById('bookCopies').value = '1';
@@ -842,6 +978,8 @@
       const cover = document.getElementById('bookCoverPreview');
       if (book.title) document.getElementById('bookTitle').value = book.title;
       if (book.author) document.getElementById('bookAuthor').value = book.author;
+      pendingCoverUrl = book.coverUrl || null;
+      pendingPublishYear = book.year || null;
       if (book.coverUrl) {
         cover.src = book.coverUrl;
         cover.alt = t('books.coverAlt', { title: book.title });
@@ -976,7 +1114,9 @@
       const url = isEditing ? `/api/v1/books/${editingBookId}` : '/api/v1/books';
       const method = isEditing ? 'PUT' : 'POST';
       const initialCopies = Number(rawCopies);
-      const body = isEditing ? { title, author } : { title, author, initialCopies };
+      const body = isEditing
+        ? { title, author, coverUrl: pendingCoverUrl, publishYear: pendingPublishYear }
+        : { title, author, initialCopies, coverUrl: pendingCoverUrl, publishYear: pendingPublishYear };
       const { ok, data } = await fetchJson(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -1203,15 +1343,32 @@
     const STAFF_ROLES = ['BIBLIOTECARIO', 'ADMINISTRADOR'];
     const ROLE_LABEL_KEY = { USUARIO: 'auth.roleUser', BIBLIOTECARIO: 'auth.roleLibrarian', ADMINISTRADOR: 'auth.roleAdmin' };
 
+    // Pestañas de gestión (todo salvo Catálogo): solo BIBLIOTECARIO/ADMINISTRADOR.
+    // El Catálogo mismo es para cualquier rol logueado (ver setLoggedInView) —
+    // es justo lo que hace que la app se sienta como una biblioteca real y no
+    // solo un panel de back-office.
+    const STAFF_ONLY_TABS = ['loans', 'books', 'users', 'debts'];
+
     function setStaffView(isStaff) {
-      document.querySelector('.tabs').style.display = isStaff ? '' : 'none';
-      document.querySelectorAll('.tab-panel').forEach((p) => { p.style.display = isStaff ? '' : 'none'; });
+      STAFF_ONLY_TABS.forEach((tab) => {
+        const display = isStaff ? '' : 'none';
+        document.getElementById(`tabbtn-${tab}`).style.display = display;
+        document.getElementById(`tab-${tab}`).style.display = display;
+      });
       const showGate = !isStaff && !!localStorage.getItem('authToken');
       const gate = document.getElementById('gateMsg');
       gate.style.display = showGate ? 'block' : 'none';
       if (showGate) {
         gate.textContent = t('auth.gateMessage', { librarian: t('auth.roleLibrarian'), admin: t('auth.roleAdmin') });
       }
+    }
+
+    // La barra de pestañas y el Catálogo se ven con cualquier sesión válida
+    // (incluido el rol USUARIO, que antes no veía nada al iniciar sesión).
+    function setLoggedInView(loggedIn) {
+      document.querySelector('.tabs').style.display = loggedIn ? '' : 'none';
+      document.getElementById('tab-catalog').style.display = loggedIn ? '' : 'none';
+      if (loggedIn) loadCatalog();
     }
 
     // La pestaña "Configuración" es solo para ADMINISTRADOR, ni siquiera para bibliotecarios.
@@ -1233,6 +1390,7 @@
         document.getElementById('authSessionLabel').textContent = t('auth.sessionActive', { email, role: roleLabel });
       }
       const isStaff = loggedIn && STAFF_ROLES.includes(role);
+      setLoggedInView(loggedIn);
       setStaffView(isStaff);
       setAdminView(loggedIn && role === 'ADMINISTRADOR');
       if (isStaff) loadAll();

@@ -4,6 +4,7 @@
   "BOOK_QUANTITY_INVALID": "La cantidad a agregar debe ser mayor a cero.",
   "BOOK_HAS_LOANED_COPIES": "No se puede eliminar un libro con copias actualmente prestadas.",
   "BOOK_COPIES_NEGATIVE": "Las copias no pueden ser negativas.",
+  "BOOK_PUBLISH_YEAR_INVALID": "El año de publicación no es válido.",
   "BOOK_NO_COPIES_AVAILABLE": "No hay copias disponibles de este libro.",
 
   "USER_NOT_FOUND": "El usuario no existe.",

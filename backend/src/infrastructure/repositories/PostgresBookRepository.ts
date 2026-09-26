@@ -8,6 +8,8 @@ interface BookRow {
   id: string;
   title: string;
   author: string;
+  cover_url: string | null;
+  publish_year: number | null;
 }
 
 interface BookCopyRow {
@@ -16,7 +18,13 @@ interface BookCopyRow {
   status: BookCopy["status"];
 }
 
-const toBook = (row: BookRow): Book => ({ id: row.id, title: row.title, author: row.author });
+const toBook = (row: BookRow): Book => ({
+  id: row.id,
+  title: row.title,
+  author: row.author,
+  coverUrl: row.cover_url,
+  publishYear: row.publish_year,
+});
 const toCopy = (row: BookCopyRow): BookCopy => ({ id: row.id, bookId: row.book_id, status: row.status });
 
 export class PostgresBookRepository implements IBookRepository {
@@ -34,20 +42,18 @@ export class PostgresBookRepository implements IBookRepository {
 
   async create(book: Omit<Book, "id">): Promise<Book> {
     const id = randomUUID();
-    await this.pool.query("INSERT INTO books (id, title, author) VALUES ($1, $2, $3)", [
-      id,
-      book.title,
-      book.author,
-    ]);
+    await this.pool.query(
+      "INSERT INTO books (id, title, author, cover_url, publish_year) VALUES ($1, $2, $3, $4, $5)",
+      [id, book.title, book.author, book.coverUrl, book.publishYear]
+    );
     return { id, ...book };
   }
 
   async update(id: string, book: Omit<Book, "id">): Promise<Book | null> {
-    const result = await this.pool.query("UPDATE books SET title = $1, author = $2 WHERE id = $3", [
-      book.title,
-      book.author,
-      id,
-    ]);
+    const result = await this.pool.query(
+      "UPDATE books SET title = $1, author = $2, cover_url = $3, publish_year = $4 WHERE id = $5",
+      [book.title, book.author, book.coverUrl, book.publishYear, id]
+    );
     if (result.rowCount === 0) return null;
     return { id, ...book };
   }
