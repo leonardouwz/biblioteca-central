@@ -269,6 +269,38 @@
   .inline-stock { display: flex; gap: 4px; align-items: center; }
   .inline-stock input { width: 60px; margin-top: 0; padding: 6px; }
 
+  .search-row { display: flex; gap: 8px; align-items: flex-start; }
+  .search-row input { flex: 1; min-width: 0; }
+  .search-row button { margin-top: 5px; width: auto; padding: 9px 16px; flex: none; }
+
+  .search-results { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .search-result {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+  }
+  .search-result img {
+    flex: none;
+    width: 40px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 2px;
+    background: var(--line);
+  }
+  .search-result .search-result-info { flex: 1; min-width: 0; }
+  .search-result .search-result-title { font-weight: 600; font-size: 0.88rem; }
+  .search-result .search-result-meta { font-size: 0.78rem; color: var(--ink-soft); margin-top: 2px; }
+  .search-result button { margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; flex: none; }
+
+  .search-pagination { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; }
+  .search-pagination button { margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
+  .search-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .search-page-info { font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink-soft); }
+
   .modal-overlay {
     display: none;
     position: fixed;
@@ -421,12 +453,20 @@
     <div class="card">
       <h2 id="bookFormTitle" data-i18n="books.addTitle">Agregar libro</h2>
 
-      <label for="bookIsbn" data-i18n="books.isbnLabel">ISBN (opcional, autocompleta con Open Library)</label>
-      <div class="inline-stock">
-        <input id="bookIsbn" type="text" inputmode="numeric" data-i18n-placeholder="books.isbnPlaceholder" placeholder="978-0-451-52493-5">
-        <button type="button" class="secondary" id="bookIsbnSearch" data-i18n="books.isbnSearch">Buscar</button>
+      <label for="bookSearchQuery" data-i18n="books.searchLabel">Buscar libro (ISBN, título o autor — opcional, vía Open Library)</label>
+      <div class="search-row">
+        <input id="bookSearchQuery" type="text" data-i18n-placeholder="books.searchPlaceholder" placeholder="978-0-451-52493-5, Mario Vargas Llosa…">
+        <button type="button" class="secondary" id="bookSearchSubmit" data-i18n="books.searchSubmit">Buscar</button>
       </div>
-      <div id="bookIsbnResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+      <div id="bookSearchResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+
+      <ul id="bookSearchList" class="search-results" style="display:none"></ul>
+      <div id="bookSearchPagination" class="search-pagination" style="display:none">
+        <button type="button" class="ghost" id="bookSearchPrev" data-i18n="books.pagePrev">‹ Anterior</button>
+        <span id="bookSearchPageInfo" class="search-page-info"></span>
+        <button type="button" class="ghost" id="bookSearchNext" data-i18n="books.pageNext">Siguiente ›</button>
+      </div>
+
       <img id="bookCoverPreview" alt="" style="display:none; max-height:120px; margin-top:8px; border-radius:3px;">
 
       <label for="bookTitle" data-i18n="books.titleField">Título</label>
@@ -780,8 +820,11 @@
       document.getElementById('bookTitle').value = '';
       document.getElementById('bookAuthor').value = '';
       document.getElementById('bookCopies').value = '1';
-      document.getElementById('bookIsbn').value = '';
-      document.getElementById('bookIsbnResult').style.display = 'none';
+      document.getElementById('bookSearchQuery').value = '';
+      document.getElementById('bookSearchResult').style.display = 'none';
+      document.getElementById('bookSearchList').style.display = 'none';
+      document.getElementById('bookSearchList').innerHTML = '';
+      document.getElementById('bookSearchPagination').style.display = 'none';
       document.getElementById('bookCoverPreview').style.display = 'none';
       document.getElementById('bookCopiesLabel').style.display = 'block';
       document.getElementById('bookCopies').style.display = 'block';
@@ -790,44 +833,136 @@
       document.getElementById('bookCancelEdit').style.display = 'none';
     }
 
-    // ---------- Búsqueda por ISBN (Open Library, servicio externo) ----------
-    document.getElementById('bookIsbnSearch').addEventListener('click', async () => {
-      const isbnInput = document.getElementById('bookIsbn');
-      const resultEl = document.getElementById('bookIsbnResult');
-      const cover = document.getElementById('bookCoverPreview');
-      const isbn = isbnInput.value;
+    // ---------- Búsqueda de libro (Open Library, servicio externo) ----------
+    // ISBN exacto -> autocompleta directo. Texto libre (título/autor) -> lista
+    // paginada para elegir. Un solo botón decide según el formato de lo tipeado.
+    let searchState = { query: '', page: 1 };
 
-      if (!OpenLibrary.isValidIsbn(isbn)) {
-        showResult(resultEl, false, t('books.isbnInvalid'));
+    function applyBookResult(book) {
+      const cover = document.getElementById('bookCoverPreview');
+      if (book.title) document.getElementById('bookTitle').value = book.title;
+      if (book.author) document.getElementById('bookAuthor').value = book.author;
+      if (book.coverUrl) {
+        cover.src = book.coverUrl;
+        cover.alt = t('books.coverAlt', { title: book.title });
+        cover.style.display = 'block';
+      } else {
+        cover.style.display = 'none';
+      }
+    }
+
+    function renderSearchResults(page) {
+      const list = document.getElementById('bookSearchList');
+      const pagination = document.getElementById('bookSearchPagination');
+
+      if (page.results.length === 0) {
+        list.style.display = 'none';
+        pagination.style.display = 'none';
         return;
       }
 
-      const btn = document.getElementById('bookIsbnSearch');
+      list.innerHTML = page.results
+        .map((book, i) => {
+          const meta = book.year ? `${book.author || ''} · ${book.year}` : (book.author || '');
+          const cover = book.coverUrl
+            ? `<img src="${book.coverUrl}" alt="">`
+            : `<img alt="">`;
+          return `<li class="search-result">
+            ${cover}
+            <div class="search-result-info">
+              <div class="search-result-title">${book.title}</div>
+              <div class="search-result-meta">${meta}</div>
+            </div>
+            <button type="button" class="secondary" data-use-result="${i}">${t('books.useThis')}</button>
+          </li>`;
+        })
+        .join('');
+      list.style.display = 'flex';
+
+      list.querySelectorAll('[data-use-result]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          applyBookResult(page.results[Number(btn.dataset.useResult)]);
+          list.style.display = 'none';
+          pagination.style.display = 'none';
+          showResult(document.getElementById('bookSearchResult'), true, t('books.isbnFound'));
+        });
+      });
+
+      document.getElementById('bookSearchPageInfo').textContent = t('books.pageInfo', {
+        page: page.page,
+        totalPages: page.totalPages,
+      });
+      document.getElementById('bookSearchPrev').disabled = page.page <= 1;
+      document.getElementById('bookSearchNext').disabled = page.page >= page.totalPages;
+      pagination.style.display = 'flex';
+    }
+
+    async function runBookSearch(page) {
+      const resultEl = document.getElementById('bookSearchResult');
+      const btn = document.getElementById('bookSearchSubmit');
       btn.disabled = true;
-      showResult(resultEl, true, t('books.isbnSearching'));
+      showResult(resultEl, true, t('books.searching'));
       try {
-        const book = await OpenLibrary.fetchBookByIsbn(isbn);
-        if (!book) {
-          cover.style.display = 'none';
-          showResult(resultEl, false, t('books.isbnNotFound'));
+        const results = await OpenLibrary.fetchBooksByQuery(searchState.query, page, OpenLibrary.RESULTS_PER_PAGE);
+        searchState.page = page;
+        if (results.results.length === 0) {
+          document.getElementById('bookSearchList').style.display = 'none';
+          document.getElementById('bookSearchPagination').style.display = 'none';
+          showResult(resultEl, false, t('books.searchNoResults'));
           return;
         }
-        if (book.title) document.getElementById('bookTitle').value = book.title;
-        if (book.author) document.getElementById('bookAuthor').value = book.author;
-        if (book.coverUrl) {
-          cover.src = book.coverUrl;
-          cover.alt = t('books.coverAlt', { title: book.title });
-          cover.style.display = 'block';
-        } else {
-          cover.style.display = 'none';
-        }
-        showResult(resultEl, true, t('books.isbnFound'));
+        showResult(resultEl, true, t('books.resultsCount', { count: results.numFound }));
+        renderSearchResults(results);
       } catch {
         // Sin red o el servicio externo caído: no bloquea el alta manual del libro.
-        showResult(resultEl, false, t('books.isbnServiceError'));
+        showResult(resultEl, false, t('books.searchServiceError'));
       } finally {
         btn.disabled = false;
       }
+    }
+
+    document.getElementById('bookSearchSubmit').addEventListener('click', async () => {
+      const query = document.getElementById('bookSearchQuery').value.trim();
+      const resultEl = document.getElementById('bookSearchResult');
+      const cover = document.getElementById('bookCoverPreview');
+      document.getElementById('bookSearchList').style.display = 'none';
+      document.getElementById('bookSearchPagination').style.display = 'none';
+
+      if (!query) {
+        showResult(resultEl, false, t('books.searchEmpty'));
+        return;
+      }
+
+      if (OpenLibrary.isValidIsbn(query)) {
+        const btn = document.getElementById('bookSearchSubmit');
+        btn.disabled = true;
+        showResult(resultEl, true, t('books.searching'));
+        try {
+          const book = await OpenLibrary.fetchBookByIsbn(query);
+          if (!book) {
+            cover.style.display = 'none';
+            showResult(resultEl, false, t('books.searchNoResults'));
+            return;
+          }
+          applyBookResult(book);
+          showResult(resultEl, true, t('books.isbnFound'));
+        } catch {
+          showResult(resultEl, false, t('books.searchServiceError'));
+        } finally {
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      searchState = { query, page: 1 };
+      await runBookSearch(1);
+    });
+
+    document.getElementById('bookSearchPrev').addEventListener('click', () => {
+      if (searchState.page > 1) runBookSearch(searchState.page - 1);
+    });
+    document.getElementById('bookSearchNext').addEventListener('click', () => {
+      runBookSearch(searchState.page + 1);
     });
 
     document.getElementById('bookCancelEdit').addEventListener('click', resetBookForm);

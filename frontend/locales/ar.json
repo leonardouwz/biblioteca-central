@@ -356,36 +356,57 @@
     "text": "تحرير كتاب",
     "mt": true
   },
-  "books.isbnLabel": {
-    "text": "الرقم الدولي المعياري للكتاب (اختياري، يُكمَل تلقائيًا عبر Open Library)",
+  "books.searchLabel": {
+    "text": "ابحث عن كتاب (رقم ISBN أو العنوان أو المؤلف — اختياري، عبر Open Library)",
     "mt": true
   },
-  "books.isbnPlaceholder": {
-    "text": "978-0-451-52493-5",
+  "books.searchPlaceholder": {
+    "text": "978-0-451-52493-5، ماريو بارغاس يوسا…",
     "mt": true
   },
-  "books.isbnSearch": {
+  "books.searchSubmit": {
     "text": "بحث",
     "mt": true
   },
-  "books.isbnSearching": {
+  "books.searching": {
     "text": "جارٍ البحث في Open Library…",
+    "mt": true
+  },
+  "books.searchEmpty": {
+    "text": "أدخل رقم ISBN أو عنوانًا أو مؤلفًا للبحث.",
+    "mt": true
+  },
+  "books.searchNoResults": {
+    "text": "لم يُعثر على نتائج في Open Library.",
+    "mt": true
+  },
+  "books.searchServiceError": {
+    "text": "تعذّر الاتصال بـ Open Library. أكمل البيانات يدويًا.",
     "mt": true
   },
   "books.isbnFound": {
     "text": "تم العثور على البيانات وتعبئتها.",
     "mt": true
   },
-  "books.isbnNotFound": {
-    "text": "لم يُعثر على هذا الرقم في Open Library.",
+  "books.useThis": {
+    "text": "استخدم هذا",
     "mt": true
   },
-  "books.isbnInvalid": {
-    "text": "أدخل رقم ISBN-10 أو ISBN-13 صالحًا.",
+  "books.resultsCount": {
+    "one": "تم العثور على نتيجة واحدة.",
+    "other": "تم العثور على {count} نتيجة.",
     "mt": true
   },
-  "books.isbnServiceError": {
-    "text": "تعذّر الاتصال بـ Open Library. أكمل البيانات يدويًا.",
+  "books.pagePrev": {
+    "text": "‹ السابق",
+    "mt": true
+  },
+  "books.pageNext": {
+    "text": "التالي ›",
+    "mt": true
+  },
+  "books.pageInfo": {
+    "text": "صفحة {page} من {totalPages}",
     "mt": true
   },
   "books.coverAlt": {
