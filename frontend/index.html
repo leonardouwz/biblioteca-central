@@ -420,6 +420,15 @@
   <section id="tab-books" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-books">
     <div class="card">
       <h2 id="bookFormTitle" data-i18n="books.addTitle">Agregar libro</h2>
+
+      <label for="bookIsbn" data-i18n="books.isbnLabel">ISBN (opcional, autocompleta con Open Library)</label>
+      <div class="inline-stock">
+        <input id="bookIsbn" type="text" inputmode="numeric" data-i18n-placeholder="books.isbnPlaceholder" placeholder="978-0-451-52493-5">
+        <button type="button" class="secondary" id="bookIsbnSearch" data-i18n="books.isbnSearch">Buscar</button>
+      </div>
+      <div id="bookIsbnResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+      <img id="bookCoverPreview" alt="" style="display:none; max-height:120px; margin-top:8px; border-radius:3px;">
+
       <label for="bookTitle" data-i18n="books.titleField">Título</label>
       <input id="bookTitle" type="text">
 
@@ -548,6 +557,7 @@
 
   <script src="format.js"></script>
   <script src="validators.js"></script>
+  <script src="openLibrary.js"></script>
   <script src="i18n.js"></script>
   <script>
     const { t, formatCurrency, formatDate, translateError, setLocale, getLocale } = window.I18n;
@@ -770,12 +780,55 @@
       document.getElementById('bookTitle').value = '';
       document.getElementById('bookAuthor').value = '';
       document.getElementById('bookCopies').value = '1';
+      document.getElementById('bookIsbn').value = '';
+      document.getElementById('bookIsbnResult').style.display = 'none';
+      document.getElementById('bookCoverPreview').style.display = 'none';
       document.getElementById('bookCopiesLabel').style.display = 'block';
       document.getElementById('bookCopies').style.display = 'block';
       document.getElementById('bookFormTitle').textContent = t('books.addTitle');
       document.getElementById('bookSubmit').textContent = t('books.submitAdd');
       document.getElementById('bookCancelEdit').style.display = 'none';
     }
+
+    // ---------- Búsqueda por ISBN (Open Library, servicio externo) ----------
+    document.getElementById('bookIsbnSearch').addEventListener('click', async () => {
+      const isbnInput = document.getElementById('bookIsbn');
+      const resultEl = document.getElementById('bookIsbnResult');
+      const cover = document.getElementById('bookCoverPreview');
+      const isbn = isbnInput.value;
+
+      if (!OpenLibrary.isValidIsbn(isbn)) {
+        showResult(resultEl, false, t('books.isbnInvalid'));
+        return;
+      }
+
+      const btn = document.getElementById('bookIsbnSearch');
+      btn.disabled = true;
+      showResult(resultEl, true, t('books.isbnSearching'));
+      try {
+        const book = await OpenLibrary.fetchBookByIsbn(isbn);
+        if (!book) {
+          cover.style.display = 'none';
+          showResult(resultEl, false, t('books.isbnNotFound'));
+          return;
+        }
+        if (book.title) document.getElementById('bookTitle').value = book.title;
+        if (book.author) document.getElementById('bookAuthor').value = book.author;
+        if (book.coverUrl) {
+          cover.src = book.coverUrl;
+          cover.alt = t('books.coverAlt', { title: book.title });
+          cover.style.display = 'block';
+        } else {
+          cover.style.display = 'none';
+        }
+        showResult(resultEl, true, t('books.isbnFound'));
+      } catch {
+        // Sin red o el servicio externo caído: no bloquea el alta manual del libro.
+        showResult(resultEl, false, t('books.isbnServiceError'));
+      } finally {
+        btn.disabled = false;
+      }
+    });
 
     document.getElementById('bookCancelEdit').addEventListener('click', resetBookForm);
 

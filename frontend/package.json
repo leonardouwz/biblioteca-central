@@ -2,6 +2,6 @@
   "name": "biblioteca-frontend",
   "private": true,
   "scripts": {
-    "test": "node --test format.test.js validators.test.js"
+    "test": "node --test format.test.js validators.test.js openLibrary.test.js"
   }
 }

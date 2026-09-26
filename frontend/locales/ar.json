@@ -356,6 +356,42 @@
     "text": "تحرير كتاب",
     "mt": true
   },
+  "books.isbnLabel": {
+    "text": "الرقم الدولي المعياري للكتاب (اختياري، يُكمَل تلقائيًا عبر Open Library)",
+    "mt": true
+  },
+  "books.isbnPlaceholder": {
+    "text": "978-0-451-52493-5",
+    "mt": true
+  },
+  "books.isbnSearch": {
+    "text": "بحث",
+    "mt": true
+  },
+  "books.isbnSearching": {
+    "text": "جارٍ البحث في Open Library…",
+    "mt": true
+  },
+  "books.isbnFound": {
+    "text": "تم العثور على البيانات وتعبئتها.",
+    "mt": true
+  },
+  "books.isbnNotFound": {
+    "text": "لم يُعثر على هذا الرقم في Open Library.",
+    "mt": true
+  },
+  "books.isbnInvalid": {
+    "text": "أدخل رقم ISBN-10 أو ISBN-13 صالحًا.",
+    "mt": true
+  },
+  "books.isbnServiceError": {
+    "text": "تعذّر الاتصال بـ Open Library. أكمل البيانات يدويًا.",
+    "mt": true
+  },
+  "books.coverAlt": {
+    "text": "غلاف {title}",
+    "mt": true
+  },
   "books.titleField": {
     "text": "مؤهل",
     "mt": true
