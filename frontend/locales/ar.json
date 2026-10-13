@@ -292,6 +292,10 @@
     "text": "غير متوفر",
     "mt": true
   },
+  "catalog.live": {
+    "text": "مباشر",
+    "mt": true
+  },
   "loans.requestTitle": {
     "text": "التقدم بطلب للحصول على قرض",
     "mt": true

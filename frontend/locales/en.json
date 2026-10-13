@@ -40,6 +40,7 @@
   "catalog.searchPlaceholder": "Search by title or author…",
   "catalog.empty": "No books match your search.",
   "catalog.outOfStock": "Out of stock",
+  "catalog.live": "Live",
 
   "loans.requestTitle": "Request a loan",
   "loans.user": "Member",

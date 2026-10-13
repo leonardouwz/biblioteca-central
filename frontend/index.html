@@ -301,6 +301,11 @@
   .search-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
   .search-page-info { font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink-soft); }
 
+  .catalog-live { font-family: var(--font-mono); font-size: 0.72rem; color: var(--pine); margin-inline-start: 10px; vertical-align: middle; }
+  .catalog-live::before { content: "●"; margin-inline-end: 5px; animation: live-pulse 1.6s ease-in-out infinite; }
+  @keyframes live-pulse { 50% { opacity: 0.25; } }
+  @media (prefers-reduced-motion: reduce) { .catalog-live::before { animation: none; } }
+
   .catalog-search { margin: 18px 0 22px; }
   .catalog-search input { font-size: 1rem; }
 
@@ -478,7 +483,7 @@
 
   <!-- ==================== CATÁLOGO (público, cualquier socio logueado) ==================== -->
   <section id="tab-catalog" class="tab-panel active" role="tabpanel" aria-labelledby="tabbtn-catalog">
-    <h2 class="section-title" data-i18n="catalog.title">Catálogo</h2>
+    <h2 class="section-title"><span data-i18n="catalog.title">Catálogo</span><span id="catalogLive" class="catalog-live" role="status" hidden data-i18n="catalog.live">En vivo</span></h2>
     <div class="catalog-search">
       <label for="catalogSearch" class="sr-only" data-i18n="catalog.searchLabel">Buscar por título o autor</label>
       <input id="catalogSearch" type="text" data-i18n-placeholder="catalog.searchPlaceholder" placeholder="Buscar por título o autor…">
@@ -707,7 +712,10 @@
         : `<span class="badge badge-active">${t('loans.badgeActive')}</span>`;
     }
 
-    const API_BASE_URL = 'https://biblioteca-backend-438047115829.us-central1.run.app';
+    // En local el backend sirve este mismo HTML, así que la API es el mismo origen.
+    const API_BASE_URL = ['localhost', '127.0.0.1'].includes(location.hostname)
+      ? ''
+      : 'https://biblioteca-backend-438047115829.us-central1.run.app';
 
     async function fetchJson(path, options = {}) {
       const token = localStorage.getItem('authToken');
@@ -791,6 +799,28 @@
     document.getElementById('catalogSearch').addEventListener('input', (e) => {
       renderCatalogGrid(Catalog.filterBooks(allCatalogBooks, e.target.value));
     });
+
+    // ---------- Catálogo en vivo (WebSocket) ----------
+    // El servidor avisa cuando cambia un libro o un préstamo; el aviso no trae
+    // datos, solo dispara un loadCatalog() (que va por la API con el token).
+    let liveSocket = null;
+
+    function connectLive() {
+      if (liveSocket || !localStorage.getItem('authToken')) return;
+      const badge = document.getElementById('catalogLive');
+      liveSocket = new WebSocket((API_BASE_URL || location.origin).replace(/^http/, 'ws') + '/ws');
+      liveSocket.onopen = () => {
+        badge.hidden = false;
+        loadCatalog(); // por si cambió algo mientras estaba desconectado
+      };
+      liveSocket.onmessage = () => loadCatalog();
+      // Cloud Run corta las conexiones largas cada cierto tiempo: se reconecta solo.
+      liveSocket.onclose = () => {
+        badge.hidden = true;
+        liveSocket = null;
+        setTimeout(connectLive, 3000);
+      };
+    }
 
     // ---------- Préstamos ----------
     function renderLoanForm() {
@@ -1368,7 +1398,10 @@
     function setLoggedInView(loggedIn) {
       document.querySelector('.tabs').style.display = loggedIn ? '' : 'none';
       document.getElementById('tab-catalog').style.display = loggedIn ? '' : 'none';
-      if (loggedIn) loadCatalog();
+      if (loggedIn) {
+        loadCatalog();
+        connectLive();
+      }
     }
 
     // La pestaña "Configuración" es solo para ADMINISTRADOR, ni siquiera para bibliotecarios.
@@ -1400,6 +1433,7 @@
       localStorage.removeItem('authToken');
       localStorage.removeItem('authEmail');
       localStorage.removeItem('authRole');
+      if (liveSocket) liveSocket.close();
       renderSession();
     }
 

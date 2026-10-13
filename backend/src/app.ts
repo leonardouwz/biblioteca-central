@@ -44,6 +44,7 @@ import { createDebtRoutes } from "./presentation/routes/debtRoutes";
 import { createAuthRoutes } from "./presentation/routes/authRoutes";
 import { createSettingsRoutes } from "./presentation/routes/settingsRoutes";
 import { resolveLocale } from "./presentation/middleware/locale";
+import { createCatalogSocket } from "./presentation/realtime/catalogSocket";
 import { t } from "./domain/i18n/t";
 
 async function main(): Promise<void> {
@@ -107,6 +108,8 @@ async function main(): Promise<void> {
   app.use(cors());
   app.use(express.json());
   app.use(resolveLocale);
+  const catalogSocket = createCatalogSocket();
+  app.use(catalogSocket.notifyOnChange);
   app.use(express.static(path.join(__dirname, "..", "..", "frontend")));
   app.use("/api/v1", createBookRoutes(bookController, authSecret));
   app.use("/api/v1", createUserRoutes(userController, authSecret));
@@ -128,9 +131,10 @@ async function main(): Promise<void> {
   });
 
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`);
   });
+  catalogSocket.attach(server); // WebSocket en /ws, mismo puerto que la API
 }
 
 main().catch((error) => {

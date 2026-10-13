@@ -80,6 +80,8 @@ POST   /api/v1/loans/:id/return
 
 GET    /api/v1/debts
 POST   /api/v1/debts/:id/pay
+
+WS     /ws                        aviso {"type":"catalog-changed"} — ver docs/websocket-catalogo-en-vivo.md
 ```
 
 ## Fuera de alcance (por ahora)
