@@ -3,6 +3,9 @@
 Tarea del curso: investigar cómo hacer *stream* de objetos con Node.js y construir un ejemplo sencillo.
 No usa dependencias externas, solo el módulo `node:stream` que viene con Node (versión 18 o superior).
 
+**Demo en vivo (Google Cloud Run):** <https://stream-objetos-438047115829.us-central1.run.app>
+(botón "Iniciar stream"; o desde la terminal: `curl -N https://stream-objetos-438047115829.us-central1.run.app/lecturas`)
+
 ```bash
 cd apps-secundarias/stream-objetos
 node ejemplo.js      # ejemplo 1: en la terminal
@@ -177,6 +180,16 @@ así que funciona tal cual en las plataformas que ejecutan Node.
 
 Recomendación: **Cloud Run** o **Render**, porque ejecutan el servidor sin cambiar una línea. Cloud Run ya se
 usa en el proyecto principal, así que el flujo de despliegue es conocido.
+
+**Despliegue usado para esta tarea** (desde la raíz del repositorio):
+
+```bash
+gcloud run deploy stream-objetos --source apps-secundarias/stream-objetos --region us-central1 --project biblioteca-central-2026 --allow-unauthenticated
+```
+
+Cloud Run detecta Node por el `package.json`, construye el contenedor con *buildpacks* (sin Dockerfile) y
+ejecuta `npm start`. Las respuestas en streaming llegan al cliente sin buffering: cada lectura aparece a los
+~500 ms, igual que en local. Sin tráfico escala a cero, así que no consume cuota mientras nadie la usa.
 
 Servicios en la nube especializados en streams de datos (para escalar la idea, no necesarios para la tarea):
 Apache Kafka (Confluent Cloud, Upstash), Redis Streams (Upstash, Redis Cloud), Google Pub/Sub, AWS Kinesis,
