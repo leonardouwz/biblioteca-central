@@ -1,0 +1,11 @@
+{
+  "name": "stream-objetos",
+  "version": "1.0.0",
+  "description": "Ejemplo sencillo de streams de objetos en Node.js",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "ejemplo": "node ejemplo.js",
+    "start": "node servidor.js"
+  }
+}
