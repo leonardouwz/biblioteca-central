@@ -196,5 +196,17 @@
   "errors.BODY_STOCK_INVALID": "quantity (number) es requerido.",
   "errors.BODY_USER_INVALID": "name (string) y email (string) son requeridos.",
   "errors.BODY_STATUS_INVALID": "status debe ser ACTIVE o INACTIVE.",
-  "errors.BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans y loanPeriodDays (number) son requeridos."
+  "errors.BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans y loanPeriodDays (number) son requeridos.",
+
+  "nav.countries": "Países",
+  "countries.title": "Países del mundo",
+  "countries.source": "Datos en vivo de apicountries.com (countries.dev).",
+  "countries.region": "Región",
+  "countries.country": "País",
+  "countries.choose": "— Selecciona —",
+  "countries.loading": "Cargando…",
+  "countries.colLanguage": "Idioma",
+  "countries.colLanguageNative": "Idioma (nombre nativo)",
+  "countries.colCountryNative": "Nombre nativo del país",
+  "countries.error": "No se pudo consultar apicountries.com. Intenta de nuevo."
 }
