@@ -37,6 +37,7 @@
   "AUTH_FORBIDDEN": { "text": "ليس لديك صلاحية لتنفيذ هذا الإجراء.", "mt": true },
 
   "INTERNAL_ERROR": { "text": "خطأ داخلي في الخادم.", "mt": true },
+  "TOO_MANY_REQUESTS": { "text": "محاولات كثيرة جدًا. انتظر بضع دقائق ثم حاول مرة أخرى.", "mt": true },
   "ROUTE_NOT_FOUND": { "text": "هذا المورد غير موجود.", "mt": true },
 
   "BODY_LOAN_INVALID": { "text": "الحقلان userId وbookId مطلوبان ويجب أن يكونا نصيّين.", "mt": true },
