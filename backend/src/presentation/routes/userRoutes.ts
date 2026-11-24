@@ -4,9 +4,11 @@ import { requireAuth, STAFF } from "../middleware/requireAuth";
 
 export function createUserRoutes(userController: UserController, secret: string): Router {
   const router = Router();
+  const auth = requireAuth(secret);
   const staff = requireAuth(secret, ...STAFF);
   const admin = requireAuth(secret, "ADMINISTRADOR");
 
+  router.get("/me", auth, userController.me); // panel del socio: solo sus propios datos
   router.get("/users", staff, userController.getAll);
   router.get("/users/:id", staff, userController.getById);
   router.get("/users/:id/loans", staff, userController.getLoans);

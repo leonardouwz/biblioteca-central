@@ -69,7 +69,7 @@ export class AuthService {
   private buildResult(account: Account): AuthResult {
     return {
       account: toPublicAccount(account),
-      token: signToken(account.id, account.role, this.secret),
+      token: signToken(account.id, account.role, this.secret, Date.now(), account.email),
     };
   }
 }
