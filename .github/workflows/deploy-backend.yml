@@ -42,6 +42,10 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
       - uses: google-github-actions/setup-gcloud@v2
       - name: gcloud run deploy
+        env:
+          # ID de cliente OAuth web de Google (público, no es secreto): variable del repo.
+          # Vacío = el login con Google queda oculto y el resto sigue igual.
+          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
         run: >
           gcloud run deploy biblioteca-backend
           --source .
@@ -49,6 +53,7 @@ jobs:
           --project "$GCP_PROJECT"
           --allow-unauthenticated
           --set-secrets=DATABASE_URL=database-url:latest,AUTH_SECRET=auth-secret:latest
+          --update-env-vars="GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID"
           --quiet
       - name: Prueba de humo
         run: |

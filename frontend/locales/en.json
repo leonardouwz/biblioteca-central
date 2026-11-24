@@ -208,5 +208,6 @@
   "countries.colLanguage": "Language",
   "countries.colLanguageNative": "Language (native name)",
   "countries.colCountryNative": "Country native name",
-  "countries.error": "Could not reach apicountries.com. Try again."
+  "countries.error": "Could not reach apicountries.com. Try again.",
+  "auth.lastUsed": "Last used"
 }

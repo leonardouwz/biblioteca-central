@@ -749,5 +749,9 @@
   "countries.error": {
     "text": "تعذر الاتصال بـ apicountries.com. حاول مرة أخرى.",
     "mt": true
+  },
+  "auth.lastUsed": {
+    "text": "آخر ما استُخدم",
+    "mt": true
   }
 }
