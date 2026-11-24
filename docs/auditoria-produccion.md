@@ -141,6 +141,18 @@ dueño del proyecto o acceso que este entorno no tiene:
 
 ---
 
+### 5.1 Cerrado después (PR de seguimiento)
+
+- **CORS**: `cors({ origin: corsOrigins() })` — solo el dominio del
+  frontend; se cambia con `CORS_ORIGINS` (lista separada por comas).
+- **Límite de intentos**: `POST /auth/login` 10 por IP cada 15 min,
+  `POST /auth/register` 5 por IP por hora; responde `429` con
+  `Retry-After`. El contador vive en memoria de cada instancia de Cloud Run.
+- **Cuentas de prueba admin**: no hay seed ni cuentas en el código (la única
+  regla es "la primera cuenta es ADMINISTRADOR"). Las cuentas de prueba
+  existen solo en la base de producción y hay que borrarlas a mano en
+  Supabase (tabla `accounts`).
+
 ## 6. Verificación
 
 ```
