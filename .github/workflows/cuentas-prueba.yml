@@ -1,19 +1,33 @@
-# TEMPORAL: lista las cuentas de la base de producción para identificar las de prueba.
-# Se elimina antes de fusionar. Correos de dominios no-prueba van enmascarados (repo público).
+# TEMPORAL: borra las 7 cuentas de prueba y asciende la cuenta real a admin. Se elimina antes de fusionar.
 name: Cuentas de prueba (temporal)
 on:
   push:
     branches: [claude/project-thread-z0ps7k]
     paths: [.github/workflows/cuentas-prueba.yml]
 jobs:
-  listar:
+  borrar:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - env:
           DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          q() { psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "$1"; }
-          M="CASE WHEN email ~* '(\.test|@example\.(com|org|net))$' THEN email ELSE left(email,2)||'***@'||split_part(email,'@',2) END"
-          q "SELECT $M AS email, role, created_at FROM accounts ORDER BY created_at"
-          q "SELECT $M AS email, status, (SELECT count(*) FROM loans l WHERE l.user_id=u.id) AS prestamos, (SELECT count(*) FROM debts d WHERE d.user_id=u.id) AS deudas FROM users u ORDER BY email"
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+          DO $$
+          DECLARE n int;
+          BEGIN
+            DELETE FROM accounts WHERE email IN (
+              'demo-admin@biblioteca.test','smoketest24115@example.com','regextest3921@example.com',
+              'audit-check-771@example.com','audit-libr-882@example.com',
+              'revcheck-priv-991@example.com','revcheck-lib-991@example.com');
+            GET DIAGNOSTICS n = ROW_COUNT;
+            IF n <> 7 THEN RAISE EXCEPTION 'Se esperaban 7 cuentas borradas, fueron %', n; END IF;
+            UPDATE accounts SET role = 'ADMINISTRADOR'
+              WHERE email LIKE 'lp%@ulasalle.edu.pe' AND role = 'BIBLIOTECARIO';
+            GET DIAGNOSTICS n = ROW_COUNT;
+            IF n <> 1 THEN RAISE EXCEPTION 'Se esperaba 1 cuenta ascendida, fueron %', n; END IF;
+          END $$;
+          COMMIT;
+          SELECT left(email,2)||'***@'||split_part(email,'@',2) AS email, role FROM accounts ORDER BY created_at;
+          SQL
