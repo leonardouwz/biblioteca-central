@@ -46,5 +46,8 @@
   "BODY_STOCK_INVALID": "quantity (number) is required.",
   "BODY_USER_INVALID": "name (string) and email (string) are required.",
   "BODY_STATUS_INVALID": "status must be ACTIVE or INACTIVE.",
-  "BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans and loanPeriodDays (number) are required."
+  "BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans and loanPeriodDays (number) are required.",
+  "AUTH_GOOGLE_DISABLED": "Sign-in with Google is not configured.",
+  "AUTH_GOOGLE_INVALID": "We couldn't verify your Google account. Please try again.",
+  "BODY_GOOGLE_INVALID": "credential (string) is required."
 }

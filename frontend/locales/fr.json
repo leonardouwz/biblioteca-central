@@ -232,5 +232,6 @@
   "panel.activeMembers": "membres actifs",
   "panel.overdueTitle": "Prêts en retard",
   "panel.seeAll": "Tout voir",
-  "panel.noOverdue": "Aucun prêt en retard."
+  "panel.noOverdue": "Aucun prêt en retard.",
+  "auth.lastUsed": "Dernière utilisée"
 }

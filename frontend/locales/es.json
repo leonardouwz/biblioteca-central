@@ -232,5 +232,6 @@
   "panel.activeMembers": "socios activos",
   "panel.overdueTitle": "Préstamos vencidos",
   "panel.seeAll": "Ver todos",
-  "panel.noOverdue": "No hay préstamos vencidos."
+  "panel.noOverdue": "No hay préstamos vencidos.",
+  "auth.lastUsed": "Último usado"
 }

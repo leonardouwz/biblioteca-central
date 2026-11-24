@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { Pool } from "pg";
 import { IAccountRepository } from "../../domain/interfaces/IAccountRepository";
-import { Account } from "../../domain/entities/Account";
+import { Account, LoginMethod } from "../../domain/entities/Account";
 
 interface AccountRow {
   id: string;
@@ -9,6 +9,8 @@ interface AccountRow {
   password_hash: string;
   role: Account["role"];
   created_at: string;
+  last_login_at: string | null;
+  last_login_method: LoginMethod | null;
 }
 
 const toAccount = (row: AccountRow): Account => ({
@@ -17,6 +19,8 @@ const toAccount = (row: AccountRow): Account => ({
   passwordHash: row.password_hash,
   role: row.role,
   createdAt: new Date(row.created_at),
+  lastLoginAt: row.last_login_at ? new Date(row.last_login_at) : null,
+  lastLoginMethod: row.last_login_method,
 });
 
 export class PostgresAccountRepository implements IAccountRepository {
@@ -39,5 +43,13 @@ export class PostgresAccountRepository implements IAccountRepository {
       [id, account.email, account.passwordHash, account.role, account.createdAt.toISOString()]
     );
     return { id, ...account };
+  }
+
+  async recordLogin(id: string, method: LoginMethod, at: Date): Promise<void> {
+    await this.pool.query("UPDATE accounts SET last_login_at = $1, last_login_method = $2 WHERE id = $3", [
+      at.toISOString(),
+      method,
+      id,
+    ]);
   }
 }

@@ -877,5 +877,9 @@
   "panel.noOverdue": {
     "text": "لا توجد إعارات متأخرة.",
     "mt": true
+  },
+  "auth.lastUsed": {
+    "text": "آخر ما استُخدم",
+    "mt": true
   }
 }

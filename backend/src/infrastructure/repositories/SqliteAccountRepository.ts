@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { DatabaseSync } from "node:sqlite";
 import { IAccountRepository } from "../../domain/interfaces/IAccountRepository";
-import { Account } from "../../domain/entities/Account";
+import { Account, LoginMethod } from "../../domain/entities/Account";
 
 interface AccountRow {
   id: string;
@@ -9,6 +9,8 @@ interface AccountRow {
   password_hash: string;
   role: Account["role"];
   created_at: string;
+  last_login_at: string | null;
+  last_login_method: LoginMethod | null;
 }
 
 const toAccount = (row: AccountRow): Account => ({
@@ -17,6 +19,8 @@ const toAccount = (row: AccountRow): Account => ({
   passwordHash: row.password_hash,
   role: row.role,
   createdAt: new Date(row.created_at),
+  lastLoginAt: row.last_login_at ? new Date(row.last_login_at) : null,
+  lastLoginMethod: row.last_login_method,
 });
 
 export class SqliteAccountRepository implements IAccountRepository {
@@ -40,5 +44,11 @@ export class SqliteAccountRepository implements IAccountRepository {
       .prepare("INSERT INTO accounts (id, email, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)")
       .run(id, account.email, account.passwordHash, account.role, account.createdAt.toISOString());
     return { id, ...account };
+  }
+
+  async recordLogin(id: string, method: LoginMethod, at: Date): Promise<void> {
+    this.db
+      .prepare("UPDATE accounts SET last_login_at = ?, last_login_method = ? WHERE id = ?")
+      .run(at.toISOString(), method, id);
   }
 }

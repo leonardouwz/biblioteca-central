@@ -232,5 +232,6 @@
   "panel.activeMembers": "active members",
   "panel.overdueTitle": "Overdue loans",
   "panel.seeAll": "See all",
-  "panel.noOverdue": "No overdue loans."
+  "panel.noOverdue": "No overdue loans.",
+  "auth.lastUsed": "Last used"
 }
