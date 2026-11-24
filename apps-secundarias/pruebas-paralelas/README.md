@@ -75,4 +75,13 @@ corre la suite en serie y en paralelo cada vez que cambia esta carpeta (o a mano
 *Actions*, "Run workflow"). El resumen del run muestra los dos tiempos y qué worker ejecutó cada
 prueba.
 
-<!-- RUN_ACTIONS -->
+Run de evidencia: <https://github.com/leonardouwz/biblioteca-central/actions/runs/45455379875>
+(runner `ubuntu-latest`, Python 3.12):
+
+| Paso | Duración del paso | Resultado de pytest |
+|---|---|---|
+| En serie (1 proceso) | 8 s (18:03:53 a 18:04:01) | 8 passed |
+| En paralelo (`-n 4`) | 3 s (18:04:01 a 18:04:04) | `8 passed in 2.40s` |
+
+En el log del paso paralelo se ven los 4 workers con PID distintos
+(`gw0 pid=2452`, `gw1 pid=2455`, `gw2 pid=2458`, `gw3 pid=2461`), cada uno con 2 pruebas.
