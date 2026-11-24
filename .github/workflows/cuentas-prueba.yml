@@ -1,0 +1,19 @@
+# TEMPORAL: lista las cuentas de la base de producción para identificar las de prueba.
+# Se elimina antes de fusionar. Correos de dominios no-prueba van enmascarados (repo público).
+name: Cuentas de prueba (temporal)
+on:
+  push:
+    branches: [claude/project-thread-z0ps7k]
+    paths: [.github/workflows/cuentas-prueba.yml]
+jobs:
+  listar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          q() { psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "$1"; }
+          M="CASE WHEN email ~* '(\.test|@example\.(com|org|net))$' THEN email ELSE left(email,2)||'***@'||split_part(email,'@',2) END"
+          q "SELECT $M AS email, role, created_at FROM accounts ORDER BY created_at"
+          q "SELECT $M AS email, status, (SELECT count(*) FROM loans l WHERE l.user_id=u.id) AS prestamos, (SELECT count(*) FROM debts d WHERE d.user_id=u.id) AS deudas FROM users u ORDER BY email"
