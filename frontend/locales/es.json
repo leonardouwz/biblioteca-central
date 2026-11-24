@@ -4,12 +4,10 @@
   "common.language": "Idioma",
   "common.unexpectedError": "Ocurrió un error inesperado.",
   "common.close": "Cerrar",
-
   "validation.emailInvalid": "El email no tiene un formato válido.",
   "validation.passwordWeak": "La contraseña debe tener al menos 6 caracteres, con al menos una letra y un número.",
   "validation.nameInvalid": "El nombre solo puede tener letras, espacios y guiones (2 a 60 caracteres).",
   "validation.integerInvalid": "Debe ser un número entero, sin decimales ni signos.",
-
   "nav.tablist": "Secciones de la aplicación",
   "nav.catalog": "Catálogo",
   "nav.loans": "Préstamos",
@@ -17,7 +15,6 @@
   "nav.users": "Usuarios",
   "nav.debts": "Deudas",
   "nav.settings": "Configuración",
-
   "auth.loginTitle": "Iniciar sesión",
   "auth.email": "Email",
   "auth.password": "Contraseña",
@@ -34,14 +31,12 @@
   "auth.welcome": "Bienvenido, {email}.",
   "auth.accountCreated": "Cuenta creada como {role}.",
   "auth.gateMessage": "Inicia sesión como {librarian} o {admin} para gestionar préstamos, libros y socios.",
-
   "catalog.title": "Catálogo",
   "catalog.searchLabel": "Buscar por título o autor",
   "catalog.searchPlaceholder": "Buscar por título o autor…",
   "catalog.empty": "No hay libros que coincidan con la búsqueda.",
   "catalog.outOfStock": "Agotado",
   "catalog.live": "En vivo",
-
   "loans.requestTitle": "Solicitar préstamo",
   "loans.user": "Usuario",
   "loans.book": "Libro",
@@ -62,7 +57,6 @@
   "loans.unknownBook": "(libro eliminado)",
   "loans.availableOf": "{available}/{total} disp.",
   "loans.provisionalFine": "Multa estimada si se devuelve hoy: {amount}",
-
   "books.addTitle": "Agregar libro",
   "books.editTitle": "Editar libro",
   "books.searchLabel": "Buscar libro (ISBN, título o autor — opcional, vía Open Library)",
@@ -106,7 +100,6 @@
     "one": "Se agregó \"{title}\" al catálogo con {qty} copia.",
     "other": "Se agregó \"{title}\" al catálogo con {qty} copias."
   },
-
   "users.addTitle": "Agregar usuario",
   "users.editTitle": "Editar usuario",
   "users.name": "Nombre",
@@ -137,7 +130,6 @@
   "users.detailClose": "Cerrar",
   "users.noLoans": "Sin préstamos.",
   "users.noDebts": "Sin deudas.",
-
   "debts.title": "Todas las deudas",
   "debts.colUser": "Usuario",
   "debts.colAmount": "Monto",
@@ -148,7 +140,6 @@
   "debts.unpaid": "Impaga",
   "debts.paidMessage": "Se registró el pago de {amount}.",
   "debts.paidMessageFor": "Se registró el pago de {amount} de {user}.",
-
   "settings.title": "Configuración",
   "settings.description": "Estos valores afectan a los préstamos nuevos y a las multas que se calculen de aquí en adelante.",
   "settings.hourlyRate": "Tarifa por hora de atraso",
@@ -157,7 +148,6 @@
   "settings.loanPeriodDays": "Días de préstamo",
   "settings.save": "Guardar configuración",
   "settings.saved": "Configuración actualizada.",
-
   "errors.BOOK_NOT_FOUND": "El libro no existe.",
   "errors.BOOK_TITLE_AUTHOR_REQUIRED": "Título y autor son requeridos.",
   "errors.BOOK_QUANTITY_INVALID": "La cantidad a agregar debe ser mayor a cero.",
@@ -197,7 +187,6 @@
   "errors.BODY_USER_INVALID": "name (string) y email (string) son requeridos.",
   "errors.BODY_STATUS_INVALID": "status debe ser ACTIVE o INACTIVE.",
   "errors.BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans y loanPeriodDays (number) son requeridos.",
-
   "nav.countries": "Países",
   "countries.title": "Países del mundo",
   "countries.source": "Datos en vivo de apicountries.com (countries.dev).",
@@ -209,5 +198,40 @@
   "countries.colLanguageNative": "Idioma (nombre nativo)",
   "countries.colCountryNative": "Nombre nativo del país",
   "countries.error": "No se pudo consultar apicountries.com. Intenta de nuevo.",
+  "nav.main": "Navegación principal",
+  "nav.panel": "Mi panel",
+  "nav.signIn": "Iniciar sesión",
+  "nav.summary": "Resumen",
+  "home.eyebrow": "Biblioteca pública · abierta a todos",
+  "home.title": "Encuentra tu próxima lectura",
+  "home.lead": "Consulta el catálogo y la disponibilidad en tiempo real. Inicia sesión para ver tus préstamos y deudas.",
+  "home.statsTitle": "Hoy en el estante",
+  "home.statTitles": "títulos",
+  "home.statAvailable": "copias disponibles",
+  "home.statAuthors": "autores",
+  "home.statOut": "agotados",
+  "home.ctaTitle": "¿Ya eres socio?",
+  "home.ctaText": "Revisa tus préstamos, fechas de devolución y multas desde tu panel.",
+  "home.footer": "Biblioteca Central · Arquitectura N capas",
+  "home.resultsCount": {
+    "one": "{count} libro",
+    "other": "{count} libros"
+  },
+  "auth.welcomeTitle": "Bienvenido",
+  "auth.welcomeLead": "Ingresa para ver tu panel.",
+  "auth.registerTab": "Crear cuenta",
+  "auth.orEmail": "o con tu correo",
+  "me.eyebrow": "Mi cuenta",
+  "me.greeting": "Hola, {name}",
+  "me.noRecord": "Tu cuenta aún no está vinculada a una ficha de socio. Acércate al mostrador con este correo.",
+  "me.activeLoans": "préstamos activos",
+  "me.overdueLoans": "vencidos",
+  "me.unpaidDebt": "deuda pendiente",
+  "panel.roleArea": "Panel · {role}",
+  "panel.staffTitle": "Resumen de la biblioteca",
+  "panel.activeMembers": "socios activos",
+  "panel.overdueTitle": "Préstamos vencidos",
+  "panel.seeAll": "Ver todos",
+  "panel.noOverdue": "No hay préstamos vencidos.",
   "auth.lastUsed": "Último usado"
 }

@@ -2,12 +2,18 @@ import { Request, Response } from "express";
 import { UserService } from "../../domain/services/UserService";
 import { CreateUserDto, UpdateUserDto, SetUserStatusDto } from "../dtos/UserDtos";
 import { handleBusinessError, badRequest } from "./handleBusinessError";
+import { AuthedRequest } from "../middleware/requireAuth";
 
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   getAll = async (_req: Request, res: Response): Promise<void> => {
     res.status(200).json(await this.userService.getAllUsers());
+  };
+
+  me = async (req: Request, res: Response): Promise<void> => {
+    const email = (req as Request & AuthedRequest).auth?.email;
+    res.status(200).json(email ? await this.userService.getMemberSummary(email) : { user: null, loans: [], debts: [] });
   };
 
   getById = async (req: Request, res: Response): Promise<void> => {

@@ -16,6 +16,7 @@ const TOKEN_TTL_S = 8 * 60 * 60; // 8 horas
 export interface TokenPayload {
   sub: string; // id de la cuenta
   role: Role;
+  email?: string; // para que el panel del socio encuentre su ficha sin ir a la BD
   iat: number;
   exp: number;
 }
@@ -53,10 +54,10 @@ export function verifyPassword(password: string, stored: string): boolean {
  * Firma un JWT estándar `header.payload.firma` (HS256). Pura: depende solo de
  * sub/role/secret/now. Se puede inspeccionar en https://jwt.io.
  */
-export function signToken(sub: string, role: Role, secret: string, now = Date.now()): string {
+export function signToken(sub: string, role: Role, secret: string, now = Date.now(), email?: string): string {
   const iat = Math.floor(now / 1000);
   const head = b64url(JSON.stringify(JWT_HEADER));
-  const body = b64url(JSON.stringify({ sub, role, iat, exp: iat + TOKEN_TTL_S }));
+  const body = b64url(JSON.stringify({ sub, role, email, iat, exp: iat + TOKEN_TTL_S }));
   return `${head}.${body}.${hmac(`${head}.${body}`, secret)}`;
 }
 

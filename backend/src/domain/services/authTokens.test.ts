@@ -40,3 +40,8 @@ test("verifyPassword: coincide solo con la contraseña correcta", () => {
   assert.equal(verifyPassword("clave-seg", stored), true);
   assert.equal(verifyPassword("clave-mala", stored), false);
 });
+
+test("signToken: incluye el email cuando se pasa (panel del socio)", () => {
+  const payload = verifyToken(signToken("acc-1", "USUARIO", SECRET, 0, "a@b.pe"), SECRET, 1_000);
+  assert.equal(payload?.email, "a@b.pe");
+});

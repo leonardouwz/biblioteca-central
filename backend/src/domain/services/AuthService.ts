@@ -104,7 +104,7 @@ export class AuthService {
     await this.accountRepository.recordLogin(account.id, method, now);
     return {
       account: toPublicAccount({ ...account, lastLoginAt: now, lastLoginMethod: method }),
-      token: signToken(account.id, account.role, this.secret),
+      token: signToken(account.id, account.role, this.secret, now.getTime(), account.email),
     };
   }
 }

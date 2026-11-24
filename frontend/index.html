@@ -4,662 +4,345 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Biblioteca Central</title>
+<meta name="description" content="Catálogo público y panel de gestión de la Biblioteca Central.">
+<meta name="theme-color" content="#1f4b3f">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%23e4ece7' stroke='%231f4b3f' stroke-width='5'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='30' text-anchor='middle' fill='%231f4b3f'%3EB%C2%B0%3C/text%3E%3C/svg%3E">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --paper: #f1ecdc;
-    --paper-raised: #f8f4e8;
-    --ink: #2a2420;
-    --ink-soft: #5c5346;
-    --pine: #1f4b3f;
-    --pine-soft: #e4ece7;
-    --oak: #8b5a34;
-    --stamp: #ab3a2e;
-    --stamp-soft: #f3e2dc;
-    --line: #d9cfb8;
-    --font-stamp: 'Special Elite', 'Courier New', monospace;
-    --font-body: 'Archivo', 'Noto Sans Arabic', system-ui, sans-serif;
-    --font-mono: 'Space Mono', 'Courier New', monospace;
-  }
-
-  * { box-sizing: border-box; }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-  }
-
-  body {
-    font-family: var(--font-body);
-    max-width: 920px;
-    margin: 32px auto 80px;
-    padding: 0 20px;
-    color: var(--ink);
-    background: var(--paper);
-    background-image:
-      linear-gradient(var(--line) 1px, transparent 1px);
-    background-size: 100% 2.1em;
-    background-position: 0 148px;
-  }
-
-  /* [ar] la tipografía "de máquina de escribir" no tiene glifos árabes: en RTL
-     se usa la fuente base (Noto Sans Arabic) para los títulos también. */
-  html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] .tab-btn { font-family: var(--font-body); }
-
-  ::selection { background: var(--pine); color: var(--paper); }
-
-  a, button, input, select, [tabindex] {
-    outline-offset: 2px;
-  }
-  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
-    outline: 2px solid var(--pine);
-  }
-
-  .masthead {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    padding: 22px 0 20px;
-    border-bottom: 1px solid var(--line);
-    margin-bottom: 6px;
-  }
-  .masthead-mark {
-    flex: none;
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    border: 3px double var(--pine);
-    background: var(--pine-soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-stamp);
-    font-size: 1.4rem;
-    color: var(--pine);
-    transform: rotate(-6deg);
-  }
-  .masthead-titles { flex: 1; }
-  h1 {
-    font-family: var(--font-stamp);
-    font-size: 1.65rem;
-    font-weight: 400;
-    margin: 0;
-    letter-spacing: 0.01em;
-  }
-  .tagline {
-    margin: 5px 0 0;
-    font-size: 0.82rem;
-    color: var(--ink-soft);
-    font-family: var(--font-mono);
-    letter-spacing: 0.04em;
-  }
-
-  .lang-switch { flex: none; display: flex; flex-direction: column; gap: 3px; }
-  .lang-switch label { margin: 0; font-size: 0.68rem; }
-  .lang-switch select { margin-top: 0; width: auto; min-width: 130px; }
-
-  h2 {
-    font-family: var(--font-stamp);
-    font-weight: 400;
-    font-size: 1rem;
-    letter-spacing: 0.02em;
-    margin: 0 0 10px;
-    padding-inline-start: 14px;
-    border-inline-start: 3px solid var(--oak);
-  }
-  .section-title { margin-top: 28px; }
-
-  .tabs { display: flex; gap: 4px; margin: 8px 0 0; border-bottom: 2px solid var(--ink); flex-wrap: wrap; }
-  .tab-btn {
-    font-family: var(--font-stamp);
-    padding: 9px 18px 8px;
-    margin-top: 0;
-    width: auto;
-    border: 2px solid var(--ink);
-    border-bottom: none;
-    border-radius: 8px 8px 0 0;
-    background: var(--line);
-    color: var(--ink-soft);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transform: translateY(2px);
-  }
-  .tab-btn:hover { color: var(--ink); background: var(--paper-raised); }
-  .tab-btn.active {
-    color: var(--pine);
-    background: var(--paper-raised);
-    transform: translateY(0);
-    box-shadow: 0 -2px 0 var(--paper-raised) inset;
-  }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; animation: settle 0.28s ease-out; }
-
-  @keyframes settle {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  label { display: block; margin-top: 14px; font-weight: 600; font-size: 0.82rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; }
-  .checkbox-label { display: inline-block; font-weight: normal; text-transform: none; margin-inline-start: 12px; }
-  select, input {
-    margin-top: 5px;
-    padding: 9px 10px;
-    font-size: 0.95rem;
-    font-family: var(--font-body);
-    width: 100%;
-    box-sizing: border-box;
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-bottom: 2px solid var(--oak);
-    border-radius: 3px;
-    color: var(--ink);
-  }
-  input[type="checkbox"] { width: auto; }
-
-  button {
-    margin-top: 18px;
-    cursor: pointer;
-    background: var(--pine);
-    color: var(--paper-raised);
-    border: 1.5px solid var(--pine);
-    border-radius: 4px;
-    padding: 10px 16px;
-    font-family: var(--font-stamp);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-size: 0.85rem;
-    width: 100%;
-    box-sizing: border-box;
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
-  }
-  button:hover { transform: translateY(-1px); box-shadow: 0 3px 0 rgba(31,75,63,0.25); }
-  button:active { transform: translateY(0); box-shadow: none; }
-
-  button.danger { background: var(--stamp); border-color: var(--stamp); margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
-  button.danger:hover { box-shadow: 0 3px 0 rgba(171,58,46,0.3); }
-  button.secondary { background: transparent; color: var(--oak); border: 1.5px solid var(--oak); margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
-  button.secondary:hover { background: var(--oak); color: var(--paper-raised); box-shadow: none; }
-  button.ghost { background: transparent; color: var(--ink-soft); border: 1.5px solid transparent; margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
-  button.ghost:hover { border-color: var(--line); background: var(--paper); color: var(--ink); transform: none; box-shadow: none; }
-  button.success { background: var(--pine); border-color: var(--pine); margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
-  button.cancel { background: var(--ink-soft); border-color: var(--ink-soft); }
-
-  .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-
-  .result {
-    margin-top: 16px;
-    padding: 12px 14px;
-    border-radius: 3px;
-    white-space: pre-wrap;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    border-inline-start: 3px solid;
-  }
-  .ok { background: var(--pine-soft); color: var(--pine); border-color: var(--pine); }
-  .error { background: var(--stamp-soft); color: var(--stamp); border-color: var(--stamp); }
-
-  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-  th {
-    text-align: start;
-    padding: 10px 14px;
-    font-family: var(--font-stamp);
-    font-weight: 400;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--paper-raised);
-    background: var(--pine);
-    white-space: nowrap;
-  }
-  td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
-  tbody tr:nth-child(even) td { background: var(--paper); }
-  tbody tr:hover td { background: var(--pine-soft); }
-  tbody tr:last-child td { border-bottom: none; }
-
-  .table-wrap {
-    overflow-x: auto;
-    overflow-y: hidden;
-    margin-top: 8px;
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    box-shadow: 3px 3px 0 var(--line);
-  }
-
-  .card {
-    border: 1px solid var(--line);
-    background: var(--paper-raised);
-    border-radius: 4px;
-    padding: 18px 18px 20px;
-    margin-top: 18px;
-    box-shadow: 3px 3px 0 var(--line);
-  }
-
-  .badge {
-    display: inline-block;
-    font-family: var(--font-stamp);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 0.66rem;
-    padding: 3px 11px;
-    border: 3px double currentColor;
-    border-radius: 999px;
-    background: transparent;
-    transform: rotate(-2deg);
-    animation: stamp 0.18s ease-out;
-  }
-  @keyframes stamp {
-    from { opacity: 0; transform: rotate(-2deg) scale(1.3); }
-    to { opacity: 1; transform: rotate(-2deg) scale(1); }
-  }
-  .badge-active { color: var(--pine); }
-  .badge-inactive { color: var(--ink-soft); }
-  .badge-overdue { color: var(--stamp); }
-  .badge-returned { color: var(--oak); }
-  .badge-unpaid { color: var(--stamp); }
-  .badge-paid { color: var(--oak); }
-
-  .provisional-fine { font-family: var(--font-mono); font-size: 0.68rem; color: var(--stamp); margin-top: 4px; }
-
-  .inline-stock { display: flex; gap: 4px; align-items: center; }
-  .inline-stock input { width: 60px; margin-top: 0; padding: 6px; }
-
-  .search-row { display: flex; gap: 8px; align-items: flex-start; }
-  .search-row input { flex: 1; min-width: 0; }
-  .search-row button { margin-top: 5px; width: auto; padding: 9px 16px; flex: none; }
-
-  .search-results { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-  .search-result {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    padding: 10px 12px;
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: 3px;
-  }
-  .search-result img {
-    flex: none;
-    width: 40px;
-    height: 56px;
-    object-fit: cover;
-    border-radius: 2px;
-    background: var(--line);
-  }
-  .search-result .search-result-info { flex: 1; min-width: 0; }
-  .search-result .search-result-title { font-weight: 600; font-size: 0.88rem; }
-  .search-result .search-result-meta { font-size: 0.78rem; color: var(--ink-soft); margin-top: 2px; }
-  .search-result button { margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; flex: none; }
-
-  .search-pagination { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; }
-  .search-pagination button { margin-top: 0; width: auto; padding: 6px 13px; font-size: 0.74rem; }
-  .search-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .search-page-info { font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink-soft); }
-
-  .catalog-live { font-family: var(--font-mono); font-size: 0.72rem; color: var(--pine); margin-inline-start: 10px; vertical-align: middle; }
-  .catalog-live::before { content: "●"; margin-inline-end: 5px; animation: live-pulse 1.6s ease-in-out infinite; }
-  @keyframes live-pulse { 50% { opacity: 0.25; } }
-  @media (prefers-reduced-motion: reduce) { .catalog-live::before { animation: none; } }
-
-  .catalog-search { margin: 18px 0 22px; }
-  .catalog-search input { font-size: 1rem; }
-
-  .sr-only {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .catalog-empty {
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--ink-soft);
-    padding: 40px 10px;
-  }
-
-  .catalog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 18px;
-  }
-  .catalog-card {
-    display: flex;
-    flex-direction: column;
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    box-shadow: 3px 3px 0 var(--line);
-    overflow: hidden;
-  }
-  .catalog-cover {
-    width: 100%;
-    aspect-ratio: 2 / 3;
-    object-fit: cover;
-    background: var(--pine-soft);
-    display: block;
-  }
-  .catalog-cover-placeholder {
-    width: 100%;
-    aspect-ratio: 2 / 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--pine-soft);
-    color: var(--pine);
-    font-family: var(--font-stamp);
-    font-size: 2.2rem;
-  }
-  .catalog-card-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
-  .catalog-card-title { font-size: 0.86rem; font-weight: 600; line-height: 1.3; }
-  .catalog-card-author { font-size: 0.78rem; color: var(--ink-soft); }
-  .catalog-card-year { font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-soft); }
-  .catalog-card-badge { margin-top: auto; padding-top: 6px; }
-
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(42,36,32,0.5);
-    align-items: center;
-    justify-content: center;
-    animation: veil 0.15s ease;
-  }
-  .modal-overlay.open { display: flex; }
-  @keyframes veil { from { background: rgba(42,36,32,0); } to { background: rgba(42,36,32,0.5); } }
-
-  .modal {
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 24px;
-    max-width: 600px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 6px 6px 0 var(--ink);
-    animation: settle 0.2s ease-out;
-  }
-
-  .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid var(--ink); }
-  .modal-head .eyebrow { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--oak); margin: 0 0 4px; }
-  .modal h2 { border-inline-start: none; padding-inline-start: 0; margin: 0; font-size: 1.2rem; }
-  .modal-close { flex: none; margin: 0; }
-
-  .modal h3 {
-    font-family: var(--font-stamp);
-    font-weight: 400;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--ink-soft);
-    margin: 24px 0 8px;
-  }
-  .modal h3:first-of-type { margin-top: 20px; }
-
-  .empty-note {
-    display: block;
-    text-align: center;
-    font-family: var(--font-mono);
-    font-style: normal;
-    font-size: 0.8rem;
-    color: var(--ink-soft);
-    padding: 18px 10px !important;
-  }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="masthead">
-    <div class="masthead-mark" aria-hidden="true">B°</div>
-    <div class="masthead-titles">
-      <h1 data-i18n="meta.title">Biblioteca Central</h1>
-      <p class="tagline" data-i18n="meta.tagline">registro de préstamos · catálogo · fichero de socios</p>
-    </div>
-    <div class="lang-switch">
-      <label for="langSelect" data-i18n="common.language">Idioma</label>
-      <select id="langSelect">
-        <option value="es">Español</option>
-        <option value="en">English</option>
-        <option value="ar">العربية</option>
-        <option value="fr">Français</option>
-      </select>
+  <!-- ==================== BARRA SUPERIOR (todas las vistas) ==================== -->
+  <header class="topbar">
+    <div class="container">
+      <a class="brand" href="#/">
+        <span class="brand-mark" aria-hidden="true">B°</span>
+        <span class="brand-name"><span data-i18n="meta.title">Biblioteca Central</span><span class="brand-sub" data-i18n="meta.tagline">registro de préstamos · catálogo · fichero de socios</span></span>
+      </a>
+      <nav class="topnav" data-i18n-aria-label="nav.main">
+        <a href="#/" data-route-link="home" data-i18n="nav.catalog">Catálogo</a>
+        <a href="#/panel" data-route-link="panel" data-i18n="nav.panel" hidden id="topnavPanel">Mi panel</a>
+      </nav>
+      <div class="topbar-actions">
+        <label for="langSelect" class="sr-only" data-i18n="common.language">Idioma</label>
+        <select id="langSelect" class="lang-select">
+          <option value="es">ES</option>
+          <option value="en">EN</option>
+          <option value="ar">AR</option>
+          <option value="fr">FR</option>
+        </select>
+        <a class="btn" href="#/login" id="signInLink" data-i18n="nav.signIn">Iniciar sesión</a>
+        <a class="account-chip" href="#/panel" id="accountChip" hidden style="text-decoration:none;color:inherit">
+          <span class="avatar" id="accountAvatar" aria-hidden="true"></span>
+          <span class="who-wrap"><span class="who" id="accountEmail"></span><span class="role" id="accountRole"></span></span>
+        </a>
+      </div>
     </div>
   </header>
 
-  <!-- ==================== SESIÓN ==================== -->
-  <section id="authCard" class="card">
-    <div id="authLoggedOut">
-      <h2 data-i18n="auth.loginTitle">Iniciar sesión</h2>
-      <div style="display:flex; gap:24px; flex-wrap:wrap;">
-        <div style="flex:1; min-width:240px;">
-          <label for="loginEmail" data-i18n="auth.email">Email</label>
-          <input id="loginEmail" type="email" autocomplete="username" />
-          <label for="loginPassword" data-i18n="auth.password">Contraseña</label>
-          <input id="loginPassword" type="password" autocomplete="current-password" />
-          <button id="loginSubmit" data-i18n="auth.loginSubmit">Entrar</button>
+  <!-- ==================== INICIO PÚBLICO: catálogo ==================== -->
+  <main id="view-home" data-view="home">
+    <section class="hero">
+      <div class="container">
+        <div>
+          <p class="eyebrow" data-i18n="home.eyebrow">Biblioteca pública · abierta a todos</p>
+          <h1 data-i18n="home.title">Encuentra tu próxima lectura</h1>
+          <p class="hero-lead" data-i18n="home.lead">Consulta el catálogo y la disponibilidad en tiempo real. Inicia sesión para ver tus préstamos y deudas.</p>
+          <div class="hero-search">
+            <label for="catalogSearch" class="sr-only" data-i18n="catalog.searchLabel">Buscar por título o autor</label>
+            <input id="catalogSearch" type="search" data-i18n-placeholder="catalog.searchPlaceholder" placeholder="Buscar por título o autor…">
+          </div>
         </div>
-        <div style="flex:1; min-width:240px;">
-          <h3 style="margin-top:0;" data-i18n="auth.registerTitle">¿No tienes cuenta? Regístrate</h3>
+        <aside class="hero-card" aria-labelledby="heroCardTitle">
+          <p class="stamp-title" id="heroCardTitle" data-i18n="home.statsTitle">Hoy en el estante</p>
+          <div class="stats">
+            <div class="stat"><div class="stat-value" id="statTitles">—</div><div class="stat-label" data-i18n="home.statTitles">títulos</div></div>
+            <div class="stat"><div class="stat-value" id="statAvailable">—</div><div class="stat-label" data-i18n="home.statAvailable">copias disponibles</div></div>
+            <div class="stat"><div class="stat-value" id="statAuthors">—</div><div class="stat-label" data-i18n="home.statAuthors">autores</div></div>
+            <div class="stat"><div class="stat-value" id="statOut">—</div><div class="stat-label" data-i18n="home.statOut">agotados</div></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="catalog-section" aria-labelledby="catalogTitle">
+      <div class="container">
+        <div class="catalog-head">
+          <h2 id="catalogTitle"><span data-i18n="catalog.title">Catálogo</span><span id="catalogLive" class="live" role="status" hidden data-i18n="catalog.live">En vivo</span></h2>
+          <span class="catalog-count" id="catalogCount"></span>
+        </div>
+        <div id="catalogEmpty" class="catalog-empty" style="display:none" data-i18n="catalog.empty">No hay libros que coincidan con la búsqueda.</div>
+        <div id="catalogGrid" class="catalog-grid"></div>
+      </div>
+    </section>
+
+    <section class="cta-band" id="ctaBand">
+      <div class="container">
+        <div>
+          <h2 data-i18n="home.ctaTitle">¿Ya eres socio?</h2>
+          <p data-i18n="home.ctaText">Revisa tus préstamos, fechas de devolución y multas desde tu panel.</p>
+        </div>
+        <a class="btn" href="#/login" data-i18n="nav.signIn">Iniciar sesión</a>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="container" data-i18n="home.footer">Biblioteca Central · Arquitectura N capas</div>
+    </footer>
+  </main>
+
+  <!-- ==================== INICIO DE SESIÓN ==================== -->
+  <main id="view-login" data-view="login" class="auth-page" hidden>
+    <div class="auth-card">
+      <div class="card">
+        <h1 data-i18n="auth.welcomeTitle">Bienvenido</h1>
+        <p class="muted" data-i18n="auth.welcomeLead">Ingresa para ver tu panel.</p>
+
+        <div class="segmented" role="tablist">
+          <button type="button" role="tab" id="authTabLogin" aria-selected="true" aria-controls="loginForm" data-i18n="auth.loginTitle">Iniciar sesión</button>
+          <button type="button" role="tab" id="authTabRegister" aria-selected="false" aria-controls="registerForm" data-i18n="auth.registerTab">Crear cuenta</button>
+        </div>
+
+        <!-- Otros proveedores (Google, "último usado") se montan aquí: ver googleSignIn.js -->
+        <div id="authProviders"></div>
+        <div class="divider" data-i18n="auth.orEmail">o con tu correo</div>
+
+        <form id="loginForm" novalidate>
+          <label for="loginEmail" data-i18n="auth.email">Email</label>
+          <input id="loginEmail" type="email" autocomplete="username" required>
+          <label for="loginPassword" data-i18n="auth.password">Contraseña</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" required>
+          <button type="submit" id="loginSubmit" data-i18n="auth.loginSubmit">Entrar</button>
+        </form>
+
+        <form id="registerForm" novalidate hidden>
           <label for="regEmail" data-i18n="auth.email">Email</label>
-          <input id="regEmail" type="email" autocomplete="username" />
+          <input id="regEmail" type="email" autocomplete="username" required>
           <label for="regPassword" data-i18n="auth.registerPasswordHint">Contraseña (mín. 6)</label>
-          <input id="regPassword" type="password" autocomplete="new-password" />
+          <input id="regPassword" type="password" autocomplete="new-password" required>
           <label for="regRole" data-i18n="auth.role">Rol</label>
           <select id="regRole">
             <option value="USUARIO" data-i18n="auth.roleUser">Usuario</option>
             <option value="BIBLIOTECARIO" data-i18n="auth.roleLibrarian">Bibliotecario</option>
             <!-- Sin opción "Administrador": el autorregistro nunca puede pedir ese rol (ver AuthService.resolveRole). -->
           </select>
-          <button class="secondary" id="regSubmit" data-i18n="auth.registerSubmit">Crear cuenta</button>
+          <button type="submit" id="regSubmit" data-i18n="auth.registerSubmit">Crear cuenta</button>
+        </form>
+
+        <div id="authResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== PANEL (según rol) ==================== -->
+  <div id="view-panel" data-view="panel" class="panel" hidden>
+    <aside class="sidebar">
+      <p class="sidebar-title" id="sidebarRole"></p>
+      <nav class="side-nav" data-i18n-aria-label="nav.tablist">
+        <a class="side-link" href="#/panel/resumen" data-section-link="resumen" data-roles="ALL">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          <span data-i18n="nav.summary">Resumen</span></a>
+        <a class="side-link" href="#/panel/prestamos" data-section-link="prestamos" data-roles="STAFF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+          <span data-i18n="nav.loans">Préstamos</span></a>
+        <a class="side-link" href="#/panel/libros" data-section-link="libros" data-roles="STAFF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>
+          <span data-i18n="nav.books">Gestión de libros</span></a>
+        <a class="side-link" href="#/panel/socios" data-section-link="socios" data-roles="STAFF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M1 21a8 8 0 0 1 16 0"/><path d="M17 4a4 4 0 0 1 0 8M23 21a8 8 0 0 0-5-7.4"/></svg>
+          <span data-i18n="nav.users">Usuarios</span></a>
+        <a class="side-link" href="#/panel/deudas" data-section-link="deudas" data-roles="STAFF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          <span data-i18n="nav.debts">Deudas</span></a>
+        <a class="side-link" href="#/panel/config" data-section-link="config" data-roles="ADMINISTRADOR">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          <span data-i18n="nav.settings">Configuración</span></a>
+        <a class="side-link" href="#/panel/paises" data-section-link="paises" data-roles="ALL">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+          <span data-i18n="nav.countries">Países</span></a>
+      </nav>
+      <div class="sidebar-foot">
+        <button class="ghost btn-block" id="logoutBtn" data-i18n="auth.logout">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main class="panel-main">
+      <!-- ===== RESUMEN ===== -->
+      <section class="panel-section" id="section-resumen">
+        <!-- Socio (USUARIO): sus propios préstamos y deudas, vía GET /me -->
+        <div id="memberSummary" hidden>
+          <div class="panel-head">
+            <p class="eyebrow" data-i18n="me.eyebrow">Mi cuenta</p>
+            <h1 id="memberGreeting"></h1>
+          </div>
+          <p id="memberNoRecord" class="result error" hidden data-i18n="me.noRecord">Tu cuenta aún no está vinculada a una ficha de socio. Acércate al mostrador con este correo.</p>
+          <div class="kpis">
+            <div class="stat"><div class="stat-value" id="meActive">0</div><div class="stat-label" data-i18n="me.activeLoans">préstamos activos</div></div>
+            <div class="stat"><div class="stat-value" id="meOverdue">0</div><div class="stat-label" data-i18n="me.overdueLoans">vencidos</div></div>
+            <div class="stat"><div class="stat-value" id="meDebt">0</div><div class="stat-label" data-i18n="me.unpaidDebt">deuda pendiente</div></div>
+          </div>
+          <div class="section-head"><h2 data-i18n="users.detailLoans">Préstamos</h2></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th data-i18n="loans.colBook">Libro</th><th data-i18n="loans.colDue">Vencimiento</th><th data-i18n="loans.colStatus">Estado</th></tr></thead>
+            <tbody id="meLoans"></tbody>
+          </table></div>
+          <div class="section-head"><h2 data-i18n="users.detailDebts">Deudas</h2></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th data-i18n="debts.colAmount">Monto</th><th data-i18n="debts.colCreated">Generada</th><th data-i18n="debts.colStatus">Estado</th></tr></thead>
+            <tbody id="meDebts"></tbody>
+          </table></div>
         </div>
-      </div>
-      <div id="authResult" class="result" role="status" aria-live="polite" style="display:none"></div>
-    </div>
-    <div id="authLoggedIn" style="display:none; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-      <span id="authSessionLabel"></span>
-      <button class="secondary" id="logoutBtn" data-i18n="auth.logout">Cerrar sesión</button>
-    </div>
-  </section>
 
-  <p id="gateMsg" class="result" role="status" aria-live="polite" style="display:none"></p>
+        <!-- Personal (BIBLIOTECARIO / ADMINISTRADOR) -->
+        <div id="staffSummary" hidden>
+          <div class="panel-head">
+            <p class="eyebrow" id="staffEyebrow"></p>
+            <h1 data-i18n="panel.staffTitle">Resumen de la biblioteca</h1>
+          </div>
+          <div class="kpis">
+            <div class="stat"><div class="stat-value" id="kpiBooks">0</div><div class="stat-label" data-i18n="home.statTitles">títulos</div></div>
+            <div class="stat"><div class="stat-value" id="kpiActive">0</div><div class="stat-label" data-i18n="me.activeLoans">préstamos activos</div></div>
+            <div class="stat"><div class="stat-value" id="kpiOverdue">0</div><div class="stat-label" data-i18n="me.overdueLoans">vencidos</div></div>
+            <div class="stat"><div class="stat-value" id="kpiMembers">0</div><div class="stat-label" data-i18n="panel.activeMembers">socios activos</div></div>
+            <div class="stat"><div class="stat-value" id="kpiDebt">0</div><div class="stat-label" data-i18n="me.unpaidDebt">deuda pendiente</div></div>
+          </div>
+          <div class="section-head"><h2 data-i18n="panel.overdueTitle">Préstamos vencidos</h2><a class="btn secondary btn-sm" href="#/panel/prestamos" data-i18n="panel.seeAll">Ver todos</a></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th data-i18n="loans.colUser">Usuario</th><th data-i18n="loans.colBook">Libro</th><th data-i18n="loans.colDue">Vencimiento</th><th data-i18n="loans.colStatus">Estado</th></tr></thead>
+            <tbody id="overdueTableBody"></tbody>
+          </table></div>
+        </div>
+      </section>
 
-  <div class="tabs" role="tablist" data-i18n-aria-label="nav.tablist">
-    <button class="tab-btn active" id="tabbtn-catalog" role="tab" aria-selected="true" aria-controls="tab-catalog" data-tab="catalog" data-i18n="nav.catalog">Catálogo</button>
-    <button class="tab-btn" id="tabbtn-loans" role="tab" aria-selected="false" aria-controls="tab-loans" data-tab="loans" data-i18n="nav.loans">Préstamos</button>
-    <button class="tab-btn" id="tabbtn-books" role="tab" aria-selected="false" aria-controls="tab-books" data-tab="books" data-i18n="nav.books">Gestión de libros</button>
-    <button class="tab-btn" id="tabbtn-users" role="tab" aria-selected="false" aria-controls="tab-users" data-tab="users" data-i18n="nav.users">Usuarios</button>
-    <button class="tab-btn" id="tabbtn-debts" role="tab" aria-selected="false" aria-controls="tab-debts" data-tab="debts" data-i18n="nav.debts">Deudas</button>
-    <button class="tab-btn" id="tabbtn-settings" role="tab" aria-selected="false" aria-controls="tab-settings" data-tab="settings" data-i18n="nav.settings">Configuración</button>
-    <button class="tab-btn" id="tabbtn-countries" role="tab" aria-selected="false" aria-controls="tab-countries" data-tab="countries" data-i18n="nav.countries">Países</button>
+      <!-- ===== PRÉSTAMOS ===== -->
+      <section class="panel-section" id="section-prestamos">
+        <div class="panel-head"><h1 data-i18n="nav.loans">Préstamos</h1></div>
+        <div class="card">
+          <h2 data-i18n="loans.requestTitle">Solicitar préstamo</h2>
+          <div class="form-grid">
+            <div><label for="loanUserId" data-i18n="loans.user">Usuario</label><select id="loanUserId"></select></div>
+            <div><label for="loanBookId" data-i18n="loans.book">Libro</label><select id="loanBookId"></select></div>
+          </div>
+          <div class="form-actions"><button id="loanSubmit"></button></div>
+          <div id="loanResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+        </div>
+        <div class="section-head">
+          <h2 data-i18n="loans.historyTitle">Historial de préstamos</h2>
+          <label class="checkbox-label"><input type="checkbox" id="onlyOverdue"> <span data-i18n="loans.onlyOverdue">mostrar solo vencidos</span></label>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr>
+            <th data-i18n="loans.colUser">Usuario</th><th data-i18n="loans.colBook">Libro</th><th data-i18n="loans.colDue">Vencimiento</th><th data-i18n="loans.colStatus">Estado</th><th></th>
+          </tr></thead>
+          <tbody id="loansTableBody"></tbody>
+        </table></div>
+      </section>
+
+      <!-- ===== LIBROS ===== -->
+      <section class="panel-section" id="section-libros">
+        <div class="panel-head"><h1 data-i18n="nav.books">Gestión de libros</h1></div>
+        <div class="card">
+          <h2 id="bookFormTitle" data-i18n="books.addTitle">Agregar libro</h2>
+          <label for="bookSearchQuery" data-i18n="books.searchLabel">Buscar libro (ISBN, título o autor — opcional, vía Open Library)</label>
+          <div class="search-row">
+            <input id="bookSearchQuery" type="text" data-i18n-placeholder="books.searchPlaceholder" placeholder="978-0-451-52493-5, Mario Vargas Llosa…">
+            <button type="button" class="secondary" id="bookSearchSubmit" data-i18n="books.searchSubmit">Buscar</button>
+          </div>
+          <div id="bookSearchResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+          <ul id="bookSearchList" class="search-results" style="display:none"></ul>
+          <div id="bookSearchPagination" class="search-pagination" style="display:none">
+            <button type="button" class="ghost btn-sm" id="bookSearchPrev" data-i18n="books.pagePrev">‹ Anterior</button>
+            <span id="bookSearchPageInfo" class="search-page-info"></span>
+            <button type="button" class="ghost btn-sm" id="bookSearchNext" data-i18n="books.pageNext">Siguiente ›</button>
+          </div>
+          <img id="bookCoverPreview" alt="" style="display:none">
+          <div class="form-grid">
+            <div><label for="bookTitle" data-i18n="books.titleField">Título</label><input id="bookTitle" type="text"></div>
+            <div><label for="bookAuthor" data-i18n="books.authorField">Autor</label><input id="bookAuthor" type="text"></div>
+            <div><label for="bookCopies" id="bookCopiesLabel" data-i18n="books.initialCopies">Copias iniciales</label><input id="bookCopies" type="number" min="0" value="1"></div>
+          </div>
+          <div class="form-actions">
+            <button id="bookSubmit" data-i18n="books.submitAdd">Agregar libro</button>
+            <button id="bookCancelEdit" class="cancel" style="display:none" data-i18n="books.cancelEdit">Cancelar edición</button>
+          </div>
+          <div id="bookResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+        </div>
+        <div class="section-head"><h2 data-i18n="books.catalogTitle">Catálogo</h2></div>
+        <div class="table-wrap"><table>
+          <thead><tr>
+            <th data-i18n="books.colTitle">Título</th><th data-i18n="books.colAuthor">Autor</th><th data-i18n="books.colCopies">Copias</th><th data-i18n="books.colAddStock">Agregar stock</th><th></th>
+          </tr></thead>
+          <tbody id="booksTableBody"></tbody>
+        </table></div>
+      </section>
+
+      <!-- ===== SOCIOS ===== -->
+      <section class="panel-section" id="section-socios">
+        <div class="panel-head"><h1 data-i18n="nav.users">Usuarios</h1></div>
+        <div class="card">
+          <h2 id="userFormTitle" data-i18n="users.addTitle">Agregar usuario</h2>
+          <div class="form-grid">
+            <div><label for="userName" data-i18n="users.name">Nombre</label><input id="userName" type="text"></div>
+            <div><label for="userEmail" data-i18n="users.email">Email</label><input id="userEmail" type="email"></div>
+          </div>
+          <div class="form-actions">
+            <button id="userSubmit" data-i18n="users.submitAdd">Agregar usuario</button>
+            <button id="userCancelEdit" class="cancel" style="display:none" data-i18n="users.cancelEdit">Cancelar edición</button>
+          </div>
+          <div id="userResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+        </div>
+        <div class="section-head"><h2 data-i18n="users.listTitle">Usuarios registrados</h2></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th data-i18n="users.colName">Nombre</th><th data-i18n="users.colEmail">Email</th><th data-i18n="users.colStatus">Estado</th><th></th></tr></thead>
+          <tbody id="usersTableBody"></tbody>
+        </table></div>
+      </section>
+
+      <!-- ===== DEUDAS ===== -->
+      <section class="panel-section" id="section-deudas">
+        <div class="panel-head"><h1 data-i18n="debts.title">Todas las deudas</h1></div>
+        <div id="debtResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th data-i18n="debts.colUser">Usuario</th><th data-i18n="debts.colAmount">Monto</th><th data-i18n="debts.colCreated">Generada</th><th data-i18n="debts.colStatus">Estado</th><th></th></tr></thead>
+          <tbody id="debtsTableBody"></tbody>
+        </table></div>
+      </section>
+
+      <!-- ===== CONFIGURACIÓN (solo administrador) ===== -->
+      <section class="panel-section" id="section-config">
+        <div class="panel-head"><h1 data-i18n="settings.title">Configuración</h1></div>
+        <div class="card">
+          <p class="muted" data-i18n="settings.description">Estos valores afectan a los préstamos nuevos y a las multas que se calculen de aquí en adelante.</p>
+          <div class="form-grid">
+            <div><label for="settingsHourlyRate" data-i18n="settings.hourlyRate">Tarifa por hora de atraso</label><input id="settingsHourlyRate" type="number" min="0" step="0.01"></div>
+            <div><label for="settingsMultiplier" data-i18n="settings.debtMultiplier">Multiplicador de deuda</label><input id="settingsMultiplier" type="number" min="0.01" step="0.01"></div>
+            <div><label for="settingsMaxLoans" data-i18n="settings.maxActiveLoans">Préstamos activos máximos por usuario</label><input id="settingsMaxLoans" type="number" min="1" step="1"></div>
+            <div><label for="settingsLoanPeriod" data-i18n="settings.loanPeriodDays">Días de préstamo</label><input id="settingsLoanPeriod" type="number" min="1" step="1"></div>
+          </div>
+          <div class="form-actions"><button id="settingsSubmit" data-i18n="settings.save">Guardar configuración</button></div>
+          <div id="settingsResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+        </div>
+      </section>
+
+      <!-- ===== PAÍSES (actividad: llamadas asíncronas con apicountries.com) ===== -->
+      <section class="panel-section" id="section-paises">
+        <div class="panel-head"><h1 data-i18n="countries.title">Países del mundo</h1><p class="muted" data-i18n="countries.source">Datos en vivo de apicountries.com (countries.dev).</p></div>
+        <div class="card">
+          <div class="form-grid">
+            <div><label for="countryRegion" data-i18n="countries.region">Región</label><select id="countryRegion"></select></div>
+            <div><label for="countrySelect" data-i18n="countries.country">País</label><select id="countrySelect" disabled></select></div>
+          </div>
+          <div id="countryResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+        </div>
+        <div id="countryTableWrap" class="table-wrap" style="display:none;margin-top:24px"><table>
+          <caption id="countryCaption"></caption>
+          <thead><tr><th data-i18n="countries.colLanguage">Idioma</th><th data-i18n="countries.colLanguageNative">Idioma (nombre nativo)</th><th data-i18n="countries.colCountryNative">Nombre nativo del país</th></tr></thead>
+          <tbody id="countryTableBody"></tbody>
+        </table></div>
+      </section>
+    </main>
   </div>
-
-  <!-- ==================== CATÁLOGO (público, cualquier socio logueado) ==================== -->
-  <section id="tab-catalog" class="tab-panel active" role="tabpanel" aria-labelledby="tabbtn-catalog">
-    <h2 class="section-title"><span data-i18n="catalog.title">Catálogo</span><span id="catalogLive" class="catalog-live" role="status" hidden data-i18n="catalog.live">En vivo</span></h2>
-    <div class="catalog-search">
-      <label for="catalogSearch" class="sr-only" data-i18n="catalog.searchLabel">Buscar por título o autor</label>
-      <input id="catalogSearch" type="text" data-i18n-placeholder="catalog.searchPlaceholder" placeholder="Buscar por título o autor…">
-    </div>
-    <div id="catalogEmpty" class="catalog-empty" style="display:none" data-i18n="catalog.empty">No hay libros que coincidan con la búsqueda.</div>
-    <div id="catalogGrid" class="catalog-grid"></div>
-  </section>
-
-  <!-- ==================== PRÉSTAMOS ==================== -->
-  <section id="tab-loans" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-loans">
-    <div class="card">
-      <h2 data-i18n="loans.requestTitle">Solicitar préstamo</h2>
-      <label for="loanUserId" data-i18n="loans.user">Usuario</label>
-      <select id="loanUserId"></select>
-
-      <label for="loanBookId" data-i18n="loans.book">Libro</label>
-      <select id="loanBookId"></select>
-
-      <button id="loanSubmit"></button>
-      <div id="loanResult" class="result" role="status" aria-live="polite" style="display:none"></div>
-    </div>
-
-    <h2 class="section-title">
-      <span data-i18n="loans.historyTitle">Historial de préstamos</span>
-      <label class="checkbox-label">
-        <input type="checkbox" id="onlyOverdue"> <span data-i18n="loans.onlyOverdue">mostrar solo vencidos</span>
-      </label>
-    </h2>
-    <div class="table-wrap"><table>
-      <thead><tr>
-        <th data-i18n="loans.colUser">Usuario</th>
-        <th data-i18n="loans.colBook">Libro</th>
-        <th data-i18n="loans.colDue">Vencimiento</th>
-        <th data-i18n="loans.colStatus">Estado</th>
-        <th></th>
-      </tr></thead>
-      <tbody id="loansTableBody"></tbody>
-    </table></div>
-  </section>
-
-  <!-- ==================== LIBROS ==================== -->
-  <section id="tab-books" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-books">
-    <div class="card">
-      <h2 id="bookFormTitle" data-i18n="books.addTitle">Agregar libro</h2>
-
-      <label for="bookSearchQuery" data-i18n="books.searchLabel">Buscar libro (ISBN, título o autor — opcional, vía Open Library)</label>
-      <div class="search-row">
-        <input id="bookSearchQuery" type="text" data-i18n-placeholder="books.searchPlaceholder" placeholder="978-0-451-52493-5, Mario Vargas Llosa…">
-        <button type="button" class="secondary" id="bookSearchSubmit" data-i18n="books.searchSubmit">Buscar</button>
-      </div>
-      <div id="bookSearchResult" class="result" role="status" aria-live="polite" style="display:none"></div>
-
-      <ul id="bookSearchList" class="search-results" style="display:none"></ul>
-      <div id="bookSearchPagination" class="search-pagination" style="display:none">
-        <button type="button" class="ghost" id="bookSearchPrev" data-i18n="books.pagePrev">‹ Anterior</button>
-        <span id="bookSearchPageInfo" class="search-page-info"></span>
-        <button type="button" class="ghost" id="bookSearchNext" data-i18n="books.pageNext">Siguiente ›</button>
-      </div>
-
-      <img id="bookCoverPreview" alt="" style="display:none; max-height:120px; margin-top:8px; border-radius:3px;">
-
-      <label for="bookTitle" data-i18n="books.titleField">Título</label>
-      <input id="bookTitle" type="text">
-
-      <label for="bookAuthor" data-i18n="books.authorField">Autor</label>
-      <input id="bookAuthor" type="text">
-
-      <label for="bookCopies" id="bookCopiesLabel" data-i18n="books.initialCopies">Copias iniciales</label>
-      <input id="bookCopies" type="number" min="0" value="1">
-
-      <button id="bookSubmit" data-i18n="books.submitAdd">Agregar libro</button>
-      <button id="bookCancelEdit" class="cancel" style="display:none" data-i18n="books.cancelEdit">Cancelar edición</button>
-      <div id="bookResult" class="result" role="status" aria-live="polite" style="display:none"></div>
-    </div>
-
-    <h2 class="section-title" data-i18n="books.catalogTitle">Catálogo</h2>
-    <div class="table-wrap"><table>
-      <thead><tr>
-        <th data-i18n="books.colTitle">Título</th>
-        <th data-i18n="books.colAuthor">Autor</th>
-        <th data-i18n="books.colCopies">Copias</th>
-        <th data-i18n="books.colAddStock">Agregar stock</th>
-        <th></th>
-      </tr></thead>
-      <tbody id="booksTableBody"></tbody>
-    </table></div>
-  </section>
-
-  <!-- ==================== USUARIOS ==================== -->
-  <section id="tab-users" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-users">
-    <div class="card">
-      <h2 id="userFormTitle" data-i18n="users.addTitle">Agregar usuario</h2>
-      <label for="userName" data-i18n="users.name">Nombre</label>
-      <input id="userName" type="text">
-
-      <label for="userEmail" data-i18n="users.email">Email</label>
-      <input id="userEmail" type="email">
-
-      <button id="userSubmit" data-i18n="users.submitAdd">Agregar usuario</button>
-      <button id="userCancelEdit" class="cancel" style="display:none" data-i18n="users.cancelEdit">Cancelar edición</button>
-      <div id="userResult" class="result" role="status" aria-live="polite" style="display:none"></div>
-    </div>
-
-    <h2 class="section-title" data-i18n="users.listTitle">Usuarios registrados</h2>
-    <div class="table-wrap"><table>
-      <thead><tr>
-        <th data-i18n="users.colName">Nombre</th>
-        <th data-i18n="users.colEmail">Email</th>
-        <th data-i18n="users.colStatus">Estado</th>
-        <th></th>
-      </tr></thead>
-      <tbody id="usersTableBody"></tbody>
-    </table></div>
-  </section>
-
-  <!-- ==================== DEUDAS ==================== -->
-  <section id="tab-debts" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-debts">
-    <h2 class="section-title" data-i18n="debts.title">Todas las deudas</h2>
-    <div id="debtResult" class="result" role="status" aria-live="polite" style="display:none"></div>
-    <div class="table-wrap"><table>
-      <thead><tr>
-        <th data-i18n="debts.colUser">Usuario</th>
-        <th data-i18n="debts.colAmount">Monto</th>
-        <th data-i18n="debts.colCreated">Generada</th>
-        <th data-i18n="debts.colStatus">Estado</th>
-        <th></th>
-      </tr></thead>
-      <tbody id="debtsTableBody"></tbody>
-    </table></div>
-  </section>
-
-  <!-- ==================== PAÍSES (actividad: llamadas asíncronas con apicountries.com) ==================== -->
-  <section id="tab-countries" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-countries">
-    <div class="card">
-      <h2 data-i18n="countries.title">Países del mundo</h2>
-      <p data-i18n="countries.source">Datos en vivo de apicountries.com (countries.dev).</p>
-      <label for="countryRegion" data-i18n="countries.region">Región</label>
-      <select id="countryRegion"></select>
-      <label for="countrySelect" data-i18n="countries.country">País</label>
-      <select id="countrySelect" disabled></select>
-      <div id="countryResult" class="result" role="status" aria-live="polite" style="display:none"></div>
-    </div>
-    <div id="countryTableWrap" class="table-wrap" style="display:none"><table>
-      <caption id="countryCaption"></caption>
-      <thead><tr>
-        <th data-i18n="countries.colLanguage">Idioma</th>
-        <th data-i18n="countries.colLanguageNative">Idioma (nombre nativo)</th>
-        <th data-i18n="countries.colCountryNative">Nombre nativo del país</th>
-      </tr></thead>
-      <tbody id="countryTableBody"></tbody>
-    </table></div>
-  </section>
-
-  <!-- ==================== CONFIGURACIÓN (solo administrador) ==================== -->
-  <section id="tab-settings" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-settings">
-    <div class="card">
-      <h2 data-i18n="settings.title">Configuración</h2>
-      <p class="tagline" data-i18n="settings.description">Estos valores afectan a los préstamos nuevos y a las multas que se calculen de aquí en adelante.</p>
-
-      <label for="settingsHourlyRate" data-i18n="settings.hourlyRate">Tarifa por hora de atraso</label>
-      <input id="settingsHourlyRate" type="number" min="0" step="0.01">
-
-      <label for="settingsMultiplier" data-i18n="settings.debtMultiplier">Multiplicador de deuda</label>
-      <input id="settingsMultiplier" type="number" min="0.01" step="0.01">
-
-      <label for="settingsMaxLoans" data-i18n="settings.maxActiveLoans">Préstamos activos máximos por usuario</label>
-      <input id="settingsMaxLoans" type="number" min="1" step="1">
-
-      <label for="settingsLoanPeriod" data-i18n="settings.loanPeriodDays">Días de préstamo</label>
-      <input id="settingsLoanPeriod" type="number" min="1" step="1">
-
-      <button id="settingsSubmit" data-i18n="settings.save">Guardar configuración</button>
-      <div id="settingsResult" class="result" role="status" aria-live="polite" style="display:none"></div>
-    </div>
-  </section>
 
   <!-- ==================== MODAL DETALLE USUARIO ==================== -->
   <div class="modal-overlay" id="userDetailOverlay">
@@ -667,27 +350,18 @@
       <div class="modal-head">
         <div>
           <p class="eyebrow" data-i18n="users.detailTitle">Ficha de socio</p>
-          <h2><span id="userDetailName"></span></h2>
+          <h2 id="userDetailName"></h2>
         </div>
-        <button class="secondary modal-close" id="userDetailClose" data-i18n="users.detailClose">Cerrar</button>
+        <button class="secondary btn-sm" id="userDetailClose" data-i18n="users.detailClose">Cerrar</button>
       </div>
       <h3 data-i18n="users.detailLoans">Préstamos</h3>
       <div class="table-wrap"><table>
-        <thead><tr>
-          <th data-i18n="loans.colBook">Libro</th>
-          <th data-i18n="loans.colDue">Vencimiento</th>
-          <th data-i18n="loans.colStatus">Estado</th>
-        </tr></thead>
+        <thead><tr><th data-i18n="loans.colBook">Libro</th><th data-i18n="loans.colDue">Vencimiento</th><th data-i18n="loans.colStatus">Estado</th></tr></thead>
         <tbody id="userDetailLoans"></tbody>
       </table></div>
       <h3 data-i18n="users.detailDebts">Deudas</h3>
       <div class="table-wrap"><table>
-        <thead><tr>
-          <th data-i18n="debts.colAmount">Monto</th>
-          <th data-i18n="debts.colCreated">Generada</th>
-          <th data-i18n="debts.colStatus">Estado</th>
-          <th></th>
-        </tr></thead>
+        <thead><tr><th data-i18n="debts.colAmount">Monto</th><th data-i18n="debts.colCreated">Generada</th><th data-i18n="debts.colStatus">Estado</th><th></th></tr></thead>
         <tbody id="userDetailDebts"></tbody>
       </table></div>
       <div id="modalResult" class="result" role="status" aria-live="polite" style="display:none"></div>
@@ -700,891 +374,8 @@
   <script src="catalog.js"></script>
   <script src="countries.js"></script>
   <script src="i18n.js"></script>
-  <script>
-    const { t, formatCurrency, formatDate, translateError, setLocale, getLocale } = window.I18n;
-    const { isValidEmail, isValidPassword, isValidName, isNonNegativeInteger } = window.Validators;
-
-    /** Valida `value` con `check` (una de las funciones de validators.js); si falla, muestra el error en `resultEl` y corta el flujo. */
-    function validateField(value, check, messageKey, resultEl) {
-      if (check(value)) return true;
-      showResult(resultEl, false, t(messageKey));
-      return false;
-    }
-
-    // ---------- Navegación entre pestañas (patrón ARIA tablist) ----------
-    document.querySelectorAll('.tab-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach((b) => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
-        document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
-        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-      });
-    });
-
-    // ---------- Países (llamadas asíncronas a apicountries.com) ----------
-    const regionSel = document.getElementById('countryRegion');
-    const countrySel = document.getElementById('countrySelect');
-    const countryResult = document.getElementById('countryResult');
-    const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-    let countryRequest = 0; // descarta respuestas viejas si el usuario cambia rápido de selección
-
-    function renderRegionOptions() {
-      const current = regionSel.value;
-      regionSel.innerHTML = `<option value="">${t('countries.choose')}</option>`
-        + Countries.REGIONS.map((r) => `<option value="${r}">${r}</option>`).join('');
-      regionSel.value = current;
-    }
-
-    regionSel.addEventListener('change', async () => {
-      const req = ++countryRequest;
-      document.getElementById('countryTableWrap').style.display = 'none';
-      countryResult.style.display = 'none';
-      countrySel.disabled = true;
-      if (!regionSel.value) { countrySel.innerHTML = ''; return; }
-      countrySel.innerHTML = `<option>${t('countries.loading')}</option>`;
-      try {
-        const list = await Countries.fetchCountriesByRegion(regionSel.value);
-        if (req !== countryRequest) return;
-        countrySel.innerHTML = `<option value="">${t('countries.choose')}</option>`
-          + list.map((c) => `<option value="${c.code}">${escapeHtml(c.name)}</option>`).join('');
-        countrySel.disabled = false;
-      } catch {
-        if (req !== countryRequest) return;
-        countrySel.innerHTML = '';
-        showResult(countryResult, false, t('countries.error'));
-      }
-    });
-
-    countrySel.addEventListener('change', async () => {
-      const req = ++countryRequest;
-      const wrap = document.getElementById('countryTableWrap');
-      wrap.style.display = 'none';
-      countryResult.style.display = 'none';
-      if (!countrySel.value) return;
-      try {
-        const { name, nativeName, rows } = await Countries.fetchCountryDetail(countrySel.value);
-        if (req !== countryRequest) return;
-        document.getElementById('countryCaption').textContent = name;
-        document.getElementById('countryTableBody').innerHTML = rows.map((r) =>
-          `<tr><td>${escapeHtml(r.language)}</td><td>${escapeHtml(r.languageNative)}</td><td>${escapeHtml(nativeName)}</td></tr>`).join('');
-        wrap.style.display = '';
-      } catch {
-        if (req !== countryRequest) return;
-        showResult(countryResult, false, t('countries.error'));
-      }
-    });
-
-    function showResult(el, ok, message) {
-      el.style.display = 'block';
-      el.className = 'result ' + (ok ? 'ok' : 'error');
-      el.textContent = message;
-    }
-
-    function loanBadge(l) {
-      if (l.status === 'RETURNED') return `<span class="badge badge-returned">${t('loans.badgeReturned')}</span>`;
-      const isOverdue = new Date(l.dueDate).getTime() < Date.now();
-      return isOverdue
-        ? `<span class="badge badge-overdue">${t('loans.badgeOverdue')}</span>`
-        : `<span class="badge badge-active">${t('loans.badgeActive')}</span>`;
-    }
-
-    // En local el backend sirve este mismo HTML, así que la API es el mismo origen.
-    const API_BASE_URL = ['localhost', '127.0.0.1'].includes(location.hostname)
-      ? ''
-      : 'https://biblioteca-backend-438047115829.us-central1.run.app';
-
-    async function fetchJson(path, options = {}) {
-      const token = localStorage.getItem('authToken');
-      const headers = { ...(options.headers || {}) };
-      if (token) headers['Authorization'] = 'Bearer ' + token;
-      const sep = path.includes('?') ? '&' : '?';
-      const res = await fetch(API_BASE_URL + path + sep + 'lang=' + getLocale(), { ...options, headers });
-      const data = res.status === 204 ? null : await res.json().catch(() => null);
-      if (res.status === 401) {
-        clearSession();
-      }
-      return { ok: res.ok, data };
-    }
-
-    function errorMessage(data) {
-      return translateError(data);
-    }
-
-    let allUsers = [];
-    let allBooks = [];
-    let allLoans = [];
-    let currentSettings = null;
-
-    async function loadAll() {
-      [allUsers, allBooks, currentSettings] = await Promise.all([
-        fetchJson('/api/v1/users').then((r) => r.data),
-        fetchJson('/api/v1/books').then((r) => r.data),
-        fetchJson('/api/v1/settings').then((r) => r.data),
-      ]);
-      renderLoanForm();
-      renderBooksTable();
-      renderUsersTable();
-      renderSettingsForm();
-      await loadLoans();
-      await loadDebts();
-      await loadCatalog(); // el catálogo lee /books igual que allBooks; se refresca en cada acción de staff para no quedar desactualizado
-    }
-
-    // ---------- Catálogo (público: cualquier rol logueado) ----------
-    let allCatalogBooks = [];
-
-    function renderCatalogGrid(books) {
-      const grid = document.getElementById('catalogGrid');
-      const empty = document.getElementById('catalogEmpty');
-
-      if (books.length === 0) {
-        grid.innerHTML = '';
-        empty.style.display = 'block';
-        return;
-      }
-      empty.style.display = 'none';
-
-      grid.innerHTML = books
-        .map((b) => {
-          const cover = b.coverUrl
-            ? `<img class="catalog-cover" src="${b.coverUrl}" alt="${t('books.coverAlt', { title: b.title })}">`
-            : `<div class="catalog-cover-placeholder" aria-hidden="true">${(b.title || '?').charAt(0).toUpperCase()}</div>`;
-          const badgeClass = b.availableCopies > 0 ? 'badge-active' : 'badge-unpaid';
-          const badgeText = b.availableCopies > 0
-            ? t('loans.availableOf', { available: b.availableCopies, total: b.totalCopies })
-            : t('catalog.outOfStock');
-          return `<div class="catalog-card">
-            ${cover}
-            <div class="catalog-card-body">
-              <div class="catalog-card-title">${b.title}</div>
-              <div class="catalog-card-author">${b.author}</div>
-              ${b.publishYear ? `<div class="catalog-card-year">${b.publishYear}</div>` : ''}
-              <div class="catalog-card-badge"><span class="badge ${badgeClass}">${badgeText}</span></div>
-            </div>
-          </div>`;
-        })
-        .join('');
-    }
-
-    // La búsqueda corre en un Web Worker (catalogWorker.js) para no bloquear
-    // la UI con catálogos grandes. Sin soporte de Worker, filtra aquí mismo.
-    const catalogWorker = window.Worker ? new Worker('catalogWorker.js') : null;
-    let catalogQueryId = 0;
-    if (catalogWorker) {
-      catalogWorker.onmessage = (e) => {
-        if (e.data.id === catalogQueryId) renderCatalogGrid(e.data.books); // descarta respuestas de teclas anteriores
-      };
-    }
-
-    function filterCatalog(query) {
-      if (!catalogWorker) return renderCatalogGrid(Catalog.filterBooks(allCatalogBooks, query));
-      catalogWorker.postMessage({ type: 'filter', id: ++catalogQueryId, query });
-    }
-
-    async function loadCatalog() {
-      const { data } = await fetchJson('/api/v1/books');
-      allCatalogBooks = data || [];
-      catalogWorker?.postMessage({ type: 'set', books: allCatalogBooks });
-      filterCatalog(document.getElementById('catalogSearch').value);
-    }
-
-    document.getElementById('catalogSearch').addEventListener('input', (e) => filterCatalog(e.target.value));
-
-    // ---------- Catálogo en vivo (WebSocket) ----------
-    // El servidor avisa cuando cambia un libro o un préstamo; el aviso no trae
-    // datos, solo dispara un loadCatalog() (que va por la API con el token).
-    let liveSocket = null;
-
-    function connectLive() {
-      if (liveSocket || !localStorage.getItem('authToken')) return;
-      const badge = document.getElementById('catalogLive');
-      liveSocket = new WebSocket((API_BASE_URL || location.origin).replace(/^http/, 'ws') + '/ws');
-      liveSocket.onopen = () => {
-        badge.hidden = false;
-        loadCatalog(); // por si cambió algo mientras estaba desconectado
-      };
-      liveSocket.onmessage = () => loadCatalog();
-      // Cloud Run corta las conexiones largas cada cierto tiempo: se reconecta solo.
-      liveSocket.onclose = () => {
-        badge.hidden = true;
-        liveSocket = null;
-        setTimeout(connectLive, 3000);
-      };
-    }
-
-    // ---------- Préstamos ----------
-    function renderLoanForm() {
-      document.getElementById('loanUserId').innerHTML = allUsers
-        .filter((u) => u.status === 'ACTIVE')
-        .map((u) => `<option value="${u.id}">${u.name}</option>`)
-        .join('');
-      document.getElementById('loanBookId').innerHTML = allBooks
-        .map((b) => `<option value="${b.id}">${b.title} (${t('loans.availableOf', { available: b.availableCopies, total: b.totalCopies })})</option>`)
-        .join('');
-      document.getElementById('loanSubmit').textContent = t('loans.submit', { days: currentSettings?.loanPeriodDays ?? '' });
-    }
-
-    async function loadLoans() {
-      const overdue = document.getElementById('onlyOverdue').checked;
-      const { data: loans } = await fetchJson('/api/v1/loans' + (overdue ? '?overdue=true' : ''));
-      allLoans = loans;
-      const userName = (id) => allUsers.find((u) => u.id === id)?.name ?? id;
-
-      document.getElementById('loansTableBody').innerHTML = loans
-        .slice()
-        .reverse()
-        .map((l) => {
-          const badge = loanBadge(l);
-          const provisional = l.provisionalFine != null
-            ? `<div class="provisional-fine">${t('loans.provisionalFine', { amount: formatCurrency(l.provisionalFine) })}</div>`
-            : '';
-          const action = l.status === 'ACTIVE'
-            ? `<button class="success" data-return-loan="${l.id}">${t('loans.returnAction')}</button>`
-            : '';
-          return `<tr>
-            <td>${userName(l.userId)}</td>
-            <td>${l.bookTitle ?? t('loans.unknownBook')}</td>
-            <td>${formatDate(l.dueDate)}</td>
-            <td>${badge}${provisional}</td>
-            <td>${action}</td>
-          </tr>`;
-        })
-        .join('');
-
-      document.querySelectorAll('[data-return-loan]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const { ok, data } = await fetchJson(`/api/v1/loans/${btn.dataset.returnLoan}/return`, { method: 'POST' });
-          const message = ok
-            ? data.fineAmount > 0
-              ? t('loans.returnedLate', { amount: formatCurrency(data.fineAmount) })
-              : t('loans.returnedOnTime')
-            : errorMessage(data);
-          showResult(document.getElementById('loanResult'), ok, message);
-          if (ok) await loadAll();
-        });
-      });
-    }
-
-    document.getElementById('onlyOverdue').addEventListener('change', loadLoans);
-
-    document.getElementById('loanSubmit').addEventListener('click', async () => {
-      const userId = document.getElementById('loanUserId').value;
-      const bookId = document.getElementById('loanBookId').value;
-      const userName = allUsers.find((u) => u.id === userId)?.name ?? '';
-      const bookTitle = allBooks.find((b) => b.id === bookId)?.title ?? '';
-      const { ok, data } = await fetchJson('/api/v1/loans', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, bookId }),
-      });
-      const message = ok
-        ? t('loans.created', { book: bookTitle, user: userName, date: formatDate(data.dueDate) })
-        : errorMessage(data);
-      showResult(document.getElementById('loanResult'), ok, message);
-      if (ok) await loadAll();
-    });
-
-    // ---------- Libros ----------
-    let editingBookId = null;
-    // Portada/año no tienen campo propio en el formulario: se capturan al
-    // usar la búsqueda de Open Library (o se precargan al editar un libro
-    // que ya los tenía) y viajan junto con título/autor al guardar.
-    let pendingCoverUrl = null;
-    let pendingPublishYear = null;
-
-    function renderBooksTable() {
-      document.getElementById('booksTableBody').innerHTML = allBooks
-        .map(
-          (b) => `<tr>
-            <td>${b.title}</td>
-            <td>${b.author}</td>
-            <td>${b.availableCopies}/${b.totalCopies}</td>
-            <td>
-              <div class="inline-stock">
-                <input type="number" min="1" value="1" id="stock-${b.id}">
-                <button class="secondary" data-add-stock="${b.id}">${t('books.addStockAction')}</button>
-              </div>
-            </td>
-            <td class="row-actions">
-              <button class="secondary" data-edit-book="${b.id}">${t('books.editAction')}</button>
-              <button class="danger" data-delete-book="${b.id}">${t('books.deleteAction')}</button>
-            </td>
-          </tr>`
-        )
-        .join('');
-
-      document.querySelectorAll('[data-delete-book]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const book = allBooks.find((b) => b.id === btn.dataset.deleteBook);
-          const { ok, data } = await fetchJson(`/api/v1/books/${btn.dataset.deleteBook}`, { method: 'DELETE' });
-          const message = ok ? t('books.deleted', { title: book?.title ?? '' }) : errorMessage(data);
-          showResult(document.getElementById('bookResult'), ok, message);
-          await loadAll();
-        });
-      });
-
-      document.querySelectorAll('[data-edit-book]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const book = allBooks.find((b) => b.id === btn.dataset.editBook);
-          if (!book) return;
-          editingBookId = book.id;
-          document.getElementById('bookTitle').value = book.title;
-          document.getElementById('bookAuthor').value = book.author;
-          pendingCoverUrl = book.coverUrl || null;
-          pendingPublishYear = book.publishYear || null;
-          const cover = document.getElementById('bookCoverPreview');
-          if (book.coverUrl) {
-            cover.src = book.coverUrl;
-            cover.alt = t('books.coverAlt', { title: book.title });
-            cover.style.display = 'block';
-          } else {
-            cover.style.display = 'none';
-          }
-          document.getElementById('bookCopiesLabel').style.display = 'none';
-          document.getElementById('bookCopies').style.display = 'none';
-          document.getElementById('bookFormTitle').textContent = t('books.editTitle');
-          document.getElementById('bookSubmit').textContent = t('books.submitSave');
-          document.getElementById('bookCancelEdit').style.display = 'block';
-        });
-      });
-
-      document.querySelectorAll('[data-add-stock]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const bookId = btn.dataset.addStock;
-          const book = allBooks.find((b) => b.id === bookId);
-          const rawQuantity = document.getElementById(`stock-${bookId}`).value;
-          if (!validateField(rawQuantity, isNonNegativeInteger, 'validation.integerInvalid', document.getElementById('bookResult'))) return;
-          const quantity = Number(rawQuantity);
-          const { ok, data } = await fetchJson(`/api/v1/books/${bookId}/stock`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quantity }),
-          });
-          const message = ok
-            ? t('books.stockAdded', { qty: quantity, count: quantity, title: book?.title ?? '' })
-            : errorMessage(data);
-          showResult(document.getElementById('bookResult'), ok, message);
-          await loadAll();
-        });
-      });
-    }
-
-    function resetBookForm() {
-      editingBookId = null;
-      pendingCoverUrl = null;
-      pendingPublishYear = null;
-      document.getElementById('bookTitle').value = '';
-      document.getElementById('bookAuthor').value = '';
-      document.getElementById('bookCopies').value = '1';
-      document.getElementById('bookSearchQuery').value = '';
-      document.getElementById('bookSearchResult').style.display = 'none';
-      document.getElementById('bookSearchList').style.display = 'none';
-      document.getElementById('bookSearchList').innerHTML = '';
-      document.getElementById('bookSearchPagination').style.display = 'none';
-      document.getElementById('bookCoverPreview').style.display = 'none';
-      document.getElementById('bookCopiesLabel').style.display = 'block';
-      document.getElementById('bookCopies').style.display = 'block';
-      document.getElementById('bookFormTitle').textContent = t('books.addTitle');
-      document.getElementById('bookSubmit').textContent = t('books.submitAdd');
-      document.getElementById('bookCancelEdit').style.display = 'none';
-    }
-
-    // ---------- Búsqueda de libro (Open Library, servicio externo) ----------
-    // ISBN exacto -> autocompleta directo. Texto libre (título/autor) -> lista
-    // paginada para elegir. Un solo botón decide según el formato de lo tipeado.
-    let searchState = { query: '', page: 1 };
-
-    function applyBookResult(book) {
-      const cover = document.getElementById('bookCoverPreview');
-      if (book.title) document.getElementById('bookTitle').value = book.title;
-      if (book.author) document.getElementById('bookAuthor').value = book.author;
-      pendingCoverUrl = book.coverUrl || null;
-      pendingPublishYear = book.year || null;
-      if (book.coverUrl) {
-        cover.src = book.coverUrl;
-        cover.alt = t('books.coverAlt', { title: book.title });
-        cover.style.display = 'block';
-      } else {
-        cover.style.display = 'none';
-      }
-    }
-
-    function renderSearchResults(page) {
-      const list = document.getElementById('bookSearchList');
-      const pagination = document.getElementById('bookSearchPagination');
-
-      if (page.results.length === 0) {
-        list.style.display = 'none';
-        pagination.style.display = 'none';
-        return;
-      }
-
-      list.innerHTML = page.results
-        .map((book, i) => {
-          const meta = book.year ? `${book.author || ''} · ${book.year}` : (book.author || '');
-          const cover = book.coverUrl
-            ? `<img src="${book.coverUrl}" alt="">`
-            : `<img alt="">`;
-          return `<li class="search-result">
-            ${cover}
-            <div class="search-result-info">
-              <div class="search-result-title">${book.title}</div>
-              <div class="search-result-meta">${meta}</div>
-            </div>
-            <button type="button" class="secondary" data-use-result="${i}">${t('books.useThis')}</button>
-          </li>`;
-        })
-        .join('');
-      list.style.display = 'flex';
-
-      list.querySelectorAll('[data-use-result]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          applyBookResult(page.results[Number(btn.dataset.useResult)]);
-          list.style.display = 'none';
-          pagination.style.display = 'none';
-          showResult(document.getElementById('bookSearchResult'), true, t('books.isbnFound'));
-        });
-      });
-
-      document.getElementById('bookSearchPageInfo').textContent = t('books.pageInfo', {
-        page: page.page,
-        totalPages: page.totalPages,
-      });
-      document.getElementById('bookSearchPrev').disabled = page.page <= 1;
-      document.getElementById('bookSearchNext').disabled = page.page >= page.totalPages;
-      pagination.style.display = 'flex';
-    }
-
-    async function runBookSearch(page) {
-      const resultEl = document.getElementById('bookSearchResult');
-      const btn = document.getElementById('bookSearchSubmit');
-      btn.disabled = true;
-      showResult(resultEl, true, t('books.searching'));
-      try {
-        const results = await OpenLibrary.fetchBooksByQuery(searchState.query, page, OpenLibrary.RESULTS_PER_PAGE);
-        searchState.page = page;
-        if (results.results.length === 0) {
-          document.getElementById('bookSearchList').style.display = 'none';
-          document.getElementById('bookSearchPagination').style.display = 'none';
-          showResult(resultEl, false, t('books.searchNoResults'));
-          return;
-        }
-        showResult(resultEl, true, t('books.resultsCount', { count: results.numFound }));
-        renderSearchResults(results);
-      } catch {
-        // Sin red o el servicio externo caído: no bloquea el alta manual del libro.
-        showResult(resultEl, false, t('books.searchServiceError'));
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
-    document.getElementById('bookSearchSubmit').addEventListener('click', async () => {
-      const query = document.getElementById('bookSearchQuery').value.trim();
-      const resultEl = document.getElementById('bookSearchResult');
-      const cover = document.getElementById('bookCoverPreview');
-      document.getElementById('bookSearchList').style.display = 'none';
-      document.getElementById('bookSearchPagination').style.display = 'none';
-
-      if (!query) {
-        showResult(resultEl, false, t('books.searchEmpty'));
-        return;
-      }
-
-      if (OpenLibrary.isValidIsbn(query)) {
-        const btn = document.getElementById('bookSearchSubmit');
-        btn.disabled = true;
-        showResult(resultEl, true, t('books.searching'));
-        try {
-          const book = await OpenLibrary.fetchBookByIsbn(query);
-          if (!book) {
-            cover.style.display = 'none';
-            showResult(resultEl, false, t('books.searchNoResults'));
-            return;
-          }
-          applyBookResult(book);
-          showResult(resultEl, true, t('books.isbnFound'));
-        } catch {
-          showResult(resultEl, false, t('books.searchServiceError'));
-        } finally {
-          btn.disabled = false;
-        }
-        return;
-      }
-
-      searchState = { query, page: 1 };
-      await runBookSearch(1);
-    });
-
-    document.getElementById('bookSearchPrev').addEventListener('click', () => {
-      if (searchState.page > 1) runBookSearch(searchState.page - 1);
-    });
-    document.getElementById('bookSearchNext').addEventListener('click', () => {
-      runBookSearch(searchState.page + 1);
-    });
-
-    document.getElementById('bookCancelEdit').addEventListener('click', resetBookForm);
-
-    document.getElementById('bookSubmit').addEventListener('click', async () => {
-      const title = document.getElementById('bookTitle').value;
-      const author = document.getElementById('bookAuthor').value;
-      const isEditing = !!editingBookId;
-      const rawCopies = document.getElementById('bookCopies').value;
-      if (!isEditing && !validateField(rawCopies, isNonNegativeInteger, 'validation.integerInvalid', document.getElementById('bookResult'))) return;
-      const url = isEditing ? `/api/v1/books/${editingBookId}` : '/api/v1/books';
-      const method = isEditing ? 'PUT' : 'POST';
-      const initialCopies = Number(rawCopies);
-      const body = isEditing
-        ? { title, author, coverUrl: pendingCoverUrl, publishYear: pendingPublishYear }
-        : { title, author, initialCopies, coverUrl: pendingCoverUrl, publishYear: pendingPublishYear };
-      const { ok, data } = await fetchJson(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const message = ok
-        ? isEditing
-          ? t('books.updated', { title: data.title })
-          : t('books.created', { title: data.title, qty: initialCopies, count: initialCopies })
-        : errorMessage(data);
-      showResult(document.getElementById('bookResult'), ok, message);
-      if (ok) {
-        resetBookForm();
-        await loadAll();
-      }
-    });
-
-    // ---------- Usuarios ----------
-    let editingUserId = null;
-
-    function renderUsersTable() {
-      document.getElementById('usersTableBody').innerHTML = allUsers
-        .map((u) => {
-          const badge = u.status === 'ACTIVE'
-            ? `<span class="badge badge-active">${t('users.statusActive')}</span>`
-            : `<span class="badge badge-inactive">${t('users.statusInactive')}</span>`;
-          const statusBtn = u.status === 'ACTIVE'
-            ? `<button class="secondary" data-toggle-status="${u.id}" data-next-status="INACTIVE">${t('users.deactivate')}</button>`
-            : `<button class="secondary" data-toggle-status="${u.id}" data-next-status="ACTIVE">${t('users.activate')}</button>`;
-          return `<tr>
-            <td>${u.name}</td>
-            <td>${u.email}</td>
-            <td>${badge}</td>
-            <td class="row-actions">
-              <button class="ghost" data-view-user="${u.id}">${t('users.viewDetail')}</button>
-              <button class="secondary" data-edit-user="${u.id}">${t('users.editAction')}</button>
-              ${statusBtn}
-              <button class="danger" data-delete-user="${u.id}">${t('users.deleteAction')}</button>
-            </td>
-          </tr>`;
-        })
-        .join('');
-
-      document.querySelectorAll('[data-delete-user]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const user = allUsers.find((u) => u.id === btn.dataset.deleteUser);
-          const { ok, data } = await fetchJson(`/api/v1/users/${btn.dataset.deleteUser}`, { method: 'DELETE' });
-          const message = ok ? t('users.deleted', { name: user?.name ?? '' }) : errorMessage(data);
-          showResult(document.getElementById('userResult'), ok, message);
-          await loadAll();
-        });
-      });
-
-      document.querySelectorAll('[data-toggle-status]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const user = allUsers.find((u) => u.id === btn.dataset.toggleStatus);
-          const nextStatus = btn.dataset.nextStatus;
-          const { ok, data } = await fetchJson(`/api/v1/users/${btn.dataset.toggleStatus}/status`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: nextStatus }),
-          });
-          const name = user?.name ?? t('users.defaultName');
-          const message = ok
-            ? nextStatus === 'ACTIVE'
-              ? t('users.statusChangedActive', { name })
-              : t('users.statusChangedInactive', { name })
-            : errorMessage(data);
-          showResult(document.getElementById('userResult'), ok, message);
-          await loadAll();
-        });
-      });
-
-      document.querySelectorAll('[data-edit-user]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const user = allUsers.find((u) => u.id === btn.dataset.editUser);
-          if (!user) return;
-          editingUserId = user.id;
-          document.getElementById('userName').value = user.name;
-          document.getElementById('userEmail').value = user.email;
-          document.getElementById('userFormTitle').textContent = t('users.editTitle');
-          document.getElementById('userSubmit').textContent = t('users.submitSave');
-          document.getElementById('userCancelEdit').style.display = 'block';
-        });
-      });
-
-      document.querySelectorAll('[data-view-user]').forEach((btn) => {
-        btn.addEventListener('click', () => openUserDetail(btn.dataset.viewUser));
-      });
-    }
-
-    function resetUserForm() {
-      editingUserId = null;
-      document.getElementById('userName').value = '';
-      document.getElementById('userEmail').value = '';
-      document.getElementById('userFormTitle').textContent = t('users.addTitle');
-      document.getElementById('userSubmit').textContent = t('users.submitAdd');
-      document.getElementById('userCancelEdit').style.display = 'none';
-    }
-
-    document.getElementById('userCancelEdit').addEventListener('click', resetUserForm);
-
-    document.getElementById('userSubmit').addEventListener('click', async () => {
-      const name = document.getElementById('userName').value;
-      const email = document.getElementById('userEmail').value;
-      const userResultEl = document.getElementById('userResult');
-      if (!validateField(name, isValidName, 'validation.nameInvalid', userResultEl)) return;
-      if (!validateField(email, isValidEmail, 'validation.emailInvalid', userResultEl)) return;
-      const isEditing = !!editingUserId;
-      const url = isEditing ? `/api/v1/users/${editingUserId}` : '/api/v1/users';
-      const method = isEditing ? 'PUT' : 'POST';
-      const { ok, data } = await fetchJson(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email }),
-      });
-      const message = ok
-        ? isEditing
-          ? t('users.updated', { name: data.name })
-          : t('users.created', { name: data.name })
-        : errorMessage(data);
-      showResult(document.getElementById('userResult'), ok, message);
-      if (ok) {
-        resetUserForm();
-        await loadAll();
-      }
-    });
-
-    // ---------- Detalle de usuario (modal) ----------
-    async function openUserDetail(userId) {
-      const user = allUsers.find((u) => u.id === userId);
-      const [loansRes, debtsRes] = await Promise.all([
-        fetchJson(`/api/v1/users/${userId}/loans`),
-        fetchJson(`/api/v1/users/${userId}/debts`),
-      ]);
-
-      document.getElementById('userDetailName').textContent = user ? user.name : userId;
-
-      document.getElementById('userDetailLoans').innerHTML = loansRes.data
-        .map((l) => `<tr><td>${l.bookTitle ?? t('loans.unknownBook')}</td><td>${formatDate(l.dueDate)}</td><td>${loanBadge(l)}</td></tr>`)
-        .join('') || `<tr><td colspan="3" class="empty-note">${t('users.noLoans')}</td></tr>`;
-
-      document.getElementById('userDetailDebts').innerHTML = debtsRes.data
-        .map((d) => `<tr>
-          <td>${formatCurrency(d.amount)}</td>
-          <td>${formatDate(d.createdAt)}</td>
-          <td>${d.paid ? `<span class="badge badge-paid">${t('debts.paid')}</span>` : `<span class="badge badge-unpaid">${t('debts.unpaid')}</span>`}</td>
-          <td>${d.paid ? '' : `<button class="success" data-pay-debt="${d.id}">${t('debts.markPaid')}</button>`}</td>
-        </tr>`)
-        .join('') || `<tr><td colspan="4" class="empty-note">${t('users.noDebts')}</td></tr>`;
-
-      document.querySelectorAll('[data-pay-debt]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const { ok, data } = await fetchJson(`/api/v1/debts/${btn.dataset.payDebt}/pay`, { method: 'POST' });
-          const message = ok ? t('debts.paidMessage', { amount: formatCurrency(data.amount) }) : errorMessage(data);
-          await openUserDetail(userId);
-          showResult(document.getElementById('modalResult'), ok, message);
-          await loadDebts();
-        });
-      });
-
-      document.getElementById('userDetailOverlay').classList.add('open');
-    }
-
-    document.getElementById('userDetailClose').addEventListener('click', () => {
-      document.getElementById('userDetailOverlay').classList.remove('open');
-    });
-
-    // ---------- Deudas ----------
-    async function loadDebts() {
-      const { data: debts } = await fetchJson('/api/v1/debts');
-      const userName = (id) => allUsers.find((u) => u.id === id)?.name ?? id;
-
-      document.getElementById('debtsTableBody').innerHTML = debts
-        .slice()
-        .reverse()
-        .map((d) => `<tr>
-          <td>${userName(d.userId)}</td>
-          <td>${formatCurrency(d.amount)}</td>
-          <td>${formatDate(d.createdAt)}</td>
-          <td>${d.paid ? `<span class="badge badge-paid">${t('debts.paid')}</span>` : `<span class="badge badge-unpaid">${t('debts.unpaid')}</span>`}</td>
-          <td>${d.paid ? '' : `<button class="success" data-pay-debt-global="${d.id}">${t('debts.markPaid')}</button>`}</td>
-        </tr>`)
-        .join('');
-
-      document.querySelectorAll('[data-pay-debt-global]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const { ok, data } = await fetchJson(`/api/v1/debts/${btn.dataset.payDebtGlobal}/pay`, { method: 'POST' });
-          const message = ok
-            ? t('debts.paidMessageFor', { amount: formatCurrency(data.amount), user: userName(data.userId) })
-            : errorMessage(data);
-          await loadDebts();
-          showResult(document.getElementById('debtResult'), ok, message);
-        });
-      });
-    }
-
-    // ---------- Configuración (solo administrador) ----------
-    function renderSettingsForm() {
-      if (!currentSettings) return;
-      document.getElementById('settingsHourlyRate').value = currentSettings.hourlyLateFeeRate;
-      document.getElementById('settingsMultiplier').value = currentSettings.debtMultiplier;
-      document.getElementById('settingsMaxLoans').value = currentSettings.maxActiveLoans;
-      document.getElementById('settingsLoanPeriod').value = currentSettings.loanPeriodDays;
-    }
-
-    document.getElementById('settingsSubmit').addEventListener('click', async () => {
-      const body = {
-        hourlyLateFeeRate: Number(document.getElementById('settingsHourlyRate').value),
-        debtMultiplier: Number(document.getElementById('settingsMultiplier').value),
-        maxActiveLoans: Number(document.getElementById('settingsMaxLoans').value),
-        loanPeriodDays: Number(document.getElementById('settingsLoanPeriod').value),
-      };
-      const { ok, data } = await fetchJson('/api/v1/settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (ok) currentSettings = data;
-      showResult(document.getElementById('settingsResult'), ok, ok ? t('settings.saved') : errorMessage(data));
-    });
-
-    // ---------- Sesión (autenticación básica) ----------
-    const STAFF_ROLES = ['BIBLIOTECARIO', 'ADMINISTRADOR'];
-    const ROLE_LABEL_KEY = { USUARIO: 'auth.roleUser', BIBLIOTECARIO: 'auth.roleLibrarian', ADMINISTRADOR: 'auth.roleAdmin' };
-
-    // Pestañas de gestión (todo salvo Catálogo): solo BIBLIOTECARIO/ADMINISTRADOR.
-    // El Catálogo mismo es para cualquier rol logueado (ver setLoggedInView) —
-    // es justo lo que hace que la app se sienta como una biblioteca real y no
-    // solo un panel de back-office.
-    const STAFF_ONLY_TABS = ['loans', 'books', 'users', 'debts'];
-
-    function setStaffView(isStaff) {
-      STAFF_ONLY_TABS.forEach((tab) => {
-        const display = isStaff ? '' : 'none';
-        document.getElementById(`tabbtn-${tab}`).style.display = display;
-        document.getElementById(`tab-${tab}`).style.display = display;
-      });
-      const showGate = !isStaff && !!localStorage.getItem('authToken');
-      const gate = document.getElementById('gateMsg');
-      gate.style.display = showGate ? 'block' : 'none';
-      if (showGate) {
-        gate.textContent = t('auth.gateMessage', { librarian: t('auth.roleLibrarian'), admin: t('auth.roleAdmin') });
-      }
-    }
-
-    // La barra de pestañas y el Catálogo se ven con cualquier sesión válida
-    // (incluido el rol USUARIO, que antes no veía nada al iniciar sesión).
-    function setLoggedInView(loggedIn) {
-      document.querySelector('.tabs').style.display = loggedIn ? '' : 'none';
-      document.getElementById('tab-catalog').style.display = loggedIn ? '' : 'none';
-      if (loggedIn) {
-        loadCatalog();
-        connectLive();
-      }
-    }
-
-    // La pestaña "Configuración" es solo para ADMINISTRADOR, ni siquiera para bibliotecarios.
-    function setAdminView(isAdmin) {
-      const display = isAdmin ? '' : 'none';
-      document.getElementById('tabbtn-settings').style.display = display;
-      document.getElementById('tab-settings').style.display = display;
-    }
-
-    function renderSession() {
-      const token = localStorage.getItem('authToken');
-      const email = localStorage.getItem('authEmail');
-      const role = localStorage.getItem('authRole');
-      const loggedIn = !!token;
-      document.getElementById('authLoggedOut').style.display = loggedIn ? 'none' : 'block';
-      document.getElementById('authLoggedIn').style.display = loggedIn ? 'flex' : 'none';
-      if (loggedIn) {
-        const roleLabel = t(ROLE_LABEL_KEY[role] || 'auth.roleUser');
-        document.getElementById('authSessionLabel').textContent = t('auth.sessionActive', { email, role: roleLabel });
-      }
-      const isStaff = loggedIn && STAFF_ROLES.includes(role);
-      setLoggedInView(loggedIn);
-      setStaffView(isStaff);
-      setAdminView(loggedIn && role === 'ADMINISTRADOR');
-      if (isStaff) loadAll();
-    }
-
-    function clearSession() {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authEmail');
-      localStorage.removeItem('authRole');
-      if (liveSocket) liveSocket.close();
-      renderSession();
-    }
-
-    function saveSession(data) {
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('authEmail', data.account.email);
-      localStorage.setItem('authRole', data.account.role);
-      renderSession();
-    }
-
-    document.getElementById('loginSubmit').addEventListener('click', async () => {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      // Solo se valida el formato del email: la contraseña no se valida por
-      // patrón aquí para no bloquear el login de cuentas ya existentes.
-      if (!validateField(email, isValidEmail, 'validation.emailInvalid', document.getElementById('authResult'))) return;
-      const { ok, data } = await fetchJson('/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      if (ok) saveSession(data);
-      showResult(document.getElementById('authResult'), ok, ok ? t('auth.welcome', { email: data.account.email }) : errorMessage(data));
-    });
-
-    document.getElementById('regSubmit').addEventListener('click', async () => {
-      const email = document.getElementById('regEmail').value;
-      const password = document.getElementById('regPassword').value;
-      const role = document.getElementById('regRole').value;
-      const authResultEl = document.getElementById('authResult');
-      if (!validateField(email, isValidEmail, 'validation.emailInvalid', authResultEl)) return;
-      if (!validateField(password, isValidPassword, 'validation.passwordWeak', authResultEl)) return;
-      const { ok, data } = await fetchJson('/api/v1/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role }),
-      });
-      if (ok) saveSession(data);
-      showResult(document.getElementById('authResult'), ok, ok ? t('auth.accountCreated', { role: t(ROLE_LABEL_KEY[data.account?.role] || 'auth.roleUser') }) : errorMessage(data));
-    });
-
-    document.getElementById('logoutBtn').addEventListener('click', clearSession);
-
-    // ---------- Selector de idioma ----------
-    const langSelect = document.getElementById('langSelect');
-    langSelect.addEventListener('change', async () => {
-      await setLocale(langSelect.value);
-      renderSession(); // vuelve a traducir textos generados dinámicamente (sesión, gate, tablas ya cargadas se refrescan con loadAll)
-    });
-
-    document.addEventListener('i18n:changed', () => {
-      document.title = t('meta.title');
-      langSelect.value = getLocale();
-      renderRegionOptions();
-    });
-
-    (async () => {
-      await window.I18n.initI18n();
-      renderSession();
-    })();
-  </script>
+  <script src="router.js"></script>
+  <script src="googleSignIn.js"></script> <!-- opcional: Google + "último usado" -->
+  <script src="app.js"></script>
 </body>
 </html>
