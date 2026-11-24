@@ -67,8 +67,28 @@ Si RabbitMQ corre en otra máquina o contenedor, usar la variable `RABBITMQ_HOST
 
 El workflow [`.github/workflows/rabbitmq-demo.yml`](../../.github/workflows/rabbitmq-demo.yml) corre todo sin
 necesitar una laptop encendida: levanta `rabbitmq:4-management` como contenedor de servicio, arranca `receive.py`,
-envía 3 mensajes con `send.py` y comprueba que el consumer recibió los 3. La salida queda en el resumen del job
-(pestaña **Actions → RabbitMQ Producer/Consumer (demo)**). Se puede volver a lanzar con *Run workflow*.
+envía 3 mensajes con `send.py` y comprueba que el consumer recibió los 3 (si falta alguno, el job falla).
+Para repetirlo: GitHub → pestaña **Actions** → *RabbitMQ Producer/Consumer (demo)* → **Run workflow**.
+
+Run de evidencia (24/11/2026, lanzado a mano sobre `main`, broker **RabbitMQ 4.4.1**):
+<https://github.com/leonardouwz/biblioteca-central/actions/runs/45475327225>
+
+```
+# producer (send.py, 3 ejecuciones)
+ [x] Sent 'Hello World!'
+ [x] Sent 'Hola desde Biblioteca Central'
+ [x] Sent 'Mensaje 3 desde GitHub Actions'
+
+# consumer (receive.py)
+ [*] Waiting for messages. To exit press CTRL+C
+ [x] Received Hello World!
+ [x] Received Hola desde Biblioteca Central
+ [x] Received Mensaje 3 desde GitHub Actions
+```
+
+En el log del contenedor de RabbitMQ del mismo run se ven las conexiones AMQP: una larga (el consumer, que queda
+escuchando) y tres cortas de ~5 ms (cada `send.py` se conecta, publica y cierra).
 
 Esta app **no** se despliega en Cloud Run: el workflow de despliegue de apps secundarias solo toma carpetas con
-`package.json`, y un consumer que escucha una cola no es un servicio web.
+`package.json`, y un consumer que escucha una cola no es un servicio web. Tampoco comparte código con la app
+Biblioteca central.

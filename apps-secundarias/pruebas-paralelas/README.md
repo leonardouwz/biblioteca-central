@@ -1,7 +1,8 @@
 # Ejecución paralela de pruebas con PyTest + pytest-xdist
 
 Actividad del curso *Tecnologías de Construcción de Software*. Es independiente de la app
-Biblioteca central: no comparte código con ella y no se despliega (no tiene `package.json`,
+Biblioteca central (vive en `apps-secundarias/`, aparte de la app y de su rediseño):
+no comparte código con ella y no se despliega (no tiene `package.json`,
 así que el workflow `deploy-apps.yml` la ignora).
 
 ## Herramienta elegida
@@ -75,13 +76,20 @@ corre la suite en serie y en paralelo cada vez que cambia esta carpeta (o a mano
 *Actions*, "Run workflow"). El resumen del run muestra los dos tiempos y qué worker ejecutó cada
 prueba.
 
-Run de evidencia: <https://github.com/leonardouwz/biblioteca-central/actions/runs/45455379875>
-(runner `ubuntu-latest`, Python 3.12):
+Run de evidencia más reciente (24/11/2026, lanzado a mano sobre `main`):
+<https://github.com/leonardouwz/biblioteca-central/actions/runs/45475321160>
+(runner `ubuntu-latest`, Python 3.12.16):
 
 | Paso | Duración del paso | Resultado de pytest |
 |---|---|---|
-| En serie (1 proceso) | 8 s (18:03:53 a 18:04:01) | 8 passed |
-| En paralelo (`-n 4`) | 3 s (18:04:01 a 18:04:04) | `8 passed in 2.40s` |
+| En serie (1 proceso) | 8 s (19:55:38 a 19:55:46 UTC) | 8 passed |
+| En paralelo (`-n 4`) | 3 s (19:55:46 a 19:55:49 UTC) | `8 passed in 2.36s` |
 
 En el log del paso paralelo se ven los 4 workers con PID distintos
-(`gw0 pid=2452`, `gw1 pid=2455`, `gw2 pid=2458`, `gw3 pid=2461`), cada uno con 2 pruebas.
+(`gw0 pid=2242`, `gw1 pid=2245`, `gw2 pid=2248`, `gw3 pid=2251`), cada uno con 2 pruebas.
+El resumen del run (pestaña *Summary*) muestra los dos tiempos y qué worker ejecutó cada prueba.
+
+Run anterior, con el mismo resultado: <https://github.com/leonardouwz/biblioteca-central/actions/runs/45455379875>
+(`8 passed in 2.40s`).
+
+Para repetirlo: GitHub → pestaña **Actions** → *Pruebas paralelas (pytest-xdist)* → **Run workflow**.
