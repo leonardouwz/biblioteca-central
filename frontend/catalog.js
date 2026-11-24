@@ -15,13 +15,13 @@
    * (insensible a mayúsculas/acentos simples). `query` vacío devuelve
    * todos los libros sin tocarlos.
    */
+  // "García" y "garcia" deben coincidir: se quitan las tildes (NFD + marcas).
+  const normalize = (text) => String(text || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
   function filterBooks(books, query) {
-    const needle = String(query || "").trim().toLowerCase();
+    const needle = normalize(query).trim();
     if (!needle) return books;
-    return books.filter((book) => {
-      const haystack = `${book.title || ""} ${book.author || ""}`.toLowerCase();
-      return haystack.includes(needle);
-    });
+    return books.filter((book) => normalize(`${book.title || ""} ${book.author || ""}`).includes(needle));
   }
 
   return { filterBooks };
