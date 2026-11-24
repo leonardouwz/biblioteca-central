@@ -2,7 +2,7 @@ name: Deploy frontend (Cloudflare Workers)
 
 on:
   push:
-    branches: [main, claude/project-thread-l9bwxb] # TEMP: rama de prueba, quitar antes del merge
+    branches: [main]
     paths: ['frontend/**', '.github/workflows/deploy-frontend.yml']
   workflow_dispatch:
 
