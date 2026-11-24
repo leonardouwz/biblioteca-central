@@ -1,0 +1,6 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"   # AMQP (lo usan send.py y receive.py)
+      - "15672:15672" # panel web: http://localhost:15672 (guest / guest)

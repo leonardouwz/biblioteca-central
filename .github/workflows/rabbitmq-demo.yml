@@ -1,0 +1,53 @@
+name: RabbitMQ Producer/Consumer (demo)
+
+# Evidencia remota del tutorial 1 de RabbitMQ: levanta la imagen oficial rabbitmq
+# como contenedor de servicio, ejecuta receive.py (consumer) y send.py (producer)
+# y deja la salida en el resumen del job. No despliega nada.
+on:
+  push:
+    branches: [main]
+    paths: ['apps-secundarias/rabbitmq-producer-consumer/**', '.github/workflows/rabbitmq-demo.yml']
+  pull_request:
+    paths: ['apps-secundarias/rabbitmq-producer-consumer/**', '.github/workflows/rabbitmq-demo.yml']
+  workflow_dispatch:
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:4-management
+        ports: ['5672:5672']
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q check_port_connectivity"
+          --health-interval 5s --health-timeout 10s --health-retries 20
+    defaults:
+      run:
+        working-directory: apps-secundarias/rabbitmq-producer-consumer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Consumer + Producer
+        run: |
+          python receive.py > receive.log 2>&1 &
+          sleep 3
+          python send.py
+          python send.py "Hola desde Biblioteca Central"
+          python send.py "Mensaje 3 desde GitHub Actions"
+          sleep 3
+          kill %1 || true
+          echo "--- salida de receive.py ---"
+          cat receive.log
+          test "$(grep -c 'Received' receive.log)" -eq 3   # falla si no llegaron los 3 mensajes
+      - name: Resumen
+        if: always()
+        run: |
+          {
+            echo '### Salida del consumer (receive.py)'
+            echo '```'
+            cat receive.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
