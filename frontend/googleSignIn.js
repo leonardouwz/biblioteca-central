@@ -110,6 +110,9 @@
     const el = document.createElement("span");
     el.className = "last-used-badge";
     el.textContent = label;
+    // ponytail: estilo mínimo inline para que se vea sin depender de styles.css; el CSS de la app lo puede sobrescribir.
+    el.style.cssText =
+      "display:inline-block;margin:6px 0 0 8px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:#e8f0fe;color:#1a56db;";
     return el;
   }
 
