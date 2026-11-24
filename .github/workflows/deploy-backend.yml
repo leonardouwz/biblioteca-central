@@ -2,7 +2,7 @@ name: Deploy backend (Cloud Run)
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/project-thread-l9bwxb] # TEMP: rama de prueba, quitar antes del merge
     paths: ['backend/**', '.github/workflows/deploy-backend.yml']
   workflow_dispatch:
 
@@ -27,6 +27,15 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
       - run: npm test # si fallan las pruebas, no se despliega
+      - name: Aplicar esquema a Supabase
+        # El esquema es idempotente (IF NOT EXISTS / ON CONFLICT DO NOTHING): se puede
+        # aplicar en cada despliegue. Si falla, no se despliega el backend.
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then echo "::warning::Falta el secreto SUPABASE_DB_URL; el backend aplicará el esquema al arrancar."; exit 0; fi
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f database/schema.postgres.sql
+          echo "Esquema aplicado a Supabase" >> "$GITHUB_STEP_SUMMARY"
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
