@@ -41,7 +41,7 @@ Supabase (Postgres, vía pooler Supavisor)
   Redeploy: automático al fusionar a `main` (ver `docs/despliegue-remoto.md`).
 
 - **Backend** — https://biblioteca-backend-438047115829.us-central1.run.app
-  Desplegado en Cloud Run directo desde el código fuente (Google Buildpacks, sin Dockerfile). CORS abierto (`cors()` sin restricción de origen — no hay autenticación en la API). El módulo es autocontenido: `backend/database/schema.postgres.sql` viaja dentro de `backend/` para que el deploy funcione sin las carpetas hermanas.
+  Desplegado en Cloud Run directo desde el código fuente (Google Buildpacks, sin Dockerfile). CORS restringido al frontend (`https://biblioteca-central.readuls.workers.dev` por defecto; otra lista con la variable `CORS_ORIGINS`, separada por comas). Login y registro tienen límite de intentos por IP (10/15 min y 5/hora → `429 TOO_MANY_REQUESTS`). El módulo es autocontenido: `backend/database/schema.postgres.sql` viaja dentro de `backend/` para que el deploy funcione sin las carpetas hermanas.
   Redeploy: automático al fusionar a `main` (ver `docs/despliegue-remoto.md`).
 
 - **Base de datos** — proyecto Supabase `biblioteca-central` (Postgres 17). La connection string vive en Secret Manager (`database-url` en el proyecto GCP), nunca en el código. Esquema en `backend/database/schema.postgres.sql`.
