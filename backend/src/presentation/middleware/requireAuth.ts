@@ -17,6 +17,7 @@ export function requireAuth(secret: string, ...roles: Role[]): RequestHandler {
     const token = (req.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
     const payload = verifyToken(token, secret);
     if (!payload) {
+      res.setHeader("WWW-Authenticate", 'Bearer realm="biblioteca"'); // RFC 6750
       res.status(401).json({ code: "AUTH_REQUIRED", error: t("AUTH_REQUIRED", req.locale) });
       return;
     }

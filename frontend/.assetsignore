@@ -1,7 +1,6 @@
-.wrangler
-.wrangler/**
+node_modules
+package.json
+package-lock.json
+*.test.js
 wrangler.jsonc
 .assetsignore
-node_modules
-*.test.js
-package.json
