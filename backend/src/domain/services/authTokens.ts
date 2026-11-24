@@ -10,13 +10,18 @@ import { Role } from "../entities/Account";
  * deterministas y testeables). Mismo input -> mismo output.
  */
 
-const TOKEN_TTL_MS = 8 * 60 * 60 * 1000; // 8 horas
+const TOKEN_TTL_S = 8 * 60 * 60; // 8 horas
 
+/** Claims del JWT (RFC 7519). `iat`/`exp` en segundos epoch, como manda el estándar. */
 export interface TokenPayload {
   sub: string; // id de la cuenta
   role: Role;
-  exp: number; // epoch ms
+  iat: number;
+  exp: number;
 }
+
+/** Cabecera fija: solo aceptamos HS256 (evita el ataque `alg: none`). */
+const JWT_HEADER = { alg: "HS256", typ: "JWT" };
 
 const b64url = (buf: Buffer | string): string =>
   Buffer.from(buf).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -44,28 +49,34 @@ export function verifyPassword(password: string, stored: string): boolean {
   return expected.length === actual.length && timingSafeEqual(expected, actual);
 }
 
-/** Firma un token `payload.firma` (HMAC-SHA256). Pura: depende solo de sub/role/secret/now. */
+/**
+ * Firma un JWT estándar `header.payload.firma` (HS256). Pura: depende solo de
+ * sub/role/secret/now. Se puede inspeccionar en https://jwt.io.
+ */
 export function signToken(sub: string, role: Role, secret: string, now = Date.now()): string {
-  const payload = b64url(JSON.stringify({ sub, role, exp: now + TOKEN_TTL_MS }));
-  return `${payload}.${hmac(payload, secret)}`;
+  const iat = Math.floor(now / 1000);
+  const head = b64url(JSON.stringify(JWT_HEADER));
+  const body = b64url(JSON.stringify({ sub, role, iat, exp: iat + TOKEN_TTL_S }));
+  return `${head}.${body}.${hmac(`${head}.${body}`, secret)}`;
 }
 
 /**
- * Verifica firma y expiración de un token. Devuelve el payload o `null`.
+ * Verifica cabecera, firma y expiración de un JWT. Devuelve los claims o `null`.
  * Función STATELESS de referencia: sin BD, sin sesiones en memoria.
  */
 export function verifyToken(token: string, secret: string, now = Date.now()): TokenPayload | null {
-  const [payload, sig] = token.split(".");
-  if (!payload || !sig) return null;
+  const [head, body, sig, extra] = token.split(".");
+  if (!head || !body || !sig || extra !== undefined) return null;
 
-  const expectedSig = hmac(payload, secret);
   const a = Buffer.from(sig);
-  const b = Buffer.from(expectedSig);
+  const b = Buffer.from(hmac(`${head}.${body}`, secret));
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
 
   try {
-    const data = JSON.parse(fromB64url(payload).toString("utf8")) as TokenPayload;
-    if (typeof data.exp !== "number" || data.exp < now) return null;
+    const header = JSON.parse(fromB64url(head).toString("utf8"));
+    if (header.alg !== "HS256") return null;
+    const data = JSON.parse(fromB64url(body).toString("utf8")) as TokenPayload;
+    if (typeof data.exp !== "number" || data.exp <= Math.floor(now / 1000)) return null;
     return data;
   } catch {
     return null;

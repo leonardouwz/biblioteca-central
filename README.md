@@ -84,7 +84,10 @@ GET    /api/v1/debts
 POST   /api/v1/debts/:id/pay
 
 WS     /ws                        aviso {"type":"catalog-changed"} — ver docs/websocket-catalogo-en-vivo.md
+
 ```
+
+Autenticación: `POST /api/v1/auth/login` devuelve un **JWT (HS256)**; los servicios protegidos exigen `Authorization: Bearer <token>`. Ver docs/jwt-servicios-web.md.
 
 ## Fuera de alcance (por ahora)
 
