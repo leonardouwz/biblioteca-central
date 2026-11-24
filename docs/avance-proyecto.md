@@ -1,10 +1,23 @@
 # Avance del proyecto final — Biblioteca Central (arquitectura n-capas)
 
 Sistema de gestión de préstamos de biblioteca. Este documento explica, sobre
-el código, el estado de las cuatro tecnologías pedidas:
+el código, el estado de las tecnologías pedidas en el curso y de lo que se
+agregó por cuenta propia. Actualizado al 24/11/2026.
 
-| # | Tecnología | Estado |
-|---|------------|--------|
+| # | Tecnología | Estado | Detalle |
+|---|------------|--------|---------|
+| 1 | Funciones stateful y stateless | Funcionando | §1 |
+| 2 | Internacionalización | Funcionando (4 idiomas) | §2, [i18n.md](i18n.md) |
+| 3 | Validación front-end y back-end | Funcionando | §3, [validacion-regex.md](validacion-regex.md) |
+| 4 | Web Sockets (catálogo en vivo) | Funcionando y desplegado | §4, [websocket-catalogo-en-vivo.md](websocket-catalogo-en-vivo.md) |
+| 5 | JWT y servicios web (bearer token) | Funcionando y desplegado | §5, [jwt-servicios-web.md](jwt-servicios-web.md) |
+| 6 | Llamadas asíncronas (vista Países) | Funcionando y desplegado | §6 |
+| 7 | Web Workers (búsqueda del catálogo) | Funcionando y desplegado | §7, [web-worker-catalogo.md](web-worker-catalogo.md) |
+| 8 | Integración continua y despliegue remoto | Funcionando | §8, [despliegue-remoto.md](despliegue-remoto.md) |
+| 9 | Seguridad en producción (CORS, límite de intentos) | Funcionando | §9, [auditoria-produccion.md](auditoria-produccion.md) |
+| 10 | Actividades aisladas: pruebas paralelas, RabbitMQ, stream de objetos | Terminadas | §10 |
+
+---|------------|--------|
 | 1 | Funciones stateful y stateless | Funcionando |
 | 2 | Internacionalización | Funcionando (4 idiomas) |
 | 3 | Validación front-end y back-end | Funcionando |
@@ -599,93 +612,126 @@ mensaje ya traducido al idioma del request (sección 2).
 
 ---
 
-## 4. Web Sockets — en implementación
+## 4. Web Sockets — catálogo en vivo
 
-**Estado:** el código está escrito pero todavía no forma parte del avance
-entregado (sin commit ni despliegue). Lo que sigue describe lo que hay hasta
-ahora y puede cambiar.
+**Estado:** terminado, con pruebas (`catalogSocket.test.ts`) y desplegado en
+Cloud Run. Documento completo con capturas:
+[websocket-catalogo-en-vivo.md](websocket-catalogo-en-vivo.md).
 
-**Objetivo:** catálogo en vivo. Cuando alguien crea, edita, presta o
-devuelve un libro, los demás navegadores conectados actualizan el catálogo
-solos, sin recargar la página.
+Cuando alguien crea, edita, presta o devuelve un libro, los demás navegadores
+conectados actualizan el catálogo solos. Un middleware de la capa de
+presentación (`backend/src/presentation/realtime/catalogSocket.ts`, librería
+`ws`) observa las peticiones que modifican libros o préstamos y, si terminaron
+bien, envía `{"type":"catalog-changed"}` a todos los clientes. El WebSocket
+comparte puerto con la API, en `/ws`.
 
-**Servidor** — `backend/src/presentation/realtime/catalogSocket.ts`
-(librería `ws`). Vive en la capa de presentación y no toca el dominio. Un
-middleware observa las peticiones que modifican libros o préstamos y, si
-terminaron bien, avisa a todos los clientes conectados:
-
-```ts
-const notifyOnChange: RequestHandler = (req, res, next) => {
-  if (req.method !== "GET" && /^\/api\/v1\/(books|loans)/.test(req.path)) {
-    res.on("finish", () => {
-      if (res.statusCode >= 400) return;
-      for (const client of wss.clients) {
-        if (client.readyState === WebSocket.OPEN) client.send('{"type":"catalog-changed"}');
-      }
-    });
-  }
-  next();
-};
-```
-
-El WebSocket comparte puerto con la API, en la ruta `/ws`:
-
-```ts
-// backend/src/app.ts
-const catalogSocket = createCatalogSocket();
-app.use(catalogSocket.notifyOnChange);
-// ...
-const server = app.listen(PORT, ...);
-catalogSocket.attach(server); // WebSocket en /ws, mismo puerto que la API
-```
-
-**Cliente** — `frontend/index.html`:
-
-```js
-function connectLive() {
-  if (liveSocket || !localStorage.getItem('authToken')) return;
-  const badge = document.getElementById('catalogLive');
-  liveSocket = new WebSocket((API_BASE_URL || location.origin).replace(/^http/, 'ws') + '/ws');
-  liveSocket.onopen = () => {
-    badge.hidden = false;
-    loadCatalog(); // por si cambió algo mientras estaba desconectado
-  };
-  liveSocket.onmessage = () => loadCatalog();
-  liveSocket.onclose = () => {
-    badge.hidden = true;
-    liveSocket = null;
-    setTimeout(connectLive, 3000);
-  };
-}
-```
-
-**Decisión de diseño:** el mensaje no lleva datos, solo el aviso de que algo
-cambió. El navegador vuelve a pedir el catálogo por la API normal, con su
-token, así que los permisos y la validación siguen pasando por el mismo
-camino de siempre.
-
-**Pendiente:**
-
-- Terminar las pruebas (`catalogSocket.test.ts`) y la verificación de punta
-  a punta.
-- Desplegar y comprobar que funciona en producción.
-- La lista de clientes conectados vive en memoria: funciona con una sola
-  instancia del backend. Si se escala a varias, el aviso tendría que pasar
-  por un canal compartido (por ejemplo `LISTEN/NOTIFY` de Postgres).
+**Decisión de diseño:** el mensaje no lleva datos. El navegador vuelve a pedir
+el catálogo por la API normal, con su token, así que permisos y validación
+siguen el mismo camino. La lista de clientes vive en memoria: con varias
+instancias del backend habría que pasar el aviso por un canal compartido
+(por ejemplo `LISTEN/NOTIFY` de Postgres).
 
 ---
 
-## 5. Cómo ejecutar y probar
+## 5. JWT y servicios web
+
+`POST /api/v1/auth/login` devuelve un **JWT HS256** estándar (RFC 7519) con
+`sub`, `role`, `iat` y `exp` (8 h), firmado con `AUTH_SECRET`. Todos los
+servicios de la API exigen `Authorization: Bearer <token>`; el middleware
+`requireAuth` lo valida sin consultar la base (stateless): sin token o token
+inválido → `401` con `WWW-Authenticate: Bearer`; rol sin permiso → `403`.
+Se rechaza cualquier `alg` distinto de `HS256` y la firma se compara en tiempo
+constante. Detalle y ejemplos con `curl`: [jwt-servicios-web.md](jwt-servicios-web.md).
+
+---
+
+## 6. Llamadas asíncronas — vista Países
+
+Pestaña **Países** del frontend (`frontend/countries.js`): con `fetch` +
+`async/await` pide los países de una región y luego el detalle del país
+elegido (idiomas y su nombre nativo) a la API pública de
+apicountries.com (`https://countries.dev`). Se usa esta API porque
+`restcountries.com/v3.1` fue dado de baja. Las funciones de parseo son puras
+y tienen pruebas (`countries.test.js`); los errores de red se muestran en la
+vista sin romper la página.
+
+![Vista Países](img/21-paises-llamadas-asincronas.png)
+
+---
+
+## 7. Web Workers — búsqueda del catálogo
+
+El filtrado del catálogo corre en `frontend/catalogWorker.js`, en un hilo
+aparte: el catálogo se envía al worker una vez por carga y cada tecla solo
+manda el texto. Cada búsqueda lleva un `id` para descartar respuestas viejas,
+y si el navegador no soporta `Worker` se filtra en el hilo principal. La
+búsqueda además ignora tildes. Detalle: [web-worker-catalogo.md](web-worker-catalogo.md).
+
+---
+
+## 8. Integración continua y despliegue remoto
+
+Todo corre en GitHub Actions; no hace falta tener la laptop encendida.
+
+| Workflow | Qué hace |
+|---|---|
+| `ci.yml` | Pruebas de backend y frontend en cada PR. |
+| `deploy-backend.yml` | Al fusionar a `main`: aplica `schema.postgres.sql` en Supabase y despliega el backend en Cloud Run. |
+| `deploy-frontend.yml` | Despliega el frontend como Cloudflare Worker. |
+| `deploy-apps.yml` | Despliega cada app de `apps-secundarias/` con `package.json` en Cloud Run. |
+| `supabase-keepalive.yml` | Consulta la base cada 3 días para que el plan gratis de Supabase no la pause. |
+| `pruebas-paralelas.yml`, `rabbitmq-demo.yml` | Evidencia de las actividades aisladas (§10). |
+
+Base de datos de producción: Postgres en Supabase. Guía de configuración:
+[despliegue-remoto.md](despliegue-remoto.md).
+
+---
+
+## 9. Seguridad en producción
+
+Resultado de la auditoría ([auditoria-produccion.md](auditoria-produccion.md)):
+
+- **CORS** restringido al dominio del frontend (variable `CORS_ORIGINS`).
+- **Límite de intentos** por IP: login 10 cada 15 min, registro 5 por hora
+  (`429` con `Retry-After`).
+- **Toda la API exige token** (el smoke test del despliegue verifica que
+  `GET /api/v1/books` sin token responde `401`).
+- **Cuentas de prueba eliminadas** de la base de producción (24/11/2026):
+  se borraron las cuentas creadas durante las pruebas (`@example.com`,
+  `demo-admin@biblioteca.test`; 7 en total, 2 de ellas administradoras) y la
+  cuenta real del bibliotecario responsable pasó a ADMINISTRADOR, para que la
+  app no quede sin administrador. La tabla `accounts` no tiene referencias
+  desde préstamos ni deudas, así que no se perdió ningún dato de socios.
+
+---
+
+## 10. Actividades aisladas (`apps-secundarias/`)
+
+Las actividades que no forman parte de la app viven aparte, sin compartir
+código con ella:
+
+| Carpeta | Actividad |
+|---|---|
+| `pruebas-paralelas/` | Ejecución paralela de pruebas con PyTest + pytest-xdist (por clases, suites y casos). |
+| `rabbitmq-producer-consumer/` | Producer/Consumer del tutorial 1 de RabbitMQ en Python, con Docker. |
+| `stream-objetos/` | Stream de objetos con `node:stream`, desplegado en Cloud Run. |
+
+---
+
+## 11. Cómo ejecutar y probar
 
 ```bash
 cd backend
 npm install
 npm run dev         # API + frontend en http://localhost:3000 (SQLite local)
-npm test            # pruebas del dominio (multas, tokens, validación, i18n)
+npm test            # dominio (multas, tokens, validación, i18n) y WebSocket
 npm run i18n:check  # todos los idiomas completos y con placeholders correctos
 ```
 
 ```bash
 cd frontend
-npm test            # format.js, validators.js, catalog.js, openLibrary.js
+npm test            # format, validators, catalog, openLibrary, countries
 ```
+
+En producción no hace falta ejecutar nada: cada merge a `main` prueba y
+despliega (§8).
