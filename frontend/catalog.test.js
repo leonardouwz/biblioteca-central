@@ -34,3 +34,23 @@ test("filterBooks: no rompe si el libro no tiene autor/título (undefined)", () 
   const result = filterBooks([{ title: "Solo título" }, { author: "Solo autor" }], "solo");
   assert.equal(result.length, 2);
 });
+
+test("filterBooks: ignora tildes en la búsqueda y en el libro", () => {
+  assert.equal(filterBooks(books, "garcia marquez").length, 1);
+  assert.equal(filterBooks(books, "ÁTOMIC").length, 1);
+});
+
+test("catalogWorker.js: guarda el catálogo y responde el filtro con su id", () => {
+  const fs = require("node:fs");
+  const vm = require("node:vm");
+  const sent = [];
+  const self = { postMessage: (m) => sent.push(m) };
+  const ctx = vm.createContext({ self });
+  ctx.importScripts = () => { ctx.Catalog = require("./catalog.js"); }; // en el navegador, catalog.js define `Catalog` global
+  vm.runInContext(fs.readFileSync(__dirname + "/catalogWorker.js", "utf8"), ctx);
+  self.onmessage({ data: { type: "set", books } });
+  self.onmessage({ data: { type: "filter", id: 7, query: "clear" } });
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].id, 7);
+  assert.deepEqual(sent[0].books.map((b) => b.author), ["James Clear"]);
+});

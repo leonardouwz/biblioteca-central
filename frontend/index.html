@@ -790,15 +790,29 @@
         .join('');
     }
 
+    // La búsqueda corre en un Web Worker (catalogWorker.js) para no bloquear
+    // la UI con catálogos grandes. Sin soporte de Worker, filtra aquí mismo.
+    const catalogWorker = window.Worker ? new Worker('catalogWorker.js') : null;
+    let catalogQueryId = 0;
+    if (catalogWorker) {
+      catalogWorker.onmessage = (e) => {
+        if (e.data.id === catalogQueryId) renderCatalogGrid(e.data.books); // descarta respuestas de teclas anteriores
+      };
+    }
+
+    function filterCatalog(query) {
+      if (!catalogWorker) return renderCatalogGrid(Catalog.filterBooks(allCatalogBooks, query));
+      catalogWorker.postMessage({ type: 'filter', id: ++catalogQueryId, query });
+    }
+
     async function loadCatalog() {
       const { data } = await fetchJson('/api/v1/books');
       allCatalogBooks = data || [];
-      renderCatalogGrid(Catalog.filterBooks(allCatalogBooks, document.getElementById('catalogSearch').value));
+      catalogWorker?.postMessage({ type: 'set', books: allCatalogBooks });
+      filterCatalog(document.getElementById('catalogSearch').value);
     }
 
-    document.getElementById('catalogSearch').addEventListener('input', (e) => {
-      renderCatalogGrid(Catalog.filterBooks(allCatalogBooks, e.target.value));
-    });
+    document.getElementById('catalogSearch').addEventListener('input', (e) => filterCatalog(e.target.value));
 
     // ---------- Catálogo en vivo (WebSocket) ----------
     // El servidor avisa cuando cambia un libro o un préstamo; el aviso no trae
