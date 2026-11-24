@@ -36,6 +36,8 @@ export function createDatabaseConnection(): DatabaseSync {
 
   ensureColumn(db, "books", "cover_url", "TEXT");
   ensureColumn(db, "books", "publish_year", "INTEGER");
+  ensureColumn(db, "accounts", "last_login_at", "TEXT");
+  ensureColumn(db, "accounts", "last_login_method", "TEXT");
 
   return db;
 }

@@ -35,6 +35,17 @@ export class UserService {
     return this.debtRepository.findByUserId(id);
   }
 
+  /** Panel del socio: su ficha (por email de la cuenta), préstamos y deudas. Sin ficha -> listas vacías. */
+  async getMemberSummary(email: string): Promise<{ user: User | null; loans: LoanWithBookTitle[]; debts: Debt[] }> {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) return { user: null, loans: [], debts: [] };
+    const [loans, debts] = await Promise.all([
+      this.loanService.getLoansByUserId(user.id),
+      this.debtRepository.findByUserId(user.id),
+    ]);
+    return { user, loans, debts };
+  }
+
   async createUser(name: string, email: string): Promise<User> {
     await this.validate(name, email);
     return this.userRepository.create({ name, email, status: "ACTIVE" });

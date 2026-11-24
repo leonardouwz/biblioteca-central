@@ -37,7 +37,7 @@ Supabase (Postgres, vía pooler Supavisor)
 ```
 
 - **Frontend** — https://biblioteca-central.readuls.workers.dev
-  Desplegado como Worker de assets estáticos (sin build, `frontend/wrangler.jsonc`). `frontend/index.html` apunta al backend vía la constante `API_BASE_URL` (buscarla si el backend cambia de URL).
+  Desplegado como Worker de assets estáticos (sin build, `frontend/wrangler.jsonc`). `frontend/app.js` apunta al backend vía la constante `API_BASE_URL` (buscarla si el backend cambia de URL).
   Redeploy: automático al fusionar a `main` (ver `docs/despliegue-remoto.md`).
 
 - **Backend** — https://biblioteca-backend-438047115829.us-central1.run.app

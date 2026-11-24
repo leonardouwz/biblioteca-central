@@ -705,7 +705,6 @@
     "text": "تم تحديث الإعدادات.",
     "mt": true
   },
-
   "nav.countries": {
     "text": "الدول",
     "mt": true
@@ -748,6 +747,139 @@
   },
   "countries.error": {
     "text": "تعذر الاتصال بـ apicountries.com. حاول مرة أخرى.",
+    "mt": true
+  },
+  "nav.main": {
+    "text": "التنقل الرئيسي",
+    "mt": true
+  },
+  "nav.panel": {
+    "text": "لوحتي",
+    "mt": true
+  },
+  "nav.signIn": {
+    "text": "تسجيل الدخول",
+    "mt": true
+  },
+  "nav.summary": {
+    "text": "نظرة عامة",
+    "mt": true
+  },
+  "home.eyebrow": {
+    "text": "مكتبة عامة · مفتوحة للجميع",
+    "mt": true
+  },
+  "home.title": {
+    "text": "اعثر على قراءتك التالية",
+    "mt": true
+  },
+  "home.lead": {
+    "text": "تصفح الفهرس وتوافر الكتب في الوقت الفعلي. سجّل الدخول لرؤية إعاراتك وديونك.",
+    "mt": true
+  },
+  "home.statsTitle": {
+    "text": "على الرف اليوم",
+    "mt": true
+  },
+  "home.statTitles": {
+    "text": "عناوين",
+    "mt": true
+  },
+  "home.statAvailable": {
+    "text": "نسخ متاحة",
+    "mt": true
+  },
+  "home.statAuthors": {
+    "text": "مؤلفون",
+    "mt": true
+  },
+  "home.statOut": {
+    "text": "غير متوفرة",
+    "mt": true
+  },
+  "home.ctaTitle": {
+    "text": "هل أنت عضو بالفعل؟",
+    "mt": true
+  },
+  "home.ctaText": {
+    "text": "راجع إعاراتك ومواعيد الإرجاع والغرامات من لوحتك.",
+    "mt": true
+  },
+  "home.footer": {
+    "text": "Biblioteca Central · بنية متعددة الطبقات",
+    "mt": true
+  },
+  "home.resultsCount": {
+    "one": "كتاب واحد",
+    "other": "{count} كتب",
+    "mt": true
+  },
+  "auth.welcomeTitle": {
+    "text": "مرحبًا",
+    "mt": true
+  },
+  "auth.welcomeLead": {
+    "text": "سجّل الدخول لفتح لوحتك.",
+    "mt": true
+  },
+  "auth.registerTab": {
+    "text": "إنشاء حساب",
+    "mt": true
+  },
+  "auth.orEmail": {
+    "text": "أو باستخدام بريدك الإلكتروني",
+    "mt": true
+  },
+  "me.eyebrow": {
+    "text": "حسابي",
+    "mt": true
+  },
+  "me.greeting": {
+    "text": "مرحبًا، {name}",
+    "mt": true
+  },
+  "me.noRecord": {
+    "text": "حسابك غير مرتبط بعد بسجل عضو. توجّه إلى مكتب الاستقبال بهذا البريد.",
+    "mt": true
+  },
+  "me.activeLoans": {
+    "text": "إعارات نشطة",
+    "mt": true
+  },
+  "me.overdueLoans": {
+    "text": "متأخرة",
+    "mt": true
+  },
+  "me.unpaidDebt": {
+    "text": "ديون غير مدفوعة",
+    "mt": true
+  },
+  "panel.roleArea": {
+    "text": "اللوحة · {role}",
+    "mt": true
+  },
+  "panel.staffTitle": {
+    "text": "نظرة عامة على المكتبة",
+    "mt": true
+  },
+  "panel.activeMembers": {
+    "text": "أعضاء نشطون",
+    "mt": true
+  },
+  "panel.overdueTitle": {
+    "text": "إعارات متأخرة",
+    "mt": true
+  },
+  "panel.seeAll": {
+    "text": "عرض الكل",
+    "mt": true
+  },
+  "panel.noOverdue": {
+    "text": "لا توجد إعارات متأخرة.",
+    "mt": true
+  },
+  "auth.lastUsed": {
+    "text": "آخر ما استُخدم",
     "mt": true
   }
 }
