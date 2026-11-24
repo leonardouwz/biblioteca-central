@@ -616,11 +616,11 @@
     </table></div>
   </section>
 
-  <!-- ==================== PAÍSES (actividad: llamadas asíncronas con REST Countries) ==================== -->
+  <!-- ==================== PAÍSES (actividad: llamadas asíncronas con apicountries.com) ==================== -->
   <section id="tab-countries" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-countries">
     <div class="card">
       <h2 data-i18n="countries.title">Países del mundo</h2>
-      <p data-i18n="countries.source">Datos en vivo de REST Countries (restcountries.com).</p>
+      <p data-i18n="countries.source">Datos en vivo de apicountries.com (countries.dev).</p>
       <label for="countryRegion" data-i18n="countries.region">Región</label>
       <select id="countryRegion"></select>
       <label for="countrySelect" data-i18n="countries.country">País</label>
@@ -631,8 +631,8 @@
       <caption id="countryCaption"></caption>
       <thead><tr>
         <th data-i18n="countries.colLanguage">Idioma</th>
-        <th data-i18n="countries.colNativeCommon">Nombre nativo</th>
-        <th data-i18n="countries.colNativeOfficial">Nombre nativo oficial</th>
+        <th data-i18n="countries.colLanguageNative">Idioma (nombre nativo)</th>
+        <th data-i18n="countries.colCountryNative">Nombre nativo del país</th>
       </tr></thead>
       <tbody id="countryTableBody"></tbody>
     </table></div>
@@ -722,7 +722,7 @@
       });
     });
 
-    // ---------- Países (llamadas asíncronas a REST Countries) ----------
+    // ---------- Países (llamadas asíncronas a apicountries.com) ----------
     const regionSel = document.getElementById('countryRegion');
     const countrySel = document.getElementById('countrySelect');
     const countryResult = document.getElementById('countryResult');
@@ -763,11 +763,11 @@
       countryResult.style.display = 'none';
       if (!countrySel.value) return;
       try {
-        const { name, rows } = await Countries.fetchCountryDetail(countrySel.value);
+        const { name, nativeName, rows } = await Countries.fetchCountryDetail(countrySel.value);
         if (req !== countryRequest) return;
         document.getElementById('countryCaption').textContent = name;
         document.getElementById('countryTableBody').innerHTML = rows.map((r) =>
-          `<tr><td>${escapeHtml(r.language)}</td><td>${escapeHtml(r.nativeCommon)}</td><td>${escapeHtml(r.nativeOfficial)}</td></tr>`).join('');
+          `<tr><td>${escapeHtml(r.language)}</td><td>${escapeHtml(r.languageNative)}</td><td>${escapeHtml(nativeName)}</td></tr>`).join('');
         wrap.style.display = '';
       } catch {
         if (req !== countryRequest) return;

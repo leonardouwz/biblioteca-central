@@ -200,13 +200,13 @@
 
   "nav.countries": "Countries",
   "countries.title": "Countries of the world",
-  "countries.source": "Live data from REST Countries (restcountries.com).",
+  "countries.source": "Live data from apicountries.com (countries.dev).",
   "countries.region": "Region",
   "countries.country": "Country",
   "countries.choose": "— Select —",
   "countries.loading": "Loading…",
   "countries.colLanguage": "Language",
-  "countries.colNativeCommon": "Native name",
-  "countries.colNativeOfficial": "Official native name",
-  "countries.error": "Could not reach REST Countries. Try again."
+  "countries.colLanguageNative": "Language (native name)",
+  "countries.colCountryNative": "Country native name",
+  "countries.error": "Could not reach apicountries.com. Try again."
 }

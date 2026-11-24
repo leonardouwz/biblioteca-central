@@ -715,7 +715,7 @@
     "mt": true
   },
   "countries.source": {
-    "text": "بيانات مباشرة من REST Countries (restcountries.com).",
+    "text": "بيانات مباشرة من apicountries.com (countries.dev).",
     "mt": true
   },
   "countries.region": {
@@ -738,16 +738,16 @@
     "text": "اللغة",
     "mt": true
   },
-  "countries.colNativeCommon": {
-    "text": "الاسم الأصلي",
+  "countries.colLanguageNative": {
+    "text": "اللغة (الاسم الأصلي)",
     "mt": true
   },
-  "countries.colNativeOfficial": {
-    "text": "الاسم الأصلي الرسمي",
+  "countries.colCountryNative": {
+    "text": "الاسم الأصلي للدولة",
     "mt": true
   },
   "countries.error": {
-    "text": "تعذر الاتصال بـ REST Countries. حاول مرة أخرى.",
+    "text": "تعذر الاتصال بـ apicountries.com. حاول مرة أخرى.",
     "mt": true
   }
 }

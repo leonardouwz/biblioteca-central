@@ -200,13 +200,13 @@
 
   "nav.countries": "Pays",
   "countries.title": "Pays du monde",
-  "countries.source": "Données en direct de REST Countries (restcountries.com).",
+  "countries.source": "Données en direct de apicountries.com (countries.dev).",
   "countries.region": "Région",
   "countries.country": "Pays",
   "countries.choose": "— Choisir —",
   "countries.loading": "Chargement…",
   "countries.colLanguage": "Langue",
-  "countries.colNativeCommon": "Nom natif",
-  "countries.colNativeOfficial": "Nom natif officiel",
-  "countries.error": "Impossible de joindre REST Countries. Réessayez."
+  "countries.colLanguageNative": "Langue (nom natif)",
+  "countries.colCountryNative": "Nom natif du pays",
+  "countries.error": "Impossible de joindre apicountries.com. Réessayez."
 }
