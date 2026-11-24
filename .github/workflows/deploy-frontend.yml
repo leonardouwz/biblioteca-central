@@ -24,3 +24,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: frontend
           command: deploy
+          wranglerVersion: '4.50.0' # la 3.x que trae la acción no soporta Workers solo de assets

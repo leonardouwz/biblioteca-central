@@ -35,13 +35,14 @@ for ROLE in run.admin iam.serviceAccountUser cloudbuild.builds.editor storage.ad
   gcloud projects add-iam-policy-binding $PROJECT --member "serviceAccount:$SA" --role "roles/$ROLE" --condition=None -q >/dev/null
 done
 gcloud iam service-accounts keys create key.json --iam-account $SA
-cat key.json   # copiar TODO el contenido
+base64 -w0 key.json; echo   # copiar TODA la línea que imprime
 rm key.json
 ```
 
 En GitHub: **Settings → Secrets and variables → Actions → New repository secret**
 - Nombre: `GCP_SA_KEY`
-- Valor: el contenido completo de `key.json`.
+- Valor: la línea en base64. (Pegar el JSON directo desde la terminal suele romperse,
+  porque la terminal corta la llave privada en varias líneas; el base64 no tiene ese problema.)
 
 Los secretos de la app (`database-url` y `auth-secret`) ya están en Secret Manager y
 no pasan por GitHub: el workflow solo los referencia con `--set-secrets`.
@@ -54,7 +55,33 @@ no pasan por GitHub: el workflow solo los referencia con `--set-secrets`.
    o en la URL `dash.cloudflare.com/<account-id>/...`.
 3. En GitHub, crear dos secretos de repositorio: `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID`.
 
-### 3. (Opcional) Variable `GCP_PROJECT_ID`
+### 3. Base de datos (Supabase) → secreto `SUPABASE_DB_URL`
+
+El despliegue del backend aplica `backend/database/schema.postgres.sql` en Supabase
+**antes** de desplegar el código. Si el SQL falla, no se despliega nada. El esquema es
+idempotente (`IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`, `ON CONFLICT DO NOTHING`), así que
+se puede aplicar en cada despliegue.
+
+1. Supabase → proyecto `biblioteca-central` → botón **Connect** (arriba) → **Connection string**
+   → **Session pooler** (o *Transaction pooler*). Copiar la URI y reemplazar
+   `[YOUR-PASSWORD]` por la contraseña de la base de datos.
+   (Es el mismo valor que ya está en Secret Manager como `database-url`.)
+2. En GitHub, crear el secreto de repositorio `SUPABASE_DB_URL` con esa URI.
+
+Sin este secreto el paso se salta con un aviso, y el backend sigue aplicando el esquema
+al arrancar, igual que antes.
+
+**Cambiar la base de datos**: editar `backend/database/schema.postgres.sql` (y su par SQLite,
+`database/schema.sql`) agregando sentencias que se puedan repetir sin romper, por ejemplo
+`ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...`. Nunca un `DROP` o un `ALTER` destructivo
+sin respaldo. Al fusionar a `main`, el workflow del backend lo aplica.
+
+**Cambiar la contraseña de la base de datos**: actualizar el secreto `SUPABASE_DB_URL` en GitHub
+y la versión de `database-url` en Secret Manager
+(`gcloud secrets versions add database-url --data-file=-` en Cloud Shell, pegar la URI y Ctrl+D),
+y volver a desplegar el backend desde Actions → *Deploy backend* → *Run workflow*.
+
+### 4. (Opcional) Variable `GCP_PROJECT_ID`
 
 Si el proyecto de Google Cloud cambia, crear en GitHub una **variable** (pestaña
 *Variables*, no *Secrets*) `GCP_PROJECT_ID`. Si no existe, se usa `biblioteca-central-2026`.
