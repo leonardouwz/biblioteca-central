@@ -148,6 +148,10 @@ dueño del proyecto o acceso que este entorno no tiene:
 - **Límite de intentos**: `POST /auth/login` 10 por IP cada 15 min,
   `POST /auth/register` 5 por IP por hora; responde `429` con
   `Retry-After`. El contador vive en memoria de cada instancia de Cloud Run.
+- **Cuentas de prueba borradas (24/11/2026)**: se eliminaron las 7 cuentas
+  de prueba de producción (`demo-admin@biblioteca.test` y las `@example.com`)
+  con un workflow temporal de GitHub Actions, y la cuenta real del
+  bibliotecario pasó a ADMINISTRADOR (si no, la app quedaba sin admin).
 - **Cuentas de prueba admin**: no hay seed ni cuentas en el código (la única
   regla es "la primera cuenta es ADMINISTRADOR"). Las cuentas de prueba
   existen solo en la base de producción y hay que borrarlas a mano en
