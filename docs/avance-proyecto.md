@@ -11,17 +11,12 @@ agregó por cuenta propia. Actualizado al 24/11/2026.
 | 3 | Validación front-end y back-end | Funcionando | §3, [validacion-regex.md](validacion-regex.md) |
 | 4 | Web Sockets (catálogo en vivo) | Funcionando y desplegado | §4, [websocket-catalogo-en-vivo.md](websocket-catalogo-en-vivo.md) |
 | 5 | JWT y servicios web (bearer token) | Funcionando y desplegado | §5, [jwt-servicios-web.md](jwt-servicios-web.md) |
-| 6 | Llamadas asíncronas (vista Países) | Funcionando y desplegado | §6 |
+| 6 | Llamadas asíncronas (vista Países) | Funcionando y desplegado | §6, [llamadas-asincronas-paises.md](llamadas-asincronas-paises.md) |
 | 7 | Web Workers (búsqueda del catálogo) | Funcionando y desplegado | §7, [web-worker-catalogo.md](web-worker-catalogo.md) |
 | 8 | Integración continua y despliegue remoto | Funcionando | §8, [despliegue-remoto.md](despliegue-remoto.md) |
 | 9 | Seguridad en producción (CORS, límite de intentos) | Funcionando | §9, [auditoria-produccion.md](auditoria-produccion.md) |
 | 10 | Actividades aisladas: pruebas paralelas, RabbitMQ, stream de objetos | Terminadas | §10 |
 
----|------------|--------|
-| 1 | Funciones stateful y stateless | Funcionando |
-| 2 | Internacionalización | Funcionando (4 idiomas) |
-| 3 | Validación front-end y back-end | Funcionando |
-| 4 | Web Sockets | **En implementación** |
 
 ---
 
@@ -636,8 +631,10 @@ instancias del backend habría que pasar el aviso por un canal compartido
 ## 5. JWT y servicios web
 
 `POST /api/v1/auth/login` devuelve un **JWT HS256** estándar (RFC 7519) con
-`sub`, `role`, `iat` y `exp` (8 h), firmado con `AUTH_SECRET`. Todos los
-servicios de la API exigen `Authorization: Bearer <token>`; el middleware
+`sub`, `role`, `email`, `iat` y `exp` (8 h), firmado con `AUTH_SECRET`; el login
+con Google (`POST /api/v1/auth/google`) emite ese mismo JWT. Todos los
+servicios, salvo el catálogo público de solo lectura, exigen
+`Authorization: Bearer <token>`; el middleware
 `requireAuth` lo valida sin consultar la base (stateless): sin token o token
 inválido → `401` con `WWW-Authenticate: Bearer`; rol sin permiso → `403`.
 Se rechaza cualquier `alg` distinto de `HS256` y la firma se compara en tiempo
@@ -647,7 +644,7 @@ constante. Detalle y ejemplos con `curl`: [jwt-servicios-web.md](jwt-servicios-w
 
 ## 6. Llamadas asíncronas — vista Países
 
-Pestaña **Países** del frontend (`frontend/countries.js`): con `fetch` +
+Sección **Países** del panel (`#/panel/paises`, menú lateral tras iniciar sesión) (`frontend/countries.js`): con `fetch` +
 `async/await` pide los países de una región y luego el detalle del país
 elegido (idiomas y su nombre nativo) a la API pública de
 apicountries.com (`https://countries.dev`). Se usa esta API porque
@@ -655,7 +652,9 @@ apicountries.com (`https://countries.dev`). Se usa esta API porque
 y tienen pruebas (`countries.test.js`); los errores de red se muestran en la
 vista sin romper la página.
 
-![Vista Países](img/21-paises-llamadas-asincronas.png)
+Detalle: [llamadas-asincronas-paises.md](llamadas-asincronas-paises.md).
+
+![Vista Países](img/36-paises-llamadas-asincronas.png)
 
 ---
 
@@ -694,8 +693,9 @@ Resultado de la auditoría ([auditoria-produccion.md](auditoria-produccion.md)):
 - **CORS** restringido al dominio del frontend (variable `CORS_ORIGINS`).
 - **Límite de intentos** por IP: login 10 cada 15 min, registro 5 por hora
   (`429` con `Retry-After`).
-- **Toda la API exige token** (el smoke test del despliegue verifica que
-  `GET /api/v1/books` sin token responde `401`).
+- **La API exige token** salvo el catálogo de solo lectura, que es público
+  desde el rediseño (el smoke test del despliegue verifica `GET /api/v1/books`
+  → `200` y `GET /api/v1/loans` sin token → `401`).
 - **Cuentas de prueba eliminadas** de la base de producción (24/11/2026):
   se borraron las cuentas creadas durante las pruebas (`@example.com`,
   `demo-admin@biblioteca.test`; 7 en total, 2 de ellas administradoras) y la
