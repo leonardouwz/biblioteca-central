@@ -32,6 +32,7 @@ jobs:
         # aplicar en cada despliegue. Si falla, no se despliega el backend.
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGOPTIONS: -c client_min_messages=warning # oculta los avisos "already exists, skipping"
         run: |
           if [ -z "$SUPABASE_DB_URL" ]; then echo "::warning::Falta el secreto SUPABASE_DB_URL; el backend aplicará el esquema al arrancar."; exit 0; fi
           psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f database/schema.postgres.sql
@@ -52,5 +53,7 @@ jobs:
       - name: Prueba de humo
         run: |
           url=$(gcloud run services describe biblioteca-backend --region "$REGION" --project "$GCP_PROJECT" --format='value(status.url)')
-          curl -fsS --retry 5 --retry-delay 5 -o /dev/null "$url/api/v1/books"
+          # El backend solo escucha después de conectarse a Postgres, así que si "/" responde, la BD está bien.
+          # (No usar /api/v1/books: pide login y responde 401.)
+          curl -fsS --retry 5 --retry-delay 5 -o /dev/null "$url/"
           echo "Backend: $url" >> "$GITHUB_STEP_SUMMARY"
