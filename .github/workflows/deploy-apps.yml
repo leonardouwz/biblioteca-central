@@ -1,0 +1,78 @@
+name: Deploy apps secundarias (Cloud Run)
+
+# Cada carpeta apps-secundarias/<nombre>/ con package.json se despliega como el
+# servicio Cloud Run <nombre>. En un push solo se despliegan las carpetas que cambiaron.
+on:
+  push:
+    branches: [main]
+    paths: ['apps-secundarias/**']
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'Carpeta dentro de apps-secundarias/ (vacío = todas)'
+        required: false
+
+concurrency: deploy-apps
+
+env:
+  GCP_PROJECT: ${{ vars.GCP_PROJECT_ID || 'biblioteca-central-2026' }}
+  REGION: us-central1
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.list.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: list
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_APP: ${{ inputs.app }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = workflow_dispatch ]; then
+            dirs=${INPUT_APP:-$(ls apps-secundarias)}
+          else
+            dirs=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- apps-secundarias | cut -d/ -f2 | sort -u)
+          fi
+          apps=$(for d in $dirs; do [ -f "apps-secundarias/$d/package.json" ] && echo "$d"; done | jq -R . | jq -sc .)
+          echo "apps=$apps" >> "$GITHUB_OUTPUT"
+          echo "Apps a desplegar: $apps"
+
+  deploy:
+    needs: detect
+    if: needs.detect.outputs.apps != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.detect.outputs.apps) }}
+    defaults:
+      run:
+        working-directory: apps-secundarias/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - run: npm test --if-present # si fallan las pruebas, no se despliega
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: gcloud run deploy
+        run: >
+          gcloud run deploy "${{ matrix.app }}"
+          --source .
+          --region "$REGION"
+          --project "$GCP_PROJECT"
+          --allow-unauthenticated
+          --quiet
+      - name: URL
+        run: |
+          url=$(gcloud run services describe "${{ matrix.app }}" --region "$REGION" --project "$GCP_PROJECT" --format='value(status.url)')
+          echo "${{ matrix.app }}: $url" >> "$GITHUB_STEP_SUMMARY"
