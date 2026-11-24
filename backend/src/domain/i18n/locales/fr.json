@@ -46,5 +46,8 @@
   "BODY_STOCK_INVALID": "quantity (number) est requis.",
   "BODY_USER_INVALID": "name (string) et email (string) sont requis.",
   "BODY_STATUS_INVALID": "status doit être ACTIVE ou INACTIVE.",
-  "BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans et loanPeriodDays (number) sont requis."
+  "BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans et loanPeriodDays (number) sont requis.",
+  "AUTH_GOOGLE_DISABLED": "La connexion avec Google n'est pas configurée.",
+  "AUTH_GOOGLE_INVALID": "Impossible de vérifier votre compte Google. Veuillez réessayer.",
+  "BODY_GOOGLE_INVALID": "credential (string) est requis."
 }

@@ -54,6 +54,9 @@ CREATE TABLE IF NOT EXISTS accounts (
   role TEXT NOT NULL CHECK (role IN ('USUARIO', 'BIBLIOTECARIO', 'ADMINISTRADOR')),
   created_at TIMESTAMPTZ NOT NULL
 );
+-- Último inicio de sesión (para "último usado" / auditoría). Aditivo e idempotente.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_method TEXT;
 
 CREATE TABLE IF NOT EXISTS settings (
   id TEXT PRIMARY KEY,

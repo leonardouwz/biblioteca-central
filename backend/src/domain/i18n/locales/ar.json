@@ -47,5 +47,8 @@
   "BODY_STOCK_INVALID": { "text": "الكمية (رقم) مطلوبة.", "mt": true },
   "BODY_USER_INVALID": { "text": "الاسم والبريد الإلكتروني مطلوبان.", "mt": true },
   "BODY_STATUS_INVALID": { "text": "يجب أن تكون الحالة ACTIVE أو INACTIVE.", "mt": true },
-  "BODY_SETTINGS_INVALID": { "text": "الحقول hourlyLateFeeRate وdebtMultiplier وmaxActiveLoans وloanPeriodDays (أرقام) مطلوبة.", "mt": true }
+  "BODY_SETTINGS_INVALID": { "text": "الحقول hourlyLateFeeRate وdebtMultiplier وmaxActiveLoans وloanPeriodDays (أرقام) مطلوبة.", "mt": true },
+  "AUTH_GOOGLE_DISABLED": { "text": "تسجيل الدخول باستخدام Google غير مُفعّل.", "mt": true },
+  "AUTH_GOOGLE_INVALID": { "text": "تعذّر التحقق من حساب Google الخاص بك. حاول مرة أخرى.", "mt": true },
+  "BODY_GOOGLE_INVALID": { "text": "الحقل credential (نص) مطلوب.", "mt": true }
 }

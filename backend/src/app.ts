@@ -28,6 +28,7 @@ import { UserService } from "./domain/services/UserService";
 import { LoanService } from "./domain/services/LoanService";
 import { DebtService } from "./domain/services/DebtService";
 import { AuthService } from "./domain/services/AuthService";
+import { createGoogleVerifier } from "./domain/services/googleIdToken";
 import { SettingsService } from "./domain/services/SettingsService";
 
 import { BookController } from "./presentation/controllers/BookController";
@@ -92,7 +93,13 @@ async function main(): Promise<void> {
   const loanService = new LoanService(loanRepository, bookRepository, userRepository, debtRepository, settingsRepository);
   const userService = new UserService(userRepository, loanService, debtRepository);
   const debtService = new DebtService(debtRepository);
-  const authService = new AuthService(accountRepository, authSecret);
+  // Login con Google: se activa solo si hay GOOGLE_CLIENT_ID (ID de cliente OAuth web).
+  const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
+  const authService = new AuthService(
+    accountRepository,
+    authSecret,
+    googleClientId ? createGoogleVerifier(googleClientId) : null
+  );
   const settingsService = new SettingsService(settingsRepository);
 
   // --- Presentación (Servicio -> Controlador) ---
@@ -100,7 +107,7 @@ async function main(): Promise<void> {
   const userController = new UserController(userService);
   const loanController = new LoanController(loanService);
   const debtController = new DebtController(debtService);
-  const authController = new AuthController(authService, authSecret);
+  const authController = new AuthController(authService, authSecret, googleClientId);
   const settingsController = new SettingsController(settingsService);
 
   // --- Aplicación Express ---

@@ -206,6 +206,8 @@ CREATE TABLE IF NOT EXISTS accounts (
 |--------|------|-------------|
 | `POST` | `/api/v1/auth/register` | `{ email, password, role? }` → `{ account, token }` |
 | `POST` | `/api/v1/auth/login` | `{ email, password }` → `{ account, token }` |
+| `POST` | `/api/v1/auth/google` | `{ credential }` (ID token de Google) → `{ account, token }` — ver [login-google.md](login-google.md) |
+| `GET`  | `/api/v1/auth/config` | → `{ googleClientId }` (null si Google no está configurado) |
 | `GET`  | `/api/v1/auth/me` | Header `Authorization: Bearer <token>` → payload del token o 401 |
 
 Variable de entorno `AUTH_SECRET` (secreto para firmar tokens). Si no está
