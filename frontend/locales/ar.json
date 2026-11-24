@@ -704,5 +704,50 @@
   "settings.saved": {
     "text": "تم تحديث الإعدادات.",
     "mt": true
+  },
+
+  "nav.countries": {
+    "text": "الدول",
+    "mt": true
+  },
+  "countries.title": {
+    "text": "دول العالم",
+    "mt": true
+  },
+  "countries.source": {
+    "text": "بيانات مباشرة من REST Countries (restcountries.com).",
+    "mt": true
+  },
+  "countries.region": {
+    "text": "المنطقة",
+    "mt": true
+  },
+  "countries.country": {
+    "text": "الدولة",
+    "mt": true
+  },
+  "countries.choose": {
+    "text": "— اختر —",
+    "mt": true
+  },
+  "countries.loading": {
+    "text": "جارٍ التحميل…",
+    "mt": true
+  },
+  "countries.colLanguage": {
+    "text": "اللغة",
+    "mt": true
+  },
+  "countries.colNativeCommon": {
+    "text": "الاسم الأصلي",
+    "mt": true
+  },
+  "countries.colNativeOfficial": {
+    "text": "الاسم الأصلي الرسمي",
+    "mt": true
+  },
+  "countries.error": {
+    "text": "تعذر الاتصال بـ REST Countries. حاول مرة أخرى.",
+    "mt": true
   }
 }

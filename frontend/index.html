@@ -479,6 +479,7 @@
     <button class="tab-btn" id="tabbtn-users" role="tab" aria-selected="false" aria-controls="tab-users" data-tab="users" data-i18n="nav.users">Usuarios</button>
     <button class="tab-btn" id="tabbtn-debts" role="tab" aria-selected="false" aria-controls="tab-debts" data-tab="debts" data-i18n="nav.debts">Deudas</button>
     <button class="tab-btn" id="tabbtn-settings" role="tab" aria-selected="false" aria-controls="tab-settings" data-tab="settings" data-i18n="nav.settings">Configuración</button>
+    <button class="tab-btn" id="tabbtn-countries" role="tab" aria-selected="false" aria-controls="tab-countries" data-tab="countries" data-i18n="nav.countries">Países</button>
   </div>
 
   <!-- ==================== CATÁLOGO (público, cualquier socio logueado) ==================== -->
@@ -615,6 +616,28 @@
     </table></div>
   </section>
 
+  <!-- ==================== PAÍSES (actividad: llamadas asíncronas con REST Countries) ==================== -->
+  <section id="tab-countries" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-countries">
+    <div class="card">
+      <h2 data-i18n="countries.title">Países del mundo</h2>
+      <p data-i18n="countries.source">Datos en vivo de REST Countries (restcountries.com).</p>
+      <label for="countryRegion" data-i18n="countries.region">Región</label>
+      <select id="countryRegion"></select>
+      <label for="countrySelect" data-i18n="countries.country">País</label>
+      <select id="countrySelect" disabled></select>
+      <div id="countryResult" class="result" role="status" aria-live="polite" style="display:none"></div>
+    </div>
+    <div id="countryTableWrap" class="table-wrap" style="display:none"><table>
+      <caption id="countryCaption"></caption>
+      <thead><tr>
+        <th data-i18n="countries.colLanguage">Idioma</th>
+        <th data-i18n="countries.colNativeCommon">Nombre nativo</th>
+        <th data-i18n="countries.colNativeOfficial">Nombre nativo oficial</th>
+      </tr></thead>
+      <tbody id="countryTableBody"></tbody>
+    </table></div>
+  </section>
+
   <!-- ==================== CONFIGURACIÓN (solo administrador) ==================== -->
   <section id="tab-settings" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-settings">
     <div class="card">
@@ -675,6 +698,7 @@
   <script src="validators.js"></script>
   <script src="openLibrary.js"></script>
   <script src="catalog.js"></script>
+  <script src="countries.js"></script>
   <script src="i18n.js"></script>
   <script>
     const { t, formatCurrency, formatDate, translateError, setLocale, getLocale } = window.I18n;
@@ -696,6 +720,59 @@
         btn.setAttribute('aria-selected', 'true');
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
       });
+    });
+
+    // ---------- Países (llamadas asíncronas a REST Countries) ----------
+    const regionSel = document.getElementById('countryRegion');
+    const countrySel = document.getElementById('countrySelect');
+    const countryResult = document.getElementById('countryResult');
+    const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+    let countryRequest = 0; // descarta respuestas viejas si el usuario cambia rápido de selección
+
+    function renderRegionOptions() {
+      const current = regionSel.value;
+      regionSel.innerHTML = `<option value="">${t('countries.choose')}</option>`
+        + Countries.REGIONS.map((r) => `<option value="${r}">${r}</option>`).join('');
+      regionSel.value = current;
+    }
+
+    regionSel.addEventListener('change', async () => {
+      const req = ++countryRequest;
+      document.getElementById('countryTableWrap').style.display = 'none';
+      countryResult.style.display = 'none';
+      countrySel.disabled = true;
+      if (!regionSel.value) { countrySel.innerHTML = ''; return; }
+      countrySel.innerHTML = `<option>${t('countries.loading')}</option>`;
+      try {
+        const list = await Countries.fetchCountriesByRegion(regionSel.value);
+        if (req !== countryRequest) return;
+        countrySel.innerHTML = `<option value="">${t('countries.choose')}</option>`
+          + list.map((c) => `<option value="${c.code}">${escapeHtml(c.name)}</option>`).join('');
+        countrySel.disabled = false;
+      } catch {
+        if (req !== countryRequest) return;
+        countrySel.innerHTML = '';
+        showResult(countryResult, false, t('countries.error'));
+      }
+    });
+
+    countrySel.addEventListener('change', async () => {
+      const req = ++countryRequest;
+      const wrap = document.getElementById('countryTableWrap');
+      wrap.style.display = 'none';
+      countryResult.style.display = 'none';
+      if (!countrySel.value) return;
+      try {
+        const { name, rows } = await Countries.fetchCountryDetail(countrySel.value);
+        if (req !== countryRequest) return;
+        document.getElementById('countryCaption').textContent = name;
+        document.getElementById('countryTableBody').innerHTML = rows.map((r) =>
+          `<tr><td>${escapeHtml(r.language)}</td><td>${escapeHtml(r.nativeCommon)}</td><td>${escapeHtml(r.nativeOfficial)}</td></tr>`).join('');
+        wrap.style.display = '';
+      } catch {
+        if (req !== countryRequest) return;
+        showResult(countryResult, false, t('countries.error'));
+      }
     });
 
     function showResult(el, ok, message) {
@@ -1487,6 +1564,7 @@
     document.addEventListener('i18n:changed', () => {
       document.title = t('meta.title');
       langSelect.value = getLocale();
+      renderRegionOptions();
     });
 
     (async () => {

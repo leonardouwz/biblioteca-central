@@ -196,5 +196,17 @@
   "errors.BODY_STOCK_INVALID": "quantity (number) is required.",
   "errors.BODY_USER_INVALID": "name (string) and email (string) are required.",
   "errors.BODY_STATUS_INVALID": "status must be ACTIVE or INACTIVE.",
-  "errors.BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans and loanPeriodDays (number) are required."
+  "errors.BODY_SETTINGS_INVALID": "hourlyLateFeeRate, debtMultiplier, maxActiveLoans and loanPeriodDays (number) are required.",
+
+  "nav.countries": "Countries",
+  "countries.title": "Countries of the world",
+  "countries.source": "Live data from REST Countries (restcountries.com).",
+  "countries.region": "Region",
+  "countries.country": "Country",
+  "countries.choose": "— Select —",
+  "countries.loading": "Loading…",
+  "countries.colLanguage": "Language",
+  "countries.colNativeCommon": "Native name",
+  "countries.colNativeOfficial": "Official native name",
+  "countries.error": "Could not reach REST Countries. Try again."
 }
