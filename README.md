@@ -24,6 +24,8 @@ La base de datos SQLite se crea sola en `database/biblioteca.sqlite` la primera 
 
 ## Arquitectura de despliegue (producción)
 
+Los despliegues son automáticos con GitHub Actions al fusionar a `main`, incluidas las actividades en `apps-secundarias/`. Configuración y cómo agregar una actividad nueva: [`docs/despliegue-remoto.md`](docs/despliegue-remoto.md).
+
 ```
 Cloudflare Workers (frontend estático)
         │  fetch('https://biblioteca-backend-....run.app/api/v1/...')
@@ -36,11 +38,11 @@ Supabase (Postgres, vía pooler Supavisor)
 
 - **Frontend** — https://biblioteca-central.readuls.workers.dev
   Desplegado como Worker de assets estáticos (sin build, `frontend/wrangler.jsonc`). `frontend/index.html` apunta al backend vía la constante `API_BASE_URL` (buscarla si el backend cambia de URL).
-  Redeploy: `cd frontend && npx wrangler deploy`
+  Redeploy: automático al fusionar a `main` (ver `docs/despliegue-remoto.md`).
 
 - **Backend** — https://biblioteca-backend-438047115829.us-central1.run.app
   Desplegado en Cloud Run directo desde el código fuente (Google Buildpacks, sin Dockerfile). CORS abierto (`cors()` sin restricción de origen — no hay autenticación en la API). El módulo es autocontenido: `backend/database/schema.postgres.sql` viaja dentro de `backend/` para que el deploy funcione sin las carpetas hermanas.
-  Redeploy: `gcloud run deploy biblioteca-backend --source backend --region us-central1 --project biblioteca-central-2026 --allow-unauthenticated --set-secrets=DATABASE_URL=database-url:latest`
+  Redeploy: automático al fusionar a `main` (ver `docs/despliegue-remoto.md`).
 
 - **Base de datos** — proyecto Supabase `biblioteca-central` (Postgres 17). La connection string vive en Secret Manager (`database-url` en el proyecto GCP), nunca en el código. Esquema en `backend/database/schema.postgres.sql`.
 

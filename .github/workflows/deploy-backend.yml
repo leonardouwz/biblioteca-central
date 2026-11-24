@@ -1,0 +1,47 @@
+name: Deploy backend (Cloud Run)
+
+on:
+  push:
+    branches: [main]
+    paths: ['backend/**', '.github/workflows/deploy-backend.yml']
+  workflow_dispatch:
+
+concurrency: deploy-backend
+
+env:
+  GCP_PROJECT: ${{ vars.GCP_PROJECT_ID || 'biblioteca-central-2026' }}
+  REGION: us-central1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm test # si fallan las pruebas, no se despliega
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: gcloud run deploy
+        run: >
+          gcloud run deploy biblioteca-backend
+          --source .
+          --region "$REGION"
+          --project "$GCP_PROJECT"
+          --allow-unauthenticated
+          --set-secrets=DATABASE_URL=database-url:latest,AUTH_SECRET=auth-secret:latest
+          --quiet
+      - name: Prueba de humo
+        run: |
+          url=$(gcloud run services describe biblioteca-backend --region "$REGION" --project "$GCP_PROJECT" --format='value(status.url)')
+          curl -fsS --retry 5 --retry-delay 5 -o /dev/null "$url/api/v1/books"
+          echo "Backend: $url" >> "$GITHUB_STEP_SUMMARY"
