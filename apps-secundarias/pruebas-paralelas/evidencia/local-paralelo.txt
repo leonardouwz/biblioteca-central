@@ -1,0 +1,61 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-8.3.3, pluggy-1.7.0 -- python3
+cachedir: .pytest_cache
+rootdir: /home/user/biblioteca-central/apps-secundarias/pruebas-paralelas
+plugins: xdist-3.6.1
+created: 4/4 workers
+4 workers [8 items]
+
+scheduling tests via LoadScheduling
+
+tests/test_biblioteca.py::test_libro_existe[978-2] 
+tests/test_biblioteca.py::test_libro_existe[978-0] 
+tests/test_biblioteca.py::test_multa[10-5.0] 
+tests/test_biblioteca.py::test_multa[0-0] 
+[gw1] [ 12%] PASSED tests/test_biblioteca.py::test_libro_existe[978-2] 
+tests/test_biblioteca.py::test_libro_existe[978-3] 
+[gw0] [ 25%] PASSED tests/test_biblioteca.py::test_libro_existe[978-0] 
+tests/test_biblioteca.py::test_libro_existe[978-1] 
+[gw2] [ 37%] PASSED tests/test_biblioteca.py::test_multa[0-0] 
+tests/test_biblioteca.py::test_multa[3-1.5] 
+[gw3] [ 50%] PASSED tests/test_biblioteca.py::test_multa[10-5.0] 
+tests/test_biblioteca.py::test_multa[-2-0] 
+[gw1] [ 62%] PASSED tests/test_biblioteca.py::test_libro_existe[978-3] 
+[gw0] [ 75%] PASSED tests/test_biblioteca.py::test_libro_existe[978-1] 
+[gw2] [ 87%] PASSED tests/test_biblioteca.py::test_multa[3-1.5] 
+[gw3] [100%] PASSED tests/test_biblioteca.py::test_multa[-2-0] 
+
+==================================== PASSES ====================================
+___________________________ test_libro_existe[978-2] ___________________________
+[gw1] linux -- Python 3.13.18 python3
+----------------------------- Captured stdout call -----------------------------
+worker=gw1 pid=480
+___________________________ test_libro_existe[978-0] ___________________________
+[gw0] linux -- Python 3.13.18 python3
+----------------------------- Captured stdout call -----------------------------
+worker=gw0 pid=477
+_______________________________ test_multa[0-0] ________________________________
+[gw2] linux -- Python 3.13.18 python3
+----------------------------- Captured stdout call -----------------------------
+worker=gw2 pid=483
+______________________________ test_multa[10-5.0] ______________________________
+[gw3] linux -- Python 3.13.18 python3
+----------------------------- Captured stdout call -----------------------------
+worker=gw3 pid=486
+___________________________ test_libro_existe[978-3] ___________________________
+[gw1] linux -- Python 3.13.18 python3
+----------------------------- Captured stdout call -----------------------------
+worker=gw1 pid=480
+___________________________ test_libro_existe[978-1] ___________________________
+[gw0] linux -- Python 3.13.18 python3
+----------------------------- Captured stdout call -----------------------------
+worker=gw0 pid=477
+______________________________ test_multa[3-1.5] _______________________________
+[gw2] linux -- Python 3.13.18 python3
+----------------------------- Captured stdout call -----------------------------
+worker=gw2 pid=483
+_______________________________ test_multa[-2-0] _______________________________
+[gw3] linux -- Python 3.13.18 python3
+----------------------------- Captured stdout call -----------------------------
+worker=gw3 pid=486
+============================== 8 passed in 2.39s ===============================

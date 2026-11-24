@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-8.3.3, pluggy-1.7.0 -- python3
+cachedir: .pytest_cache
+rootdir: /home/user/biblioteca-central/apps-secundarias/pruebas-paralelas
+plugins: xdist-3.6.1
+collecting ... collected 8 items
+
+tests/test_biblioteca.py::test_libro_existe[978-0] PASSED                [ 12%]
+tests/test_biblioteca.py::test_libro_existe[978-1] PASSED                [ 25%]
+tests/test_biblioteca.py::test_libro_existe[978-2] PASSED                [ 37%]
+tests/test_biblioteca.py::test_libro_existe[978-3] PASSED                [ 50%]
+tests/test_biblioteca.py::test_multa[0-0] PASSED                         [ 62%]
+tests/test_biblioteca.py::test_multa[3-1.5] PASSED                       [ 75%]
+tests/test_biblioteca.py::test_multa[10-5.0] PASSED                      [ 87%]
+tests/test_biblioteca.py::test_multa[-2-0] PASSED                        [100%]
+
+============================== 8 passed in 8.03s ===============================

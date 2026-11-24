@@ -1,0 +1,39 @@
+name: Pruebas paralelas (pytest-xdist)
+
+# Actividad del curso: compara la misma suite en serie y en paralelo.
+# Carpeta sin package.json, así que deploy-apps.yml no la despliega.
+on:
+  push:
+    paths: ['apps-secundarias/pruebas-paralelas/**', '.github/workflows/pruebas-paralelas.yml']
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps-secundarias/pruebas-paralelas
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: nproc
+      - name: En serie (1 proceso)
+        run: pytest -v | tee serie.txt
+      - name: En paralelo (pytest -n 4)
+        run: pytest -n 4 -v -rP | tee paralelo.txt
+      - name: Resumen
+        run: |
+          {
+            echo "## Serie vs paralelo"
+            echo '```'
+            echo "Serie:    $(tail -1 serie.txt)"
+            echo "Paralelo: $(tail -1 paralelo.txt)"
+            echo '```'
+            echo "### Qué worker ejecutó cada prueba"
+            echo '```'
+            grep -E '^\[gw[0-9]+\] \[' paralelo.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
