@@ -1,0 +1,21 @@
+# Mantiene activo el proyecto Supabase (el plan gratis lo pausa tras ~7 días sin actividad).
+# Para apagarlo al terminar el curso: GitHub → Actions → "Supabase keep-alive" → ⋯ → Disable workflow.
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: "0 12 */3 * *" # cada 3 días, 12:00 UTC
+  workflow_dispatch: # botón "Run workflow" para probarlo a mano
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # ponytail: psql ya viene en ubuntu-latest; una consulta real cuenta como actividad.
+      - name: Consulta ligera a la base de datos
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          test -n "$DATABASE_URL" || { echo "Falta el secreto SUPABASE_DB_URL"; exit 1; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -tAc "select count(*) from books;"
