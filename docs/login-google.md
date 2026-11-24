@@ -22,7 +22,17 @@
   método; en la próxima visita se muestra la marca **"Último usado"** junto a ese botón
   (como en Cloudflare) y Google sugiere esa cuenta (`login_hint`).
 
-## Configuración (una sola vez)
+## Configuración (hecha el 2026-11-24)
+
+- App OAuth "Biblioteca Central" (usuarios externos, estado **Prueba**) y cliente web
+  `biblioteca-web` en el proyecto `biblioteca-central-2026` (cuenta dueña: la de Gmail).
+- Orígenes autorizados: `https://biblioteca-central.readuls.workers.dev` y `http://localhost:3000`.
+- El client ID va como valor por defecto en `deploy-backend.yml` (es público).
+- En modo Prueba solo entran los **usuarios de prueba** (Google Auth Platform → Público →
+  Add users). Para abrirlo a cualquier Gmail hay que publicar la app, y Google pide antes
+  página principal y política de privacidad en un dominio propio verificado.
+
+## Configuración desde cero (referencia)
 
 1. Google Cloud Console → proyecto `biblioteca-central-2026` → **APIs y servicios →
    Pantalla de consentimiento OAuth**: tipo *Externo*, nombre "Biblioteca Central",
