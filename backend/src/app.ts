@@ -44,6 +44,7 @@ import { createDebtRoutes } from "./presentation/routes/debtRoutes";
 import { createAuthRoutes } from "./presentation/routes/authRoutes";
 import { createSettingsRoutes } from "./presentation/routes/settingsRoutes";
 import { resolveLocale } from "./presentation/middleware/locale";
+import { corsOrigins } from "./presentation/middleware/security";
 import { createCatalogSocket } from "./presentation/realtime/catalogSocket";
 import { t } from "./domain/i18n/t";
 
@@ -105,7 +106,8 @@ async function main(): Promise<void> {
   // --- Aplicación Express ---
   const app = express();
   app.disable("x-powered-by"); // no anunciar el framework/versión al mundo
-  app.use(cors());
+  app.set("trust proxy", 1); // detrás del proxy de Cloud Run: req.ip = IP real del cliente (para el rate limit)
+  app.use(cors({ origin: corsOrigins() })); // solo el frontend; configurable con CORS_ORIGINS
   app.use(express.json());
   app.use(resolveLocale);
   const catalogSocket = createCatalogSocket();

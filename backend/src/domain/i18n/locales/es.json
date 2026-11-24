@@ -36,6 +36,7 @@
   "AUTH_FORBIDDEN": "No tienes permiso para realizar esta acción.",
 
   "INTERNAL_ERROR": "Error interno del servidor.",
+  "TOO_MANY_REQUESTS": "Demasiados intentos. Espera unos minutos y vuelve a intentarlo.",
   "ROUTE_NOT_FOUND": "Ese recurso no existe.",
 
   "BODY_LOAN_INVALID": "userId y bookId son requeridos y deben ser strings.",
